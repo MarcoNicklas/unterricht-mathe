@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lineare Funktionen</title>
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#ffffff; --ink:#1d2433; --muted:#5b6475; --line:#dfe3ec;
+    --accent:#2457d6; --accent-soft:#e7eefc; --green:#12805c; --green-soft:#e3f5ee;
+    --orange:#d9620b; --orange-soft:#fdf0e5; --red:#c62f3b; --purple:#7a3fc4;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif}
+  body{overflow:hidden}
+  .slide{position:absolute;inset:0;padding:3.2vh 5vw 11vh;display:none;flex-direction:column;overflow:auto}
+  .slide.active{display:flex;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .tag{display:inline-block;font-size:clamp(12px,1.4vw,17px);font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    padding:.3em .8em;border-radius:99px;background:var(--accent-soft);color:var(--accent);margin-bottom:.6em;align-self:flex-start}
+  .tag.ue{background:var(--orange-soft);color:var(--orange)}
+  .tag.sum{background:var(--green-soft);color:var(--green)}
+  h1{font-size:clamp(36px,6vw,84px);margin:.2em 0 .1em;line-height:1.05}
+  h2{font-size:clamp(26px,3.4vw,48px);margin:0 0 .5em;line-height:1.15}
+  h3{font-size:clamp(18px,2vw,28px);margin:.2em 0 .4em}
+  p,li,td,th{font-size:clamp(16px,1.9vw,27px);line-height:1.45}
+  ul,ol{margin:.2em 0;padding-left:1.3em} li{margin:.25em 0}
+  .cols{display:grid;grid-template-columns:1.1fr 1fr;gap:3vw;align-items:start;flex:1}
+  .cols.even{grid-template-columns:1fr 1fr}
+  .box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.1em 1.4em;box-shadow:0 2px 8px rgba(20,30,60,.05)}
+  .box + .box{margin-top:1em}
+  .merke{border-left:6px solid var(--accent);background:var(--accent-soft)}
+  .merke b.t{color:var(--accent);display:block;font-size:clamp(14px,1.5vw,20px);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2em}
+  .formula{font-family:"Cambria Math","Times New Roman",serif;font-size:clamp(30px,4.6vw,66px);text-align:center;margin:.3em 0}
+  .m{color:var(--accent);font-weight:700} .t{color:var(--green);font-weight:700}
+  .math{font-family:"Cambria Math","Times New Roman",serif;font-style:italic;white-space:nowrap}
+  .frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.85em;line-height:1.1;margin:0 .1em}
+  .frac>span:first-child{border-bottom:2px solid currentColor;padding:0 .2em}
+  .graph svg{width:100%;height:auto;max-height:66vh;display:block;margin:auto;background:#fff;border:1px solid var(--line);border-radius:12px}
+  .mini{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5vw}
+  .mini .box{padding:.6em}
+  .mini p{font-size:clamp(14px,1.5vw,21px);margin:.3em 0 0;text-align:center}
+  table{border-collapse:collapse;width:100%}
+  th,td{border:1px solid var(--line);padding:.35em .6em;text-align:center}
+  th{background:var(--accent-soft)}
+  .tasks{counter-reset:t;list-style:none;padding:0}
+  .tasks>li{counter-increment:t;padding-left:2.1em;position:relative}
+  .tasks>li::before{content:counter(t,lower-alpha)")";position:absolute;left:0;font-weight:700;color:var(--orange)}
+  /* Lösungen */
+  .sol{margin-top:1em}
+  .sol .step{display:none;background:var(--green-soft);border-left:5px solid var(--green);border-radius:8px;padding:.45em .9em;margin:.45em 0}
+  .sol .step.show{display:block;animation:fade .25s}
+  .sol .step p{margin:.1em 0}
+  .btns{display:flex;gap:.6em;flex-wrap:wrap;margin-top:.6em}
+  button{font:inherit;font-size:clamp(14px,1.4vw,19px);border:1px solid var(--line);background:#fff;color:var(--ink);
+    padding:.45em 1em;border-radius:10px;cursor:pointer}
+  button:hover{border-color:var(--accent);color:var(--accent)}
+  button.primary{background:var(--green);border-color:var(--green);color:#fff}
+  button.primary:hover{filter:brightness(1.08);color:#fff}
+  /* Slider */
+  .ctrl{display:grid;grid-template-columns:auto 1fr auto;gap:.6em 1em;align-items:center;margin:.8em 0}
+  .ctrl label{font-size:clamp(16px,1.9vw,26px);font-weight:700}
+  .ctrl input{width:100%;accent-color:var(--accent)}
+  .ctrl output{font-family:monospace;font-size:clamp(16px,1.9vw,26px);min-width:3.5em;text-align:right}
+  /* Navigation */
+  .nav{position:fixed;left:0;right:0;bottom:0;height:8vh;min-height:52px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 2vw;background:rgba(246,247,251,.94);border-top:1px solid var(--line);z-index:10}
+  .nav .left{color:var(--muted);font-size:clamp(12px,1.2vw,16px)}
+  .nav .right{display:flex;gap:.5em;align-items:center}
+  #counter{font-variant-numeric:tabular-nums;color:var(--muted);margin-right:.6em;font-size:clamp(13px,1.3vw,17px)}
+  .progress{position:fixed;top:0;left:0;height:5px;background:var(--accent);transition:width .3s;z-index:11}
+  .title-slide{justify-content:center}
+  .title-slide .sub{font-size:clamp(18px,2.4vw,34px);color:var(--muted)}
+  .hint{color:var(--muted);font-size:clamp(13px,1.4vw,19px)}
+  .ok{color:var(--green);font-weight:700} .no{color:var(--red);font-weight:700}
+  @media (max-width:800px){.cols,.cols.even{grid-template-columns:1fr}.mini{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<!-- 1 Titel -->
+<section class="slide title-slide">
+  <span class="tag">Mathematik</span>
+  <h1>Lineare Funktionen</h1>
+  <p class="sub">Grundlagen · Graphen · Übungsaufgaben</p>
+  <div class="formula" style="text-align:left;margin-top:.6em">y = <span class="m">m</span>·x + <span class="t">t</span></div>
+  <p class="hint">Steuerung: ← → oder Leertaste · <b>L</b> = nächster Lösungsschritt · <b>F</b> = Vollbild</p>
+</section>
+
+<!-- 2 Definition -->
+<section class="slide">
+  <span class="tag">Grundlagen</span>
+  <h2>Was ist eine lineare Funktion?</h2>
+  <div class="cols">
+    <div>
+      <div class="box merke"><b class="t">Merke</b>
+        <p>Eine Funktion mit der Gleichung</p>
+        <div class="formula">y = <span class="m">m</span>·x + <span class="t">t</span></div>
+        <p>heißt <b>lineare Funktion</b>. Ihr Graph ist immer eine <b>Gerade</b>.</p>
+      </div>
+      <div class="box">
+        <ul>
+          <li><span class="m">m</span> = <b>Steigung</b> – wie steil ist die Gerade?</li>
+          <li><span class="t">t</span> = <b>y-Achsenabschnitt</b> – wo schneidet die Gerade die y-Achse? → Punkt T(0|<span class="t">t</span>)</li>
+          <li>Jedem x-Wert wird <b>genau ein</b> y-Wert zugeordnet.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="graph" id="g-def"></div>
+  </div>
+</section>
+
+<!-- 3 Interaktiv -->
+<section class="slide">
+  <span class="tag">Ausprobieren</span>
+  <h2>Was bewirken m und t?</h2>
+  <div class="cols">
+    <div>
+      <div class="formula" id="live-eq">y = 1·x + 0</div>
+      <div class="ctrl">
+        <label class="m" for="sm">m</label><input type="range" id="sm" min="-4" max="4" step="0.25" value="1"><output id="om">1</output>
+        <label class="t" for="st">t</label><input type="range" id="st" min="-5" max="5" step="0.5" value="0"><output id="ot">0</output>
+      </div>
+      <div class="box">
+        <ul>
+          <li><span class="m">m</span> größer → Gerade wird <b>steiler</b></li>
+          <li><span class="m">m</span> negativ → Gerade <b>fällt</b></li>
+          <li><span class="t">t</span> verändern → Gerade wird <b>nach oben/unten verschoben</b></li>
+        </ul>
+      </div>
+      <div class="btns"><button onclick="setLive(1,0)">Reset</button><button onclick="setLive(0,2)">m = 0</button><button onclick="setLive(-2,3)">m = −2, t = 3</button></div>
+    </div>
+    <div class="graph" id="g-live"></div>
+  </div>
+</section>
+
+<!-- 4 Steigungsdreieck -->
+<section class="slide">
+  <span class="tag">Grundlagen</span>
+  <h2>Die Steigung m – das Steigungsdreieck</h2>
+  <div class="cols">
+    <div>
+      <div class="box merke"><b class="t">Merke</b>
+        <div class="formula"><span class="m">m</span> = <span class="frac"><span>Δy</span><span>Δx</span></span> = <span class="frac"><span>y₂ − y₁</span><span>x₂ − x₁</span></span></div>
+        <p style="text-align:center">„Höhenunterschied durch Längenunterschied“</p>
+      </div>
+      <div class="box">
+        <p><b>Beispiel:</b> A(1|1) und B(3|5)</p>
+        <p class="math" style="font-size:clamp(18px,2.2vw,30px)">m = <span class="frac"><span>5 − 1</span><span>3 − 1</span></span> = <span class="frac"><span>4</span><span>2</span></span> = 2</p>
+        <p>→ Geht man <b>1 nach rechts</b>, geht es <b>2 nach oben</b>.</p>
+      </div>
+    </div>
+    <div class="graph" id="g-tri"></div>
+  </div>
+</section>
+
+<!-- 5 Graph zeichnen -->
+<section class="slide">
+  <span class="tag">Grundlagen</span>
+  <h2>Graph zeichnen in 3 Schritten</h2>
+  <div class="cols">
+    <div>
+      <p>Beispiel: <span class="math" style="font-size:1.2em">y = <span class="frac"><span class="m">2</span><span class="m">3</span></span>x <span class="t">− 1</span></span></p>
+      <ol>
+        <li><b>t eintragen:</b> Punkt T(0|<span class="t">−1</span>) auf der y-Achse markieren.</li>
+        <li><b>Steigungsdreieck ansetzen:</b> m = <span class="frac"><span>2</span><span>3</span></span> → von T aus <b>3 nach rechts</b> und <b>2 nach oben</b>.</li>
+        <li><b>Verbinden:</b> Die beiden Punkte mit dem Lineal zu einer Geraden verbinden.</li>
+      </ol>
+      <div class="box merke"><b class="t">Tipp</b>
+        <p>Ist m eine ganze Zahl, z. B. m = −3, schreibe m = <span class="frac"><span>−3</span><span>1</span></span>: 1 nach rechts, 3 nach unten.</p>
+      </div>
+    </div>
+    <div class="graph" id="g-draw"></div>
+  </div>
+</section>
+
+<!-- 6 Sonderfälle -->
+<section class="slide">
+  <span class="tag">Grundlagen</span>
+  <h2>Typische Fälle</h2>
+  <div class="mini">
+    <div class="box"><div class="graph" id="g-c1"></div><p><b>m &gt; 0</b><br>Gerade <b>steigt</b></p></div>
+    <div class="box"><div class="graph" id="g-c2"></div><p><b>m &lt; 0</b><br>Gerade <b>fällt</b></p></div>
+    <div class="box"><div class="graph" id="g-c3"></div><p><b>m = 0</b><br>parallel zur x-Achse<br><span class="math">y = t</span></p></div>
+    <div class="box"><div class="graph" id="g-c4"></div><p><b>t = 0</b><br>Ursprungsgerade<br><span class="math">y = m·x</span></p></div>
+  </div>
+</section>
+
+<!-- 7 Nullstelle & Punktprobe -->
+<section class="slide">
+  <span class="tag">Rechnen</span>
+  <h2>Nullstelle und Punktprobe</h2>
+  <div class="cols even">
+    <div class="box">
+      <h3>Nullstelle berechnen</h3>
+      <p>Die Nullstelle ist der Schnittpunkt mit der <b>x-Achse</b>. Dort gilt <b>y = 0</b>.</p>
+      <p class="math">y = 2x − 4</p>
+      <p class="math">0 = 2x − 4 &nbsp;&nbsp;| + 4</p>
+      <p class="math">4 = 2x &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| : 2</p>
+      <p class="math">x = 2 &nbsp;&nbsp;→ <b>N(2|0)</b></p>
+    </div>
+    <div class="box">
+      <h3>Punktprobe</h3>
+      <p>Liegt ein Punkt auf der Geraden? → Koordinaten <b>einsetzen</b> und prüfen.</p>
+      <p class="math">g: y = 2x − 4</p>
+      <p>P(3|2): <span class="math">2·3 − 4 = 2</span> ✓ <span class="ok">liegt auf g</span></p>
+      <p>Q(1|1): <span class="math">2·1 − 4 = −2 ≠ 1</span> <span class="no">liegt nicht auf g</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- 8 Gleichung aus zwei Punkten -->
+<section class="slide">
+  <span class="tag">Rechnen</span>
+  <h2>Funktionsgleichung aus zwei Punkten</h2>
+  <div class="cols">
+    <div>
+      <p><b>Gegeben:</b> A(2|1) und B(6|3)</p>
+      <div class="box">
+        <p><b>① Steigung berechnen</b></p>
+        <p class="math">m = <span class="frac"><span>3 − 1</span><span>6 − 2</span></span> = <span class="frac"><span>2</span><span>4</span></span> = 0,5</p>
+      </div>
+      <div class="box">
+        <p><b>② Einen Punkt einsetzen, t berechnen</b> (hier A)</p>
+        <p class="math">1 = 0,5 · 2 + t &nbsp;→&nbsp; 1 = 1 + t &nbsp;→&nbsp; t = 0</p>
+      </div>
+      <div class="box merke">
+        <p><b>③ Gleichung aufschreiben:</b> <span class="math">y = 0,5x</span></p>
+        <p class="hint">Kontrolle mit B: 0,5 · 6 = 3 ✓</p>
+      </div>
+    </div>
+    <div class="graph" id="g-2p"></div>
+  </div>
+</section>
+
+<!-- 9 Lage zweier Geraden -->
+<section class="slide">
+  <span class="tag">Rechnen</span>
+  <h2>Lage zweier Geraden &amp; Schnittpunkt</h2>
+  <div class="cols">
+    <div>
+      <div class="box">
+        <ul>
+          <li><b>Gleiche Steigung</b> (m₁ = m₂) → Geraden sind <b>parallel</b></li>
+          <li><b>Verschiedene Steigung</b> → Geraden <b>schneiden</b> sich in genau einem Punkt</li>
+          <li>Sonderfall: m₁ · m₂ = −1 → <b>senkrecht</b> zueinander</li>
+        </ul>
+      </div>
+      <div class="box">
+        <p><b>Schnittpunkt:</b> Funktionsterme <b>gleichsetzen</b></p>
+        <p class="math">g: y = x + 1 &nbsp;&nbsp; h: y = −x + 5</p>
+        <p class="math">x + 1 = −x + 5 &nbsp;→&nbsp; 2x = 4 &nbsp;→&nbsp; x = 2</p>
+        <p class="math">y = 2 + 1 = 3 &nbsp;→&nbsp; <b>S(2|3)</b></p>
+      </div>
+    </div>
+    <div class="graph" id="g-sp"></div>
+  </div>
+</section>
+
+<!-- 10 Anwendung -->
+<section class="slide">
+  <span class="tag">Anwendung</span>
+  <h2>Lineare Funktionen im Alltag</h2>
+  <div class="cols">
+    <div>
+      <p><b>Beispiel Taxi:</b> Grundgebühr 4 €, pro km 2 €</p>
+      <div class="formula">K(x) = <span class="m">2</span>·x + <span class="t">4</span></div>
+      <table>
+        <tr><th>Strecke x (km)</th><td>0</td><td>1</td><td>2</td><td>5</td><td>10</td></tr>
+        <tr><th>Kosten K (€)</th><td>4</td><td>6</td><td>8</td><td>14</td><td>24</td></tr>
+      </table>
+      <div class="box merke" style="margin-top:1em"><b class="t">Merke</b>
+        <p><span class="t">t</span> = fester Anteil (Grundgebühr, Startwert)<br>
+           <span class="m">m</span> = Änderung pro Einheit (Preis pro km, pro Stunde …)</p>
+      </div>
+    </div>
+    <div class="graph" id="g-taxi"></div>
+  </div>
+</section>
+
+<!-- ================= ÜBUNGEN ================= -->
+
+<!-- Ü1 -->
+<section class="slide">
+  <span class="tag ue">Übung 1</span>
+  <h2>m und t bestimmen</h2>
+  <div class="cols even">
+    <div class="box">
+      <p>Gib jeweils die Steigung m und den y-Achsenabschnitt t an.</p>
+      <ol class="tasks">
+        <li class="math">y = 2x + 3</li>
+        <li class="math">y = −0,5x + 1</li>
+        <li class="math">y = 4x</li>
+        <li class="math">y = −3</li>
+        <li class="math">y = 5 − x</li>
+        <li class="math">y = <span class="frac"><span>2</span><span>3</span></span>x − 2</li>
+      </ol>
+    </div>
+    <div class="sol">
+      <div class="step"><p>a) m = 2 &nbsp;&nbsp; t = 3</p></div>
+      <div class="step"><p>b) m = −0,5 &nbsp;&nbsp; t = 1</p></div>
+      <div class="step"><p>c) m = 4 &nbsp;&nbsp; t = 0 (Ursprungsgerade)</p></div>
+      <div class="step"><p>d) m = 0 &nbsp;&nbsp; t = −3 (parallel zur x-Achse)</p></div>
+      <div class="step"><p>e) umsortieren: y = −1x + 5 → m = −1 &nbsp;&nbsp; t = 5</p></div>
+      <div class="step"><p>f) m = <span class="frac"><span>2</span><span>3</span></span> &nbsp;&nbsp; t = −2</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Ü2 -->
+<section class="slide">
+  <span class="tag ue">Übung 2</span>
+  <h2>Funktionsgleichung am Graphen ablesen</h2>
+  <div class="cols">
+    <div>
+      <p>Bestimme die Funktionsgleichungen der Geraden <b style="color:var(--accent)">g</b>, <b style="color:var(--orange)">h</b> und <b style="color:var(--purple)">k</b>.</p>
+      <p class="hint">Tipp: Erst t an der y-Achse ablesen, dann ein Steigungsdreieck einzeichnen.</p>
+      <div class="sol">
+        <div class="step"><p><b style="color:var(--accent)">g:</b> t = −1; 1 nach rechts, 2 nach oben → <span class="math">y = 2x − 1</span></p></div>
+        <div class="step"><p><b style="color:var(--orange)">h:</b> t = 3; 2 nach rechts, 1 nach unten → <span class="math">y = −0,5x + 3</span></p></div>
+        <div class="step"><p><b style="color:var(--purple)">k:</b> waagrecht, t = −2 → <span class="math">y = −2</span></p></div>
+      </div>
+    </div>
+    <div class="graph" id="g-ue2"></div>
+  </div>
+</section>
+
+<!-- Ü3 -->
+<section class="slide">
+  <span class="tag ue">Übung 3</span>
+  <h2>Steigung aus zwei Punkten</h2>
+  <div class="cols even">
+    <div class="box">
+      <p>Berechne die Steigung der Geraden durch die Punkte A und B. Steigt oder fällt die Gerade?</p>
+      <ol class="tasks">
+        <li>A(1|2) und B(3|8)</li>
+        <li>A(−2|5) und B(2|−3)</li>
+        <li>A(0|1) und B(4|3)</li>
+        <li>A(−1|4) und B(5|4)</li>
+      </ol>
+    </div>
+    <div class="sol">
+      <div class="step"><p>a) m = <span class="frac"><span>8 − 2</span><span>3 − 1</span></span> = <span class="frac"><span>6</span><span>2</span></span> = 3 → steigt</p></div>
+      <div class="step"><p>b) m = <span class="frac"><span>−3 − 5</span><span>2 − (−2)</span></span> = <span class="frac"><span>−8</span><span>4</span></span> = −2 → fällt</p></div>
+      <div class="step"><p>c) m = <span class="frac"><span>3 − 1</span><span>4 − 0</span></span> = <span class="frac"><span>2</span><span>4</span></span> = 0,5 → steigt</p></div>
+      <div class="step"><p>d) m = <span class="frac"><span>4 − 4</span><span>5 − (−1)</span></span> = <span class="frac"><span>0</span><span>6</span></span> = 0 → waagrecht</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Ü4 -->
+<section class="slide">
+  <span class="tag ue">Übung 4</span>
+  <h2>Nullstellen berechnen</h2>
+  <div class="cols even">
+    <div class="box">
+      <p>Berechne die Nullstelle und gib den Schnittpunkt mit der x-Achse an.</p>
+      <ol class="tasks">
+        <li class="math">y = 2x − 6</li>
+        <li class="math">y = −3x + 12</li>
+        <li class="math">y = 0,5x + 2</li>
+        <li class="math">y = −<span class="frac"><span>2</span><span>3</span></span>x + 4</li>
+      </ol>
+    </div>
+    <div class="sol">
+      <div class="step"><p>a) 0 = 2x − 6 → 2x = 6 → x = 3 → <b>N(3|0)</b></p></div>
+      <div class="step"><p>b) 0 = −3x + 12 → 3x = 12 → x = 4 → <b>N(4|0)</b></p></div>
+      <div class="step"><p>c) 0 = 0,5x + 2 → −2 = 0,5x → x = −4 → <b>N(−4|0)</b></p></div>
+      <div class="step"><p>d) 0 = −<span class="frac"><span>2</span><span>3</span></span>x + 4 → <span class="frac"><span>2</span><span>3</span></span>x = 4 → x = 4 · <span class="frac"><span>3</span><span>2</span></span> = 6 → <b>N(6|0)</b></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Ü5 -->
+<section class="slide">
+  <span class="tag ue">Übung 5</span>
+  <h2>Punktprobe</h2>
+  <div class="cols even">
+    <div class="box">
+      <p>Gegeben ist die Gerade <span class="math">g: y = 3x − 2</span>.<br>Prüfe rechnerisch, ob die Punkte auf g liegen.</p>
+      <ol class="tasks">
+        <li>A(2|4)</li>
+        <li>B(−1|−6)</li>
+        <li>C(0|−2)</li>
+        <li>D(<span class="frac"><span>1</span><span>3</span></span>|−1)</li>
+      </ol>
+    </div>
+    <div class="sol">
+      <div class="step"><p>a) 3 · 2 − 2 = 4 ✓ <span class="ok">A liegt auf g</span></p></div>
+      <div class="step"><p>b) 3 · (−1) − 2 = −5 ≠ −6 <span class="no">B liegt nicht auf g</span></p></div>
+      <div class="step"><p>c) 3 · 0 − 2 = −2 ✓ <span class="ok">C liegt auf g</span> (y-Achsenabschnitt!)</p></div>
+      <div class="step"><p>d) 3 · <span class="frac"><span>1</span><span>3</span></span> − 2 = 1 − 2 = −1 ✓ <span class="ok">D liegt auf g</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Ü6 -->
+<section class="slide">
+  <span class="tag ue">Übung 6</span>
+  <h2>Funktionsgleichung aus zwei Punkten</h2>
+  <div class="cols even">
+    <div class="box">
+      <p>Bestimme die Gleichung der Geraden durch P und Q.</p>
+      <ol class="tasks">
+        <li>P(1|3) und Q(3|7)</li>
+        <li>P(−2|4) und Q(4|1)</li>
+      </ol>
+    </div>
+    <div class="sol">
+      <div class="step"><p><b>a)</b> m = <span class="frac"><span>7 − 3</span><span>3 − 1</span></span> = <span class="frac"><span>4</span><span>2</span></span> = 2</p></div>
+      <div class="step"><p>P einsetzen: 3 = 2 · 1 + t → t = 1</p></div>
+      <div class="step"><p>→ <b class="math">y = 2x + 1</b></p></div>
+      <div class="step"><p><b>b)</b> m = <span class="frac"><span>1 − 4</span><span>4 − (−2)</span></span> = <span class="frac"><span>−3</span><span>6</span></span> = −0,5</p></div>
+      <div class="step"><p>P einsetzen: 4 = −0,5 · (−2) + t → 4 = 1 + t → t = 3</p></div>
+      <div class="step"><p>→ <b class="math">y = −0,5x + 3</b></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Ü7 -->
+<section class="slide">
+  <span class="tag ue">Übung 7</span>
+  <h2>Schnittpunkt zweier Geraden</h2>
+  <div class="cols">
+    <div>
+      <div class="box">
+        <p>Berechne den Schnittpunkt der Geraden</p>
+        <p class="math">g: y = 2x − 1 &nbsp;&nbsp;und&nbsp;&nbsp; h: y = −x + 5</p>
+        <p>und überprüfe dein Ergebnis zeichnerisch.</p>
+      </div>
+      <div class="sol">
+        <div class="step"><p>Gleichsetzen: 2x − 1 = −x + 5</p></div>
+        <div class="step"><p>| + x &nbsp;→ 3x − 1 = 5 &nbsp;&nbsp;| + 1 → 3x = 6 &nbsp;&nbsp;| : 3 → x = 2</p></div>
+        <div class="step"><p>x in g einsetzen: y = 2 · 2 − 1 = 3 → <b>S(2|3)</b></p></div>
+        <div class="step" data-reveal="sp7"><p>Zeichnerische Kontrolle: siehe Graph →</p></div>
+      </div>
+    </div>
+    <div class="graph" id="g-ue7"></div>
+  </div>
+</section>
+
+<!-- Ü8 -->
+<section class="slide">
+  <span class="tag ue">Übung 8</span>
+  <h2>Sachaufgabe: Kfz-Werkstatt</h2>
+  <div class="cols even">
+    <div class="box">
+      <p>Ein Pannendienst berechnet eine <b>Anfahrtspauschale von 40 €</b> und <b>60 € pro Arbeitsstunde</b>.</p>
+      <ol class="tasks">
+        <li>Stelle die Funktionsgleichung K(x) auf (x = Arbeitszeit in h).</li>
+        <li>Was kostet ein Einsatz von 2,5 Stunden?</li>
+        <li>Eine Rechnung beträgt 340 €. Wie lange wurde gearbeitet?</li>
+        <li>Ein Konkurrent verlangt keine Pauschale, aber 75 € pro Stunde. Ab welcher Arbeitszeit ist der erste Anbieter günstiger?</li>
+      </ol>
+    </div>
+    <div class="sol">
+      <div class="step"><p>a) <b class="math">K(x) = 60x + 40</b></p></div>
+      <div class="step"><p>b) K(2,5) = 60 · 2,5 + 40 = 150 + 40 = <b>190 €</b></p></div>
+      <div class="step"><p>c) 340 = 60x + 40 → 300 = 60x → x = <b>5 Stunden</b></p></div>
+      <div class="step"><p>d) Gleichsetzen: 60x + 40 = 75x → 40 = 15x → x ≈ 2,67 h</p></div>
+      <div class="step"><p>→ Ab ca. <b>2 h 40 min</b> Arbeitszeit ist der erste Anbieter günstiger.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Ü9 -->
+<section class="slide">
+  <span class="tag ue">Übung 9</span>
+  <h2>Sachaufgabe: Tankinhalt</h2>
+  <div class="cols even">
+    <div class="box">
+      <p>Ein Auto startet mit <b>vollem Tank (50 Liter)</b>. Es verbraucht <b>6 Liter auf 100 km</b>.</p>
+      <ol class="tasks">
+        <li>Stelle eine Funktionsgleichung V(x) für den Tankinhalt auf (x = gefahrene km).</li>
+        <li>Wie viel Kraftstoff ist nach 300 km noch im Tank?</li>
+        <li>Die Reservelampe leuchtet bei 8 Litern. Nach wie vielen km ist das der Fall?</li>
+        <li>Wie groß ist die maximale Reichweite?</li>
+      </ol>
+    </div>
+    <div class="sol">
+      <div class="step"><p>a) Verbrauch pro km: 6 : 100 = 0,06 l → <b class="math">V(x) = −0,06x + 50</b></p></div>
+      <div class="step"><p>b) V(300) = −0,06 · 300 + 50 = −18 + 50 = <b>32 Liter</b></p></div>
+      <div class="step"><p>c) 8 = −0,06x + 50 → 0,06x = 42 → x = <b>700 km</b></p></div>
+      <div class="step"><p>d) Nullstelle: 0 = −0,06x + 50 → x = 50 : 0,06 ≈ <b>833 km</b></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Zusammenfassung -->
+<section class="slide">
+  <span class="tag sum">Zusammenfassung</span>
+  <h2>Das Wichtigste auf einen Blick</h2>
+  <table>
+    <tr><th>Was?</th><th>Wie?</th></tr>
+    <tr><td>Funktionsgleichung</td><td class="math">y = m·x + t</td></tr>
+    <tr><td>Steigung aus zwei Punkten</td><td class="math">m = <span class="frac"><span>y₂ − y₁</span><span>x₂ − x₁</span></span></td></tr>
+    <tr><td>y-Achsenabschnitt</td><td>T(0|t) – Punkt einsetzen und nach t auflösen</td></tr>
+    <tr><td>Nullstelle</td><td>y = 0 setzen und nach x auflösen</td></tr>
+    <tr><td>Punktprobe</td><td>x einsetzen – kommt der y-Wert heraus?</td></tr>
+    <tr><td>Schnittpunkt</td><td>Funktionsterme gleichsetzen</td></tr>
+    <tr><td>Parallel</td><td>gleiche Steigung m</td></tr>
+  </table>
+</section>
+
+<div class="nav">
+  <div class="left">Lineare Funktionen</div>
+  <div class="right">
+    <span id="counter"></span>
+    <button onclick="fs()" title="Vollbild (F)">⛶</button>
+    <button onclick="go(cur-1)">← Zurück</button>
+    <button onclick="go(cur+1)">Weiter →</button>
+  </div>
+</div>
+
+<script>
+/* ---------- Koordinatensystem ---------- */
+let gid=0;
+function fmt(n){return (Math.round(n*100)/100).toString().replace('.',',').replace('-','−')}
+function graph(o){
+  const xmin=o.xmin??-6,xmax=o.xmax??6,ymin=o.ymin??-6,ymax=o.ymax??6,step=o.step??1,lstep=o.lstep??step;
+  const W=o.w??520,H=o.h??Math.round(W*(ymax-ymin)/(xmax-xmin)),pad=o.pad??0;
+  const sx=W/(xmax-xmin),sy=H/(ymax-ymin);
+  const X=x=>(x-xmin)*sx, Y=y=>(ymax-y)*sy;
+  const id='c'+(gid++), fs=o.fs??14, small=o.small;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial" font-size="${fs}">
+  <defs><clipPath id="${id}"><rect width="${W}" height="${H}"/></clipPath>
+  <marker id="a${id}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#1d2433"/></marker></defs>`;
+  for(let x=Math.ceil(xmin/step)*step;x<=xmax;x+=step) s+=`<line x1="${X(x)}" y1="0" x2="${X(x)}" y2="${H}" stroke="#e6e9f0"/>`;
+  for(let y=Math.ceil(ymin/step)*step;y<=ymax;y+=step) s+=`<line x1="0" y1="${Y(y)}" x2="${W}" y2="${Y(y)}" stroke="#e6e9f0"/>`;
+  s+=`<line x1="0" y1="${Y(0)}" x2="${W-2}" y2="${Y(0)}" stroke="#1d2433" stroke-width="1.6" marker-end="url(#a${id})"/>`;
+  s+=`<line x1="${X(0)}" y1="${H}" x2="${X(0)}" y2="2" stroke="#1d2433" stroke-width="1.6" marker-end="url(#a${id})"/>`;
+  if(!small){
+    for(let x=Math.ceil(xmin/lstep)*lstep;x<xmax;x+=lstep) if(Math.abs(x)>1e-9) s+=`<text x="${X(x)}" y="${Y(0)+fs+3}" text-anchor="middle" fill="#5b6475">${fmt(x)}</text>`;
+    for(let y=Math.ceil(ymin/lstep)*lstep;y<ymax;y+=lstep) if(Math.abs(y)>1e-9) s+=`<text x="${X(0)-5}" y="${Y(y)+fs/3}" text-anchor="end" fill="#5b6475">${fmt(y)}</text>`;
+    s+=`<text x="${W-8}" y="${Y(0)-8}" text-anchor="end" font-style="italic" font-weight="600">${o.xl??'x'}</text>`;
+    s+=`<text x="${X(0)+8}" y="${fs+4}" font-style="italic" font-weight="600">${o.yl??'y'}</text>`;
+  }
+  s+=`<g clip-path="url(#${id})">`;
+  (o.tris||[]).forEach(t=>{
+    const c=t.c??'#d9620b';
+    s+=`<path d="M${X(t.x1)},${Y(t.y1)} L${X(t.x2)},${Y(t.y1)} L${X(t.x2)},${Y(t.y2)}" fill="none" stroke="${c}" stroke-width="3" stroke-dasharray="7 5"/>`;
+    if(t.lx) s+=`<text x="${(X(t.x1)+X(t.x2))/2}" y="${Y(t.y1)+(t.y2>t.y1?fs+6:-8)}" text-anchor="middle" fill="${c}" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="4">${t.lx}</text>`;
+    if(t.ly) s+=`<text x="${X(t.x2)+8}" y="${(Y(t.y1)+Y(t.y2))/2+5}" fill="${c}" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="4">${t.ly}</text>`;
+  });
+  (o.lines||[]).forEach(l=>{
+    const a=l.from??xmin-1,b=l.to??xmax+1;
+    s+=`<line ${l.id?`id="${l.id}"`:''} x1="${X(a)}" y1="${Y(l.m*a+l.t)}" x2="${X(b)}" y2="${Y(l.m*b+l.t)}" stroke="${l.c}" stroke-width="${small?4:3.2}" stroke-linecap="round"/>`;
+    if(l.label){let lx=l.lx??(xmax-1.2*step),ly=l.m*lx+l.t;
+      s+=`<text x="${X(lx)}" y="${Y(ly)-10}" fill="${l.c}" font-weight="700" font-size="${fs*1.25}" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="4">${l.label}</text>`;}
+  });
+  (o.points||[]).forEach(p=>{
+    s+=`<g ${p.id?`id="${p.id}"`:''}><circle cx="${X(p.x)}" cy="${Y(p.y)}" r="${small?6:5.5}" fill="${p.c??'#1d2433'}" stroke="#fff" stroke-width="2"/>`;
+    if(p.label) s+=`<text x="${X(p.x)+(p.dx??9)}" y="${Y(p.y)+(p.dy??-9)}" fill="${p.c??'#1d2433'}" font-weight="700" text-anchor="${p.anchor??'start'}" paint-order="stroke" stroke="#fff" stroke-width="4">${p.label}</text>`;
+    s+=`</g>`;
+  });
+  s+=`</g></svg>`;
+  return s;
+}
+const $=id=>document.getElementById(id);
+const B='#2457d6',G='#12805c',O='#d9620b',P='#7a3fc4',R='#c62f3b';
+
+$('g-def').innerHTML=graph({lines:[{m:1.5,t:1,c:B,label:'y = 1,5x + 1',lx:3}],points:[{x:0,y:1,c:G,label:'T(0|1)',dx:10,dy:18}]});
+$('g-tri').innerHTML=graph({xmin:-2,xmax:6,ymin:-2,ymax:7,lines:[{m:2,t:-1,c:B}],tris:[{x1:1,y1:1,x2:3,y2:5,lx:'Δx = 2',ly:'Δy = 4'}],points:[{x:1,y:1,label:'A(1|1)',dx:-10,dy:-8,anchor:'end'},{x:3,y:5,label:'B(3|5)',dx:-10,anchor:'end'}]});
+$('g-draw').innerHTML=graph({xmin:-3,xmax:7,ymin:-3,ymax:5,lines:[{m:2/3,t:-1,c:B}],tris:[{x1:0,y1:-1,x2:3,y2:1,lx:'3 nach rechts',ly:'2 hoch'}],points:[{x:0,y:-1,c:G,label:'T(0|−1)',dx:-10,dy:-8,anchor:'end'},{x:3,y:1,label:'(3|1)',dx:-10,dy:-8,anchor:'end'}]});
+const sm={small:true,xmin:-4,xmax:4,ymin:-4,ymax:4,w:300};
+$('g-c1').innerHTML=graph({...sm,lines:[{m:1,t:0.5,c:B}]});
+$('g-c2').innerHTML=graph({...sm,lines:[{m:-1.5,t:1,c:R}]});
+$('g-c3').innerHTML=graph({...sm,lines:[{m:0,t:2,c:P}]});
+$('g-c4').innerHTML=graph({...sm,lines:[{m:0.75,t:0,c:G}],points:[{x:0,y:0,c:G}]});
+$('g-2p').innerHTML=graph({xmin:-2,xmax:8,ymin:-2,ymax:5,lines:[{m:0.5,t:0,c:B,label:'y = 0,5x',lx:6.2}],tris:[{x1:2,y1:1,x2:6,y2:3,lx:'Δx = 4',ly:'Δy = 2'}],points:[{x:2,y:1,label:'A(2|1)',dx:-8,anchor:'end'},{x:6,y:3,label:'B(6|3)',dx:-8,anchor:'end'}]});
+$('g-sp').innerHTML=graph({xmin:-2,xmax:7,ymin:-2,ymax:7,lines:[{m:1,t:1,c:B,label:'g',lx:5},{m:-1,t:5,c:O,label:'h',lx:5.5}],points:[{x:2,y:3,c:R,label:'S(2|3)',dx:10,dy:5}]});
+$('g-taxi').innerHTML=graph({xmin:-1,xmax:11,ymin:-2,ymax:26,step:1,lstep:2,w:520,h:520,xl:'km',yl:'€',lines:[{m:2,t:4,c:B,from:0,label:'K(x) = 2x + 4',lx:6}],points:[{x:0,y:4,c:G,label:'Grundgebühr',dx:10,dy:16},{x:5,y:14,label:'(5|14)',dx:10,dy:16}]});
+$('g-ue2').innerHTML=graph({xmin:-6,xmax:6,ymin:-5,ymax:6,lines:[{m:2,t:-1,c:B,label:'g',lx:3},{m:-0.5,t:3,c:O,label:'h',lx:-4.5},{m:0,t:-2,c:P,label:'k',lx:-5}]});
+$('g-ue7').innerHTML=graph({xmin:-2,xmax:7,ymin:-3,ymax:7,lines:[{m:2,t:-1,c:B,label:'g',lx:3.6},{m:-1,t:5,c:O,label:'h',lx:5.5}],points:[{x:2,y:3,c:R,label:'S(2|3)',dx:12,dy:5,id:'sp7'}]});
+$('sp7').style.display='none';
+
+/* ---------- interaktiver Graph ---------- */
+function drawLive(){
+  const m=+$('sm').value,t=+$('st').value;
+  $('om').textContent=fmt(m);$('ot').textContent=fmt(t);
+  const ts=t<0?' − '+fmt(-t):' + '+fmt(t);
+  $('live-eq').innerHTML=`y = <span class="m">${fmt(m)}</span>·x<span class="t">${ts}</span>`;
+  $('g-live').innerHTML=graph({lines:[{m,t,c:B}],points:[{x:0,y:t,c:G,label:`T(0|${fmt(t)})`,dx:10,dy:18}],tris:m!==0?[{x1:0,y1:t,x2:1,y2:t+m,lx:'1',ly:fmt(m)}]:[]});
+}
+function setLive(m,t){$('sm').value=m;$('st').value=t;drawLive()}
+$('sm').oninput=$('st').oninput=drawLive; drawLive();
+
+/* ---------- Lösungen ---------- */
+document.querySelectorAll('.sol').forEach(sol=>{
+  const d=document.createElement('div');d.className='btns';
+  d.innerHTML='<button class="primary">Nächster Lösungsschritt</button><button>Alle zeigen</button><button>Ausblenden</button>';
+  sol.prepend(d);
+  const [n,a,h]=d.querySelectorAll('button');
+  n.onclick=e=>{e.stopPropagation();step(sol)};
+  a.onclick=e=>{e.stopPropagation();sol.querySelectorAll('.step').forEach(s=>show(s))};
+  h.onclick=e=>{e.stopPropagation();sol.querySelectorAll('.step').forEach(s=>{s.classList.remove('show');if(s.dataset.reveal)$(s.dataset.reveal).style.display='none'})};
+});
+function show(s){s.classList.add('show');if(s.dataset.reveal)$(s.dataset.reveal).style.display=''}
+function step(sol){const s=sol.querySelector('.step:not(.show)');if(s)show(s)}
+
+/* ---------- Navigation ---------- */
+const slides=[...document.querySelectorAll('.slide')];let cur=0;
+function go(i){
+  i=Math.max(0,Math.min(slides.length-1,i));
+  slides[cur].classList.remove('active');cur=i;slides[cur].classList.add('active');
+  $('counter').textContent=(cur+1)+' / '+slides.length;
+  $('progress').style.width=((cur+1)/slides.length*100)+'%';
+  history.replaceState(null,'','#'+(cur+1));
+}
+function fs(){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT')return;
+  if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(cur+1)}
+  else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(cur-1)}
+  else if(e.key==='Home')go(0); else if(e.key==='End')go(slides.length-1);
+  else if(e.key==='f'||e.key==='F')fs();
+  else if(e.key==='l'||e.key==='L'){const s=slides[cur].querySelector('.sol');if(s)step(s)}
+});
+slides[0].classList.add('active');
+go((parseInt(location.hash.slice(1))||1)-1);
+</script>
+</body>
+</html>
