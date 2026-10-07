@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parabeln & Geraden – Lern-App</title>
+<style>
+:root{--bg:#f5f6fa;--card:#fff;--ink:#1d2433;--muted:#5b6475;--line:#dfe3ec;--blue:#2457d6;--blue-s:#e8eefc;
+--green:#12805c;--green-s:#e3f5ee;--orange:#d9620b;--orange-s:#fdf0e5;--red:#c62f3b;--red-s:#fbe9eb;--purple:#7a3fc4}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;font-size:17px;line-height:1.5}
+header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:10px 20px;gap:12px}
+header h1{font-size:20px;margin:0}
+header .score{font-size:15px;color:var(--muted);white-space:nowrap}
+header .score b{color:var(--green)}
+.wrap{display:grid;grid-template-columns:270px 1fr;min-height:calc(100vh - 52px)}
+nav{background:#fff;border-right:1px solid var(--line);padding:16px 10px;position:sticky;top:52px;height:calc(100vh - 52px);overflow:auto}
+nav button{display:flex;gap:10px;align-items:center;width:100%;text-align:left;border:0;background:none;padding:10px 12px;border-radius:10px;font:inherit;font-size:16px;color:var(--ink);cursor:pointer}
+nav button .n{flex:0 0 28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--blue-s);color:var(--blue);font-weight:700;font-size:14px}
+nav button.on{background:var(--blue-s);font-weight:600}
+nav button.on .n{background:var(--blue);color:#fff}
+nav .pz .n{background:var(--orange-s);color:var(--orange)}
+nav .pz.on{background:var(--orange-s)} nav .pz.on .n{background:var(--orange);color:#fff}
+main{padding:26px clamp(16px,4vw,48px) 80px;max-width:1150px;width:100%}
+section{display:none} section.on{display:block}
+h2{font-size:30px;margin:0 0 4px} h3{font-size:21px;margin:28px 0 10px}
+.lead{color:var(--muted);margin:0 0 18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin:14px 0;box-shadow:0 1px 4px rgba(20,30,60,.04)}
+.merke{border-left:6px solid var(--blue);background:var(--blue-s)}
+.merke>.t{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--blue)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.f{font-family:"Cambria Math","Times New Roman",serif;font-size:1.15em;white-space:nowrap}
+.big{font-family:"Cambria Math","Times New Roman",serif;font-size:26px;text-align:center;margin:8px 0}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.15;margin:0 2px}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 3px}
+.blue{color:var(--blue)} .green{color:var(--green)} .orange{color:var(--orange)} .red{color:var(--red)} .purple{color:var(--purple)}
+svg.plot{width:100%;height:auto;display:block;background:#fff;border:1px solid var(--line);border-radius:12px}
+.ctrl{display:grid;grid-template-columns:44px 1fr 56px;gap:4px 10px;align-items:center;margin:6px 0}
+.ctrl label{font-weight:700;font-family:"Cambria Math",serif;font-size:19px}
+.ctrl input{width:100%;accent-color:var(--blue)}
+.ctrl output{font-family:ui-monospace,monospace;text-align:right}
+.live{background:#f8f9fc;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-top:10px}
+.live p{margin:3px 0}
+table.calc{border-collapse:collapse;font-family:"Cambria Math","Times New Roman",serif;font-size:18px}
+table.calc td{padding:2px 10px 2px 0;vertical-align:top}
+table.calc td.op{color:var(--muted);font-family:inherit;font-size:15px;padding-left:16px}
+.steps .st{display:none} .steps .st.show{display:block;animation:fd .25s}
+.st{background:var(--green-s);border-left:4px solid var(--green);border-radius:8px;padding:8px 12px;margin:8px 0}
+.st .why{color:var(--muted);font-size:15px;display:block}
+@keyframes fd{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+button.b{font:inherit;font-size:15px;border:1px solid var(--line);background:#fff;color:var(--ink);padding:7px 14px;border-radius:9px;cursor:pointer}
+button.b:hover{border-color:var(--blue);color:var(--blue)}
+button.b.p{background:var(--blue);border-color:var(--blue);color:#fff}
+button.b.g{background:var(--green);border-color:var(--green);color:#fff}
+button.b.o{background:var(--orange-s);border-color:#f3c9a5;color:var(--orange)}
+button.b:disabled{opacity:.45;cursor:default}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.tabs button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+/* Aufgaben */
+.ex{border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0;background:#fff}
+.ex .q{margin-bottom:10px}
+.ex .q b.nr{display:inline-block;min-width:30px;color:var(--orange)}
+.fields{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.fld{display:flex;align-items:center;gap:6px}
+.fld span{font-family:"Cambria Math","Times New Roman",serif;font-size:18px}
+.fld input,.fld select{font:inherit;font-size:16px;width:92px;padding:6px 8px;border:1.5px solid var(--line);border-radius:8px;background:#fff}
+.fld select{width:auto}
+.fld .ok{border-color:var(--green);background:var(--green-s)} .fld .no{border-color:var(--red);background:var(--red-s)}
+.fb{margin-top:10px;font-weight:600}
+.fb.ok{color:var(--green)} .fb.no{color:var(--red)}
+.hint{background:var(--orange-s);border-left:4px solid var(--orange);border-radius:8px;padding:8px 12px;margin:8px 0}
+.sol{display:none}.sol.show{display:block}
+.note{font-size:14px;color:var(--muted)}
+.sa{border:2px solid #f3c9a5;border-radius:16px;padding:20px 22px;margin:22px 0;background:#fff}
+.sa h3{margin-top:0;color:var(--orange)}
+.sa .pts{float:right;font-size:14px;color:var(--muted);font-weight:400}
+.sa .ex{background:#fffdfb}
+.case h4{margin:6px 0 2px} .case p{margin:4px 0;font-size:15px}
+.badge{display:inline-block;font-size:13px;font-weight:700;padding:2px 10px;border-radius:99px;background:var(--green-s);color:var(--green)}
+.badge.w{background:var(--orange-s);color:var(--orange)} .badge.r{background:var(--red-s);color:var(--red)}
+.start-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.start-grid .card{cursor:pointer;margin:0;transition:transform .15s,box-shadow .15s}
+.start-grid .card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(20,30,60,.08)}
+.start-grid .card h4{margin:6px 0}
+.start-grid .card p{margin:0;color:var(--muted);font-size:15px}
+.navbtm{display:flex;justify-content:space-between;margin-top:30px}
+@media(max-width:860px){.wrap{grid-template-columns:1fr}nav{position:static;height:auto;display:flex;overflow-x:auto;gap:4px;padding:8px;border-right:0;border-bottom:1px solid var(--line)}
+nav button{width:auto;white-space:nowrap;padding:8px 10px}nav button .lbl{display:none}nav button.on .lbl{display:inline}
+.grid2,.grid3{grid-template-columns:1fr}header h1{font-size:17px}}
+</style>
+</head>
+<body>
+<header><h1>📐 Parabeln &amp; Geraden</h1><div class="score">Gelöst: <b id="sc">0</b> Aufgaben</div></header>
+<div class="wrap">
+<nav id="nav">
+  <button data-s="start"><span class="n">⌂</span><span class="lbl">Start</span></button>
+  <button data-s="s1"><span class="n">1</span><span class="lbl">Parabel-Grundlagen</span></button>
+  <button data-s="s2"><span class="n">2</span><span class="lbl">Quadratische Gleichungen</span></button>
+  <button data-s="s3"><span class="n">3</span><span class="lbl">Funktionsgleichung aufstellen</span></button>
+  <button data-s="s4"><span class="n">4</span><span class="lbl">Gerade &amp; Parabel</span></button>
+  <button data-s="s5" class="pz"><span class="n">★</span><span class="lbl">Prüfungsaufgaben</span></button>
+</nav>
+<main>
+
+<!-- START -->
+<section id="start">
+  <h2>Lineare &amp; quadratische Funktionen</h2>
+  <p class="lead">Mathematik · Wirtschaftsschule · Vorbereitung auf die Abschlussprüfung</p>
+  <div class="card merke"><div class="t">So arbeitest du mit der App</div>
+    <p style="margin:.4em 0 0">Arbeite die Lerninhalte der Reihe nach durch. In jedem Kapitel gibt es eine Erklärung, ein durchgerechnetes Beispiel, ein interaktives Schaubild und Übungsaufgaben. Gib deine Ergebnisse ein und klicke auf <b>Prüfen</b>. Wenn du nicht weiterkommst: erst <b>Hinweis</b>, dann <b>Lösung</b>.<br>Dezimalzahlen kannst du mit Komma eingeben (z. B. <span class="f">−0,5</span>).</p>
+  </div>
+  <div class="start-grid">
+    <div class="card" data-go="s1"><span class="badge">Kapitel 1</span><h4>Parabel-Grundlagen</h4><p>Scheitelform, allgemeine Form, Öffnungsfaktor a, Umrechnen</p></div>
+    <div class="card" data-go="s2"><span class="badge">Kapitel 2</span><h4>Quadratische Gleichungen</h4><p>Lösungsformel, Diskriminante, Nullstellen</p></div>
+    <div class="card" data-go="s3"><span class="badge">Kapitel 3</span><h4>Funktionsgleichung aufstellen</h4><p>Parabel aus Punkten bestimmen, Gleichsetzungsverfahren</p></div>
+    <div class="card" data-go="s4"><span class="badge">Kapitel 4</span><h4>Gerade &amp; Parabel</h4><p>Sekante, Tangente, Passante – Schnittpunkte berechnen</p></div>
+    <div class="card" data-go="s5"><span class="badge w">Prüfung</span><h4>Prüfungsaufgaben</h4><p>Sachaufgaben im Stil der Abschlussprüfung mit gestuften Hinweisen</p></div>
+  </div>
+</section>
+
+<!-- 1 GRUNDLAGEN -->
+<section id="s1">
+  <h2>1 · Parabel-Grundlagen</h2>
+  <p class="lead">Der Graph einer quadratischen Funktion heißt Parabel.</p>
+  <div class="grid2">
+    <div>
+      <div class="card merke"><div class="t">Merke – zwei Formen</div>
+        <p><b>Allgemeine Form</b></p><div class="big">y = <span class="blue">a</span>x² + bx + <span class="green">c</span></div>
+        <p><b>Scheitelform</b></p><div class="big">y = <span class="blue">a</span> · (x − x<sub>S</sub>)² + y<sub>S</sub></div>
+        <p style="margin:0">Scheitelpunkt <b>S(x<sub>S</sub> | y<sub>S</sub>)</b> direkt ablesbar.<br><b>Achtung:</b> Bei <span class="f">(x <b>+</b> 2)²</span> ist x<sub>S</sub> = <b>−2</b>!</p>
+      </div>
+      <div class="card">
+        <p style="margin-top:0"><b>Der Öffnungsfaktor <span class="blue">a</span></b></p>
+        <ul style="margin:0;padding-left:20px">
+          <li><span class="f">a &gt; 0</span>: nach <b>oben</b> geöffnet, <span class="f">a &lt; 0</span>: nach <b>unten</b> geöffnet</li>
+          <li><span class="f">|a| &gt; 1</span>: <b>gestreckt</b> (schmaler), <span class="f">|a| &lt; 1</span>: <b>gestaucht</b> (breiter)</li>
+          <li>Ablesen: Vom Scheitel <b>1 nach rechts</b> → die Höhenänderung ist a</li>
+          <li><span class="green">c</span> ist der Schnittpunkt mit der y-Achse: <b>(0 | c)</b></li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <p style="margin-top:0"><b>Ausprobieren</b> – verändere a und den Scheitel:</p>
+      <div id="p1"></div>
+      <div class="ctrl"><label class="blue">a</label><input type="range" id="e1a" min="-3" max="3" step="0.25" value="1"><output id="o1a"></output></div>
+      <div class="ctrl"><label>x<sub>S</sub></label><input type="range" id="e1x" min="-5" max="5" step="0.5" value="0"><output id="o1x"></output></div>
+      <div class="ctrl"><label>y<sub>S</sub></label><input type="range" id="e1y" min="-5" max="5" step="0.5" value="0"><output id="o1y"></output></div>
+      <div class="live" id="l1"></div>
+    </div>
+  </div>
+
+  <h3>Umrechnen zwischen den Formen</h3>
+  <div class="grid2">
+    <div class="card"><p style="margin-top:0"><b>Scheitelform → allgemeine Form</b><br><span class="note">Binomische Formel anwenden, ausmultiplizieren, zusammenfassen.</span></p>
+      <table class="calc">
+        <tr><td>y = 4 · (x + 1)² − 2</td></tr>
+        <tr><td>y = 4 · (x² + 2x + 1) − 2</td><td class="op">1. binomische Formel</td></tr>
+        <tr><td>y = 4x² + 8x + 4 − 2</td><td class="op">ausmultiplizieren</td></tr>
+        <tr><td><b>y = 4x² + 8x + 2</b></td><td class="op">zusammenfassen</td></tr>
+      </table>
+    </div>
+    <div class="card"><p style="margin-top:0"><b>Allgemeine Form → Scheitelpunkt</b><br><span class="note">x<sub>S</sub> mit der Formel berechnen, dann y<sub>S</sub> durch Einsetzen.</span></p>
+      <table class="calc">
+        <tr><td>y = 2x² − 6x + 4</td></tr>
+        <tr><td>x<sub>S</sub> = <span class="frac"><span>−b</span><span>2a</span></span> = <span class="frac"><span>6</span><span>4</span></span> = 1,5</td></tr>
+        <tr><td>y<sub>S</sub> = 2 · 1,5² − 6 · 1,5 + 4 = −0,5</td></tr>
+        <tr><td><b>S(1,5 | −0,5)</b> → y = 2 · (x − 1,5)² − 0,5</td></tr>
+      </table>
+      <p class="note" style="margin-bottom:0">Alternativ: quadratische Ergänzung.</p>
+    </div>
+  </div>
+  <h3>Übungen</h3>
+  <div id="x1"></div>
+  <div class="navbtm"><button class="b" data-go="start">← Start</button><button class="b p" data-go="s2">Weiter: Quadratische Gleichungen →</button></div>
+</section>
+
+<!-- 2 GLEICHUNGEN -->
+<section id="s2">
+  <h2>2 · Quadratische Gleichungen lösen</h2>
+  <p class="lead">Brauchst du für Nullstellen, Schnittpunkte und fast jede Prüfungsaufgabe.</p>
+  <div class="grid2">
+    <div class="card merke"><div class="t">Merke – Lösungsformel („Mitternachtsformel“)</div>
+      <p>Gleichung zuerst auf die Form <span class="f">0 = ax² + bx + c</span> bringen.</p>
+      <div class="big">x<sub>1/2</sub> = <span class="frac"><span>−b ± √D</span><span>2a</span></span> &nbsp; mit &nbsp; D = b² − 4ac</div>
+      <p style="margin-bottom:0"><b>Diskriminante D</b> entscheidet über die Anzahl der Lösungen:</p>
+      <ul style="margin:4px 0 0;padding-left:20px">
+        <li><span class="f">D &gt; 0</span> → <b>zwei</b> Lösungen</li>
+        <li><span class="f">D = 0</span> → <b>eine</b> Lösung</li>
+        <li><span class="f">D &lt; 0</span> → <b>keine</b> Lösung</li>
+      </ul>
+    </div>
+    <div class="card"><p style="margin-top:0"><b>Beispiel:</b> <span class="f">0 = 4x² + 10x + 4</span></p>
+      <div class="steps" id="bsp2">
+        <div class="st">a = 4, &nbsp; b = 10, &nbsp; c = 4<span class="why">Koeffizienten ablesen</span></div>
+        <div class="st">D = 10² − 4 · 4 · 4 = 100 − 64 = 36 &gt; 0<span class="why">→ zwei Lösungen</span></div>
+        <div class="st">x<sub>1/2</sub> = <span class="frac"><span>−10 ± √36</span><span>2 · 4</span></span> = <span class="frac"><span>−10 ± 6</span><span>8</span></span></div>
+        <div class="st"><b>x₁ = −0,5 &nbsp;und&nbsp; x₂ = −2</b></div>
+      </div>
+      <div class="btns"><button class="b g" data-step="bsp2">Nächster Schritt</button><button class="b" data-all="bsp2">Alle</button></div>
+    </div>
+  </div>
+  <div class="card"><p style="margin-top:0"><b>Nullstellen einer Parabel</b> sind die Schnittpunkte mit der x-Achse. Dort gilt <b>y = 0</b> → Gleichung <span class="f">0 = ax² + bx + c</span> mit der Lösungsformel lösen. Ergebnis als Punkte angeben: <span class="f">N₁(x₁ | 0)</span>, <span class="f">N₂(x₂ | 0)</span>.</p></div>
+  <h3>Übungen</h3>
+  <p class="note">Gib D und die Lösungen ein. Gibt es weniger als zwei Lösungen, lass die übrigen Felder leer.</p>
+  <div id="x2"></div>
+  <h3>Training mit Zufallsaufgaben</h3>
+  <div id="r2"></div>
+  <div class="navbtm"><button class="b" data-go="s1">← Grundlagen</button><button class="b p" data-go="s3">Weiter: Gleichung aufstellen →</button></div>
+</section>
+
+<!-- 3 AUFSTELLEN -->
+<section id="s3">
+  <h2>3 · Funktionsgleichung aufstellen</h2>
+  <p class="lead">In der Abschlussprüfung muss fast immer eine Funktionsgleichung aus gegebenen Punkten ermittelt werden.</p>
+  <div class="card merke"><div class="t">Rezept</div>
+    <ol style="margin:.4em 0 0;padding-left:22px">
+      <li>Allgemeine Form aufschreiben: <span class="f">y = ax² + bx + c</span></li>
+      <li>Was ist schon bekannt? Der Öffnungsfaktor <b>a</b>? Der y-Achsenabschnitt <b>c</b> (Punkt mit x = 0)?</li>
+      <li>Die übrigen Punkte einsetzen → <b>pro Punkt eine Gleichung</b>, vereinfachen.</li>
+      <li>2 Gleichungen mit 2 Unbekannten lösen: <b>Gleichsetzungs-</b> oder <b>Einsetzungsverfahren</b>.</li>
+      <li>Fehlende Variable berechnen, Funktionsgleichung angeben, Probe machen.</li>
+    </ol>
+  </div>
+  <div class="tabs" id="t3">
+    <button class="b on" data-tab="b3a">Fall A: a gegeben</button>
+    <button class="b" data-tab="b3b">Fall B: c ablesbar</button>
+    <button class="b" data-tab="b3c">Fall C: Scheitel gegeben</button>
+    <button class="b" data-tab="b3d">Gerade aus 2 Punkten</button>
+  </div>
+  <div class="card" id="b3a"><p style="margin-top:0">Die Parabel verläuft durch <b>A(2 | 1)</b> und <b>B(−8 | 6)</b> und hat den Öffnungsfaktor <b>a = −0,25</b>.</p>
+    <div class="steps" id="s3a">
+      <div class="st">y = −0,25x² + bx + c<span class="why">a in die allgemeine Form einsetzen</span></div>
+      <div class="st">A einsetzen: 1 = −0,25 · 2² + b · 2 + c → 1 = −1 + 2b + c → <b>c = −2b + 2</b><span class="why">nach c auflösen: | + 1 | − 2b</span></div>
+      <div class="st">B einsetzen: 6 = −0,25 · (−8)² + b · (−8) + c → 6 = −16 − 8b + c → <b>c = 8b + 22</b><span class="why">nach c auflösen: | + 16 | + 8b</span></div>
+      <div class="st">Gleichsetzen: −2b + 2 = 8b + 22 → −10b = 20 → <b>b = −2</b><span class="why">c fällt weg, nur noch b bleibt übrig</span></div>
+      <div class="st">b einsetzen: c = −2 · (−2) + 2 = <b>6</b></div>
+      <div class="st"><b>y = −0,25x² − 2x + 6</b><span class="why">Probe mit B: −0,25 · 64 + 16 + 6 = 6 ✓</span></div>
+    </div>
+    <div class="btns"><button class="b g" data-step="s3a">Nächster Schritt</button><button class="b" data-all="s3a">Alle</button></div>
+  </div>
+  <div class="card" id="b3b" style="display:none"><p style="margin-top:0">Die Parabel verläuft durch <b>P(−1 | 10)</b>, <b>Q(0 | 5,5)</b> und <b>R(3 | −2)</b>.</p>
+    <div class="steps" id="s3b">
+      <div class="st">Q liegt auf der y-Achse → <b>c = 5,5</b> → y = ax² + bx + 5,5</div>
+      <div class="st">P einsetzen: 10 = a · (−1)² + b · (−1) + 5,5 → 4,5 = a − b → <b>a = b + 4,5</b></div>
+      <div class="st">R einsetzen: −2 = a · 3² + b · 3 + 5,5 → −7,5 = 9a + 3b<span class="why">| − 5,5</span></div>
+      <div class="st">a = b + 4,5 einsetzen: −7,5 = 9(b + 4,5) + 3b → −7,5 = 12b + 40,5 → 12b = −48 → <b>b = −4</b><span class="why">Einsetzungsverfahren</span></div>
+      <div class="st">a = −4 + 4,5 = <b>0,5</b></div>
+      <div class="st"><b>y = 0,5x² − 4x + 5,5</b><span class="why">Probe mit R: 0,5 · 9 − 12 + 5,5 = −2 ✓</span></div>
+    </div>
+    <div class="btns"><button class="b g" data-step="s3b">Nächster Schritt</button><button class="b" data-all="s3b">Alle</button></div>
+  </div>
+  <div class="card" id="b3c" style="display:none"><p style="margin-top:0">Die Parabel hat den Scheitel <b>S(2 | −1)</b> und verläuft durch <b>P(4 | 7)</b>.</p>
+    <div class="steps" id="s3c">
+      <div class="st">Scheitelform nutzen: y = a · (x − 2)² − 1</div>
+      <div class="st">P einsetzen: 7 = a · (4 − 2)² − 1 → 8 = 4a → <b>a = 2</b></div>
+      <div class="st">Scheitelform: <b>y = 2 · (x − 2)² − 1</b></div>
+      <div class="st">Allgemeine Form: y = 2(x² − 4x + 4) − 1 = <b>2x² − 8x + 7</b></div>
+    </div>
+    <div class="btns"><button class="b g" data-step="s3c">Nächster Schritt</button><button class="b" data-all="s3c">Alle</button></div>
+  </div>
+  <div class="card" id="b3d" style="display:none"><p style="margin-top:0">Die Gerade verläuft durch <b>A(−1 | 5)</b> und <b>B(3 | −3)</b>. Ansatz: <span class="f">y = mx + t</span></p>
+    <div class="steps" id="s3d">
+      <div class="st">m = <span class="frac"><span>y₂ − y₁</span><span>x₂ − x₁</span></span> = <span class="frac"><span>−3 − 5</span><span>3 − (−1)</span></span> = <span class="frac"><span>−8</span><span>4</span></span> = <b>−2</b></div>
+      <div class="st">A einsetzen: 5 = −2 · (−1) + t → 5 = 2 + t → <b>t = 3</b></div>
+      <div class="st"><b>y = −2x + 3</b></div>
+    </div>
+    <div class="btns"><button class="b g" data-step="s3d">Nächster Schritt</button><button class="b" data-all="s3d">Alle</button></div>
+  </div>
+  <h3>Übungen</h3>
+  <div id="x3"></div>
+  <h3>Training mit Zufallsaufgaben</h3>
+  <div id="r3"></div>
+  <div class="navbtm"><button class="b" data-go="s2">← Gleichungen</button><button class="b p" data-go="s4">Weiter: Gerade &amp; Parabel →</button></div>
+</section>
+
+<!-- 4 LAGEBEZIEHUNG -->
+<section id="s4">
+  <h2>4 · Lagebeziehung von Gerade und Parabel</h2>
+  <p class="lead">Wie viele gemeinsame Punkte haben eine Gerade und eine Parabel?</p>
+  <div class="grid3">
+    <div class="card case"><div id="c1"></div><h4>1. Fall: <span class="green">Sekante</span></h4><p>Gerade und Parabel <b>schneiden</b> sich.<br>Zwei gemeinsame Punkte · <b>D &gt; 0</b></p></div>
+    <div class="card case"><div id="c2"></div><h4>2. Fall: <span class="orange">Tangente</span></h4><p>Gerade und Parabel <b>berühren</b> sich.<br>Ein gemeinsamer Punkt · <b>D = 0</b></p></div>
+    <div class="card case"><div id="c3"></div><h4>3. Fall: <span class="red">Passante</span></h4><p>Gerade und Parabel <b>schneiden sich nicht</b>.<br>Kein gemeinsamer Punkt · <b>D &lt; 0</b></p></div>
+  </div>
+  <div class="card merke"><div class="t">Vorgehen (rechnerische Lösung)</div>
+    <ol style="margin:.4em 0 0;padding-left:22px">
+      <li>Gleichsetzen: <span class="f">y<sub>G</sub> = y<sub>P</sub></span> (Klammern auflösen, binomische Formel!)</li>
+      <li>Alles auf eine Seite bringen: <span class="f">0 = ax² + bx + c</span></li>
+      <li>Diskriminante <span class="f">D = b² − 4ac</span> berechnen → Anzahl der gemeinsamen Punkte</li>
+      <li>x-Werte mit der Lösungsformel berechnen</li>
+      <li>x-Werte in die <b>Geradengleichung</b> einsetzen (einfacher!) → y-Werte → Punkte angeben</li>
+    </ol>
+  </div>
+  <h3>Durchgerechnete Beispiele</h3>
+  <div class="tabs" id="t4">
+    <button class="b on" data-tab="b4a">Sekante</button><button class="b" data-tab="b4b">Tangente</button><button class="b" data-tab="b4c">Passante</button>
+  </div>
+  <div class="card" id="b4a"><p style="margin-top:0"><span class="f">y<sub>G</sub> = −2x − 2</span> &nbsp; und &nbsp; <span class="f">y<sub>P</sub> = 4 · (x + 1)² − 2</span></p>
+    <div class="steps" id="s4a">
+      <div class="st">−2x − 2 = 4 · (x + 1)² − 2<span class="why">gleichsetzen</span></div>
+      <div class="st">−2x − 2 = 4 · (x² + 2x + 1) − 2 = 4x² + 8x + 2<span class="why">binomische Formel, ausmultiplizieren</span></div>
+      <div class="st">0 = 4x² + 10x + 4<span class="why">| + 2x + 2</span></div>
+      <div class="st">D = 10² − 4 · 4 · 4 = 36 &gt; 0 → <b>zwei Schnittpunkte (Sekante)</b></div>
+      <div class="st">x<sub>1/2</sub> = <span class="frac"><span>−10 ± 6</span><span>8</span></span> → x₁ = −0,5 &nbsp; x₂ = −2</div>
+      <div class="st">y₁ = −2 · (−0,5) − 2 = −1 &nbsp; y₂ = −2 · (−2) − 2 = 2 → <b>S₁(−0,5 | −1), &nbsp;S₂(−2 | 2)</b></div>
+    </div>
+    <div class="btns"><button class="b g" data-step="s4a">Nächster Schritt</button><button class="b" data-all="s4a">Alle</button></div>
+  </div>
+  <div class="card" id="b4b" style="display:none"><p style="margin-top:0"><span class="f">y<sub>G</sub> = x − 0,5</span> &nbsp; und &nbsp; <span class="f">y<sub>P</sub> = −0,5 · (x − 2)² + 1</span></p>
+    <div class="steps" id="s4b">
+      <div class="st">x − 0,5 = −0,5 · (x² − 4x + 4) + 1 = −0,5x² + 2x − 1</div>
+      <div class="st">0 = −0,5x² + x − 0,5<span class="why">| − x + 0,5</span></div>
+      <div class="st">D = 1² − 4 · (−0,5) · (−0,5) = 1 − 1 = 0 → <b>ein Berührpunkt (Tangente)</b></div>
+      <div class="st">x = <span class="frac"><span>−1 ± 0</span><span>2 · (−0,5)</span></span> = 1 &nbsp; → &nbsp; y = 1 − 0,5 = 0,5 → <b>B(1 | 0,5)</b></div>
+    </div>
+    <div class="btns"><button class="b g" data-step="s4b">Nächster Schritt</button><button class="b" data-all="s4b">Alle</button></div>
+  </div>
+  <div class="card" id="b4c" style="display:none"><p style="margin-top:0"><span class="f">y<sub>G</sub> = −0,2x − 1</span> &nbsp; und &nbsp; <span class="f">y<sub>P</sub> = 2 · (x − 1,5)² − 0,5</span></p>
+    <div class="steps" id="s4c">
+      <div class="st">−0,2x − 1 = 2 · (x² − 3x + 2,25) − 0,5 = 2x² − 6x + 4</div>
+      <div class="st">0 = 2x² − 5,8x + 5<span class="why">| + 0,2x + 1</span></div>
+      <div class="st">D = 5,8² − 4 · 2 · 5 = 33,64 − 40 = −6,36 &lt; 0 → <b>kein gemeinsamer Punkt (Passante)</b></div>
+    </div>
+    <div class="btns"><button class="b g" data-step="s4c">Nächster Schritt</button><button class="b" data-all="s4c">Alle</button></div>
+  </div>
+
+  <h3>Ausprobieren</h3>
+  <div class="card"><div class="grid2">
+    <div id="p4"></div>
+    <div>
+      <p style="margin:0 0 4px"><b class="blue">Parabel</b> <span class="f">y = a · (x − x<sub>S</sub>)² + y<sub>S</sub></span></p>
+      <div class="ctrl"><label>a</label><input type="range" id="e4a" min="-3" max="3" step="0.25" value="1"><output id="o4a"></output></div>
+      <div class="ctrl"><label>x<sub>S</sub></label><input type="range" id="e4x" min="-4" max="4" step="0.5" value="0"><output id="o4x"></output></div>
+      <div class="ctrl"><label>y<sub>S</sub></label><input type="range" id="e4y" min="-5" max="5" step="0.5" value="-2"><output id="o4y"></output></div>
+      <p style="margin:10px 0 4px"><b class="orange">Gerade</b> <span class="f">y = mx + t</span></p>
+      <div class="ctrl"><label>m</label><input type="range" id="e4m" min="-3" max="3" step="0.25" value="1"><output id="o4m"></output></div>
+      <div class="ctrl"><label>t</label><input type="range" id="e4t" min="-5" max="5" step="0.5" value="0"><output id="o4t"></output></div>
+      <div class="live" id="l4"></div>
+    </div>
+  </div></div>
+  <h3>Übungen</h3>
+  <div id="x4"></div>
+  <h3>Training mit Zufallsaufgaben</h3>
+  <div id="r4"></div>
+  <div class="navbtm"><button class="b" data-go="s3">← Gleichung aufstellen</button><button class="b p" data-go="s5">Weiter: Prüfungsaufgaben →</button></div>
+</section>
+
+<!-- 5 PRÜFUNG -->
+<section id="s5">
+  <h2>★ Prüfungsaufgaben</h2>
+  <p class="lead">Sachaufgaben in Anlehnung an die Abschlussprüfung Mathematik an der Wirtschaftsschule. Nutze die Hinweise stufenweise – erst selbst probieren!</p>
+  <div class="card merke"><div class="t">Tipps für die Prüfung</div>
+    <ul style="margin:.4em 0 0;padding-left:20px">
+      <li>Lies die Aufgabe genau: Welche Punkte sind gegeben? Was ist gesucht?</li>
+      <li>Übersetze den Text in Mathematik: „Höhe“ = y-Wert, „Entfernung/Breite“ = x-Wert, „am Boden“ = y = 0.</li>
+      <li>Antwortsatz mit Einheit nicht vergessen!</li>
+    </ul>
+  </div>
+  <div id="x5"></div>
+  <div class="navbtm"><button class="b" data-go="s4">← Gerade &amp; Parabel</button><button class="b" data-go="start">Zur Startseite</button></div>
+</section>
+
+</main>
+</div>
+
+<script>
+/* ===== Hilfsfunktionen ===== */
+const $=id=>document.getElementById(id);
+const fmt=(n,d=2)=>{if(Math.abs(n)<1e-9)n=0;return (Math.round(n*10**d)/10**d).toString().replace('.',',').replace('-','−')};
+function poly(a,b,c,v='x'){let s='';[[a,v+'²'],[b,v],[c,'']].forEach(([k,t])=>{if(Math.abs(k)<1e-9)return;const ab=Math.abs(k),num=(ab===1&&t)?'':fmt(ab);
+ s+= s?(k<0?' − ':' + ')+num+t : (k<0?'−':'')+num+t});return s||'0'}
+function lin(m,t){return poly(0,m,t)}
+function vform(a,xs,ys){const A=a===1?'':a===-1?'−':fmt(a)+' · ';const X=Math.abs(xs)<1e-9?'x²':`(x ${xs>0?'−':'+'} ${fmt(Math.abs(xs))})²`;
+ const Y=Math.abs(ys)<1e-9?'':` ${ys>0?'+':'−'} ${fmt(Math.abs(ys))}`;return A+X+Y}
+const P=(x,y)=>`(${fmt(x)} | ${fmt(y)})`;
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const par=n=>n<0?`(${fmt(n)})`:fmt(n);
+
+/* ===== Koordinatensystem ===== */
+let gid=0;
+function nice(r){for(const s of [0.5,1,2,5,10,20,50,100,200,500])if(s>=r)return s;return 1000}
+function plot(o){
+ const {xmin,xmax,ymin,ymax}=o,W=o.w||520,H=o.h||Math.round(Math.min(620,Math.max(240,W*(ymax-ymin)/(xmax-xmin))));
+ const X=x=>(x-xmin)/(xmax-xmin)*W,Y=y=>(ymax-y)/(ymax-ymin)*H,id='k'+(gid++),fs=o.small?16:13;
+ const sx=o.sx||nice((xmax-xmin)/12),sy=o.sy||nice((ymax-ymin)/12);
+ let s=`<svg class="plot" viewBox="0 0 ${W} ${H}" font-family="Segoe UI,Arial" font-size="${fs}"><defs><clipPath id="${id}"><rect width="${W}" height="${H}"/></clipPath>
+ <marker id="m${id}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#1d2433"/></marker></defs>`;
+ for(let x=Math.ceil(xmin/sx)*sx;x<=xmax;x+=sx)s+=`<line x1="${X(x)}" y1="0" x2="${X(x)}" y2="${H}" stroke="#eceef4"/>`;
+ for(let y=Math.ceil(ymin/sy)*sy;y<=ymax;y+=sy)s+=`<line x1="0" y1="${Y(y)}" x2="${W}" y2="${Y(y)}" stroke="#eceef4"/>`;
+ const y0=Math.min(Math.max(Y(0),0),H),x0=Math.min(Math.max(X(0),0),W);
+ s+=`<line x1="0" y1="${y0}" x2="${W-2}" y2="${y0}" stroke="#1d2433" stroke-width="1.5" marker-end="url(#m${id})"/><line x1="${x0}" y1="${H}" x2="${x0}" y2="2" stroke="#1d2433" stroke-width="1.5" marker-end="url(#m${id})"/>`;
+ if(!o.small){
+  for(let x=Math.ceil(xmin/sx)*sx;x<xmax-sx/2;x+=sx)if(Math.abs(x)>1e-9)s+=`<text x="${X(x)}" y="${y0+15}" text-anchor="middle" fill="#5b6475">${fmt(x)}</text>`;
+  for(let y=Math.ceil(ymin/sy)*sy;y<ymax-sy/2;y+=sy)if(Math.abs(y)>1e-9)s+=`<text x="${x0-5}" y="${Y(y)+4}" text-anchor="end" fill="#5b6475">${fmt(y)}</text>`;
+  s+=`<text x="${W-6}" y="${y0-8}" text-anchor="end" font-style="italic" font-weight="600">${o.xl||'x'}</text><text x="${x0+8}" y="16" font-style="italic" font-weight="600">${o.yl||'y'}</text>`}
+ s+=`<g clip-path="url(#${id})">`;
+ (o.fns||[]).forEach(f=>{let d='';const a=f.from??xmin,b=f.to??xmax;for(let i=0;i<=300;i++){const x=a+(b-a)*i/300;let y=f.f(x);y=Math.max(ymin-(ymax-ymin),Math.min(ymax+(ymax-ymin),y));d+=(i?'L':'M')+X(x).toFixed(1)+','+Y(y).toFixed(1)}
+  s+=`<path d="${d}" fill="none" stroke="${f.c}" stroke-width="${o.small?4:3}" stroke-linecap="round" ${f.dash?'stroke-dasharray="8 6"':''}/>`;
+  if(f.label){const lx=f.lx,ly=f.f(lx);s+=`<text x="${X(lx)}" y="${Y(ly)-10}" fill="${f.c}" font-weight="700" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="4">${f.label}</text>`}});
+ (o.pts||[]).forEach(p=>{s+=`<circle cx="${X(p.x)}" cy="${Y(p.y)}" r="${o.small?7:5.5}" fill="${p.c||'#1d2433'}" stroke="#fff" stroke-width="2"/>`;
+  if(p.label)s+=`<text x="${X(p.x)+(p.dx??8)}" y="${Y(p.y)+(p.dy??-8)}" font-weight="700" fill="${p.c||'#1d2433'}" text-anchor="${p.an||'start'}" paint-order="stroke" stroke="#fff" stroke-width="4">${p.label}</text>`});
+ (o.segs||[]).forEach(g=>{s+=`<line x1="${X(g.x1)}" y1="${Y(g.y1)}" x2="${X(g.x2)}" y2="${Y(g.y2)}" stroke="${g.c}" stroke-width="2.5" stroke-dasharray="6 5"/>`;
+  if(g.label)s+=`<text x="${(X(g.x1)+X(g.x2))/2+(g.dx||0)}" y="${(Y(g.y1)+Y(g.y2))/2+(g.dy||0)}" fill="${g.c}" font-weight="700" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="4">${g.label}</text>`});
+ return s+'</g></svg>'}
+const B='#2457d6',G='#12805c',O='#d9620b',R='#c62f3b',V='#7a3fc4';
+
+/* ===== Aufgaben-Engine ===== */
+let solved=0;
+function num(v){v=v.trim().replace(/\s/g,'').replace(',','.').replace(/[−–]/g,'-');if(v==='')return null;if(/^-?\d+(\.\d+)?\/\d+(\.\d+)?$/.test(v)){const[a,b]=v.split('/');return +a/+b}const n=Number(v);return isNaN(n)?NaN:n}
+function renderEx(ex,host,nr){
+ const el=document.createElement('div');el.className='ex';
+ const fl=ex.fields.map((f,i)=>f.opts?`<label class="fld"><span>${f.l}</span><select data-i="${i}"><option value="">– wählen –</option>${f.opts.map(o=>`<option>${o}</option>`).join('')}</select></label>`
+   :`<label class="fld"><span>${f.l}</span><input data-i="${i}" inputmode="decimal" autocomplete="off">${f.u?`<span style="font-family:inherit;font-size:15px">${f.u}</span>`:''}</label>`).join('');
+ el.innerHTML=`<div class="q">${nr?`<b class="nr">${nr}</b>`:''}${ex.q}</div><div class="fields">${fl}</div>
+ <div class="btns"><button class="b p ck">Prüfen</button>${ex.hints&&ex.hints.length?'<button class="b o hn">Hinweis</button>':''}<button class="b sl">Lösung zeigen</button></div>
+ <div class="fb"></div><div class="hs"></div><div class="sol">${ex.sol.map(s=>`<div class="st">${s}</div>`).join('')}</div>`;
+ host.appendChild(el);
+ const inp=[...el.querySelectorAll('[data-i]')];let hi=0,counted=false;
+ el.querySelector('.ck').onclick=()=>{
+  const groups={};let ok=0;
+  ex.fields.forEach((f,i)=>{const e=inp[i];let good;
+   if(f.opts)good=e.value===f.a;
+   else if(f.g){(groups[f.g]=groups[f.g]||[]).push(i);return}
+   else{const v=num(e.value);good=f.a===null?v===null:(v!==null&&Math.abs(v-f.a)<=(f.tol??0.011))}
+   e.className=good?'ok':'no';if(good)ok++});
+  Object.values(groups).forEach(ix=>{const ans=ix.map(i=>ex.fields[i].a),used=[];
+   ix.forEach(i=>{const v=num(inp[i].value);let hit=-1;
+    ans.forEach((a,j)=>{if(hit>=0||used[j])return;if(a===null?v===null:(v!==null&&Math.abs(v-a)<=(ex.fields[i].tol??0.011)))hit=j});
+    if(hit>=0){used[hit]=1;ok++;inp[i].className='ok'}else inp[i].className='no'})});
+  const fb=el.querySelector('.fb');
+  if(ok===ex.fields.length){fb.className='fb ok';fb.textContent='✓ Richtig – super!';if(!counted){counted=true;solved++;$('sc').textContent=solved}}
+  else{fb.className='fb no';fb.textContent=`Noch nicht ganz: ${ok} von ${ex.fields.length} richtig. ${ex.hints&&hi<ex.hints.length?'Tipp: Nutze einen Hinweis.':''}`}};
+ const hb=el.querySelector('.hn');
+ if(hb)hb.onclick=()=>{const h=document.createElement('div');h.className='hint';h.innerHTML=`<b>Hinweis ${hi+1}:</b> ${ex.hints[hi]}`;el.querySelector('.hs').appendChild(h);hi++;
+  if(hi>=ex.hints.length){hb.disabled=true;hb.textContent='Keine weiteren Hinweise'}else hb.textContent=`Hinweis ${hi+1}`};
+ el.querySelector('.sl').onclick=e=>{const s=el.querySelector('.sol');s.classList.toggle('show');e.target.textContent=s.classList.contains('show')?'Lösung ausblenden':'Lösung zeigen'};
+ return el}
+function renderList(hostId,list,pre){const h=$(hostId);list.forEach((ex,i)=>renderEx(ex,h,(pre||'')+String.fromCharCode(97+i)+')'))}
+function randomBox(hostId,gen,title){const h=$(hostId);h.innerHTML=`<div class="card"><div class="btns" style="margin:0 0 4px"><button class="b g">🎲 Neue Zufallsaufgabe</button><span class="note" style="align-self:center">${title}</span></div><div class="rb"></div></div>`;
+ const box=h.querySelector('.rb');const go=()=>{box.innerHTML='';renderEx(gen(),box)};h.querySelector('button').onclick=go;go()}
+
+/* ===== Navigation ===== */
+function show(id){document.querySelectorAll('main section').forEach(s=>s.classList.toggle('on',s.id===id));
+ document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.s===id));window.scrollTo(0,0);history.replaceState(null,'','#'+id)}
+document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>show(b.dataset.s));
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
+document.querySelectorAll('[data-step]').forEach(b=>b.onclick=()=>{const s=$(b.dataset.step).querySelector('.st:not(.show)');if(s)s.classList.add('show')});
+document.querySelectorAll('[data-all]').forEach(b=>b.onclick=()=>$(b.dataset.all).querySelectorAll('.st').forEach(s=>s.classList.add('show')));
+document.querySelectorAll('.tabs').forEach(t=>t.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{t.querySelectorAll('[data-tab]').forEach(x=>{x.classList.toggle('on',x===b);$(x.dataset.tab).style.display=x===b?'':'none'})}));
+
+/* ===== Kapitel 1 ===== */
+function upd1(){const a=+$('e1a').value,xs=+$('e1x').value,ys=+$('e1y').value;$('o1a').textContent=fmt(a);$('o1x').textContent=fmt(xs);$('o1y').textContent=fmt(ys);
+ const f=x=>a*(x-xs)**2+ys;
+ $('p1').innerHTML=plot({xmin:-6,xmax:6,ymin:-6,ymax:6,fns:[{f:x=>x*x,c:'#b8c0d0',dash:1},{f,c:B}],pts:[{x:xs,y:ys,c:R,label:'S'+P(xs,ys)},...(Math.abs(xs)>0.01?[{x:0,y:f(0),c:G}]:[])]});
+ const b=-2*a*xs,c=a*xs*xs+ys;
+ $('l1').innerHTML=a===0?'<p class="red">a = 0 → keine Parabel, sondern eine Gerade!</p>':
+ `<p><b>Scheitelform:</b> <span class="f">y = ${vform(a,xs,ys)}</span></p><p><b>Allgemeine Form:</b> <span class="f">y = ${poly(a,b,c)}</span></p>
+ <p>${a>0?'nach oben':'nach unten'} geöffnet, ${Math.abs(a)>1?'gestreckt':Math.abs(a)<1?'gestaucht':'Form der Normalparabel'} · <span class="green">y-Achsenabschnitt c = ${fmt(c)}</span></p><p class="note">grau gestrichelt: Normalparabel y = x²</p>`}
+['e1a','e1x','e1y'].forEach(i=>$(i).oninput=upd1);upd1();
+
+renderList('x1',[
+ {q:'Gib den Scheitelpunkt und die Öffnung an: <span class="f">y = 2 · (x − 3)² + 1</span>',fields:[{l:'x<sub>S</sub> =',a:3},{l:'y<sub>S</sub> =',a:1},{l:'Öffnung:',opts:['nach oben','nach unten'],a:'nach oben'}],
+  hints:['In der Scheitelform y = a(x − x<sub>S</sub>)² + y<sub>S</sub> steht x<sub>S</sub> mit umgekehrtem Vorzeichen in der Klammer.'],sol:['S(3 | 1), a = 2 &gt; 0 → nach oben geöffnet']},
+ {q:'Gib den Scheitelpunkt und die Öffnung an: <span class="f">y = −0,5 · (x + 2)² − 4</span>',fields:[{l:'x<sub>S</sub> =',a:-2},{l:'y<sub>S</sub> =',a:-4},{l:'Öffnung:',opts:['nach oben','nach unten'],a:'nach unten'}],
+  hints:['(x + 2) = (x − (−2)) → x<sub>S</sub> ist negativ.'],sol:['S(−2 | −4), a = −0,5 &lt; 0 → nach unten geöffnet (und gestaucht)']},
+ {q:'Wandle in die allgemeine Form <span class="f">y = ax² + bx + c</span> um: <span class="f">y = 2 · (x − 1)² − 3</span>',fields:[{l:'a =',a:2},{l:'b =',a:-4},{l:'c =',a:-1}],
+  hints:['2. binomische Formel: (x − 1)² = x² − 2x + 1','Danach jedes Glied der Klammer mit 2 multiplizieren und −3 verrechnen.'],
+  sol:['y = 2 · (x² − 2x + 1) − 3','y = 2x² − 4x + 2 − 3','<b>y = 2x² − 4x − 1</b>']},
+ {q:'Berechne den Scheitelpunkt: <span class="f">y = x² − 6x + 5</span>',fields:[{l:'x<sub>S</sub> =',a:3},{l:'y<sub>S</sub> =',a:-4}],
+  hints:['x<sub>S</sub> = −b / (2a) mit a = 1 und b = −6','y<sub>S</sub>: x<sub>S</sub> in die Funktionsgleichung einsetzen.'],sol:['x<sub>S</sub> = 6 / 2 = 3','y<sub>S</sub> = 3² − 6 · 3 + 5 = 9 − 18 + 5 = −4','<b>S(3 | −4)</b>']},
+ {q:'Berechne den Scheitelpunkt: <span class="f">y = −2x² + 8x − 3</span>',fields:[{l:'x<sub>S</sub> =',a:2},{l:'y<sub>S</sub> =',a:5}],
+  hints:['x<sub>S</sub> = −b / (2a) = −8 / (2 · (−2))'],sol:['x<sub>S</sub> = −8 / (−4) = 2','y<sub>S</sub> = −2 · 4 + 16 − 3 = 5','<b>S(2 | 5)</b>']}
+]);
+
+/* ===== Kapitel 2 ===== */
+function qex(a,b,c,extra){const D=b*b-4*a*c;let xs=[];if(D>1e-9)xs=[(-b+Math.sqrt(D))/(2*a),(-b-Math.sqrt(D))/(2*a)];else if(Math.abs(D)<1e-9)xs=[-b/(2*a)];
+ const sol=[`a = ${fmt(a)}, b = ${fmt(b)}, c = ${fmt(c)}`,`D = ${par(b)}² − 4 · ${par(a)} · ${par(c)} = <b>${fmt(D)}</b>`];
+ if(D<-1e-9)sol.push('D &lt; 0 → <b>keine Lösung</b>');
+ else if(xs.length===1)sol.push(`D = 0 → eine Lösung: x = <span class="frac"><span>${fmt(-b)}</span><span>${fmt(2*a)}</span></span> = <b>${fmt(xs[0])}</b>`);
+ else sol.push(`x<sub>1/2</sub> = <span class="frac"><span>${fmt(-b)} ± √${fmt(D)}</span><span>${fmt(2*a)}</span></span> → <b>x₁ = ${fmt(xs[0])}, x₂ = ${fmt(xs[1])}</b>`);
+ return {q:`Löse die Gleichung: <span class="f">0 = ${poly(a,b,c)}</span>`+(extra||''),fields:[{l:'D =',a:D},{l:'x₁ =',a:xs[0]??null,g:'x'},{l:'x₂ =',a:xs[1]??null,g:'x'}],
+  hints:['Lies a, b und c ab – das Vorzeichen gehört dazu!','Setze in D = b² − 4ac ein. Ist D negativ, gibt es keine Lösung (Felder leer lassen).'],sol}}
+renderList('x2',[qex(1,-2,-8),qex(2,4,-6),qex(1,6,9),qex(1,2,5),qex(-0.5,1.5,2)]);
+function genNull(){const a=pick([1,1,2,-1,0.5,-2]),k=pick([2,2,2,1,0]);let b,c;
+ if(k===2){let r1=rnd(-5,5),r2;do r2=rnd(-5,5);while(r2===r1);b=-a*(r1+r2);c=a*r1*r2}
+ else if(k===1){const r=rnd(-4,4);b=-2*a*r;c=a*r*r}else{const h=rnd(-3,3),q=rnd(1,4)*Math.sign(a);b=-2*a*h;c=a*(h*h+q)}
+ return qex(a,b,c)}
+randomBox('r2',genNull,'Quadratische Gleichung lösen');
+
+/* ===== Kapitel 3 ===== */
+renderList('x3',[
+ {q:'Die Parabel hat den Öffnungsfaktor <b>a = 2</b> und verläuft durch <b>A(1 | 3)</b> und <b>B(−1 | −1)</b>. Bestimme die Funktionsgleichung.',fields:[{l:'b =',a:2},{l:'c =',a:-1}],
+  hints:['Ansatz: y = 2x² + bx + c. Setze A und B ein → zwei Gleichungen.','A: 3 = 2 + b + c → c = −b + 1. &nbsp; B: −1 = 2 − b + c → c = b − 3. Jetzt gleichsetzen!'],
+  sol:['A: 3 = 2 · 1² + b + c → <b>c = −b + 1</b>','B: −1 = 2 · (−1)² − b + c → <b>c = b − 3</b>','−b + 1 = b − 3 → −2b = −4 → <b>b = 2</b>','c = −2 + 1 = <b>−1</b>','<b>y = 2x² + 2x − 1</b>']},
+ {q:'Die Parabel verläuft durch <b>P(0 | −3)</b>, <b>Q(1 | 0)</b> und <b>R(−2 | −3)</b>. Bestimme die Funktionsgleichung.',fields:[{l:'a =',a:1},{l:'b =',a:2},{l:'c =',a:-3}],
+  hints:['P liegt auf der y-Achse → c ist sofort bekannt.','Q: 0 = a + b − 3 → a = −b + 3. &nbsp; R: −3 = 4a − 2b − 3 → 0 = 4a − 2b.'],
+  sol:['P → <b>c = −3</b>','Q: 0 = a + b − 3 → a = −b + 3','R: −3 = 4a − 2b − 3 → 4a = 2b → b = 2a','Einsetzen: a = −2a + 3 → 3a = 3 → <b>a = 1</b>, b = <b>2</b>','<b>y = x² + 2x − 3</b>']},
+ {q:'Die Parabel hat den Scheitel <b>S(−1 | 4)</b> und verläuft durch <b>P(1 | 2)</b>. Gib die Gleichung in allgemeiner Form an.',fields:[{l:'a =',a:-0.5},{l:'b =',a:-1},{l:'c =',a:3.5}],
+  hints:['Ansatz Scheitelform: y = a · (x + 1)² + 4','P einsetzen: 2 = a · 2² + 4 → a berechnen, danach ausmultiplizieren.'],
+  sol:['2 = a · (1 + 1)² + 4 → −2 = 4a → <b>a = −0,5</b>','y = −0,5 · (x + 1)² + 4 = −0,5(x² + 2x + 1) + 4','<b>y = −0,5x² − x + 3,5</b>']},
+ {q:'Eine Gerade verläuft durch <b>A(−1 | 5)</b> und <b>B(3 | −3)</b>. Bestimme <span class="f">y = mx + t</span>.',fields:[{l:'m =',a:-2},{l:'t =',a:3}],
+  hints:['m = (y₂ − y₁) / (x₂ − x₁)'],sol:['m = (−3 − 5) / (3 + 1) = −2','5 = −2 · (−1) + t → t = 3','<b>y = −2x + 3</b>']}
+]);
+function genAuf(){const a=pick([-2,-1,-0.5,0.5,1,2]),b=rnd(-5,5),c=rnd(-6,6);let x1=pick([-3,-2,-1,1,2,3]),x2;do x2=pick([-4,-3,-2,-1,1,2,3,4]);while(x2===x1);
+ const f=x=>a*x*x+b*x+c,y1=f(x1),y2=f(x2),K1=y1-a*x1*x1,K2=y2-a*x2*x2;
+ return {q:`Die Parabel hat den Öffnungsfaktor <b>a = ${fmt(a)}</b> und verläuft durch <b>A${P(x1,y1)}</b> und <b>B${P(x2,y2)}</b>. Bestimme b und c.`,
+  fields:[{l:'b =',a:b},{l:'c =',a:c}],hints:[`Ansatz: y = ${fmt(a)}x² + bx + c. Setze beide Punkte ein und löse jeweils nach c auf.`,`A liefert c = ${poly(0,-x1,K1,'b')}, B liefert c = ${poly(0,-x2,K2,'b')}. Gleichsetzen!`],
+  sol:[`A: ${fmt(y1)} = ${fmt(a)} · ${par(x1)}² + b · ${par(x1)} + c → c = ${poly(0,-x1,K1,'b')}`,`B: ${fmt(y2)} = ${fmt(a)} · ${par(x2)}² + b · ${par(x2)} + c → c = ${poly(0,-x2,K2,'b')}`,
+   `Gleichsetzen → b = <b>${fmt(b)}</b>, &nbsp; c = <b>${fmt(c)}</b>`,`<b>y = ${poly(a,b,c)}</b>`]}}
+randomBox('r3',genAuf,'Parabel mit gegebenem a aus zwei Punkten');
+
+/* ===== Kapitel 4 ===== */
+const cs={small:true,w:300,h:260,xmin:-3,xmax:3,ymin:-2.5,ymax:3};
+$('c1').innerHTML=plot({...cs,fns:[{f:x=>x*x-1,c:B},{f:x=>0.5*x+0.5,c:O}],pts:[{x:-1,y:0,c:R},{x:1.5,y:1.25,c:R}]});
+$('c2').innerHTML=plot({...cs,fns:[{f:x=>x*x-1,c:B},{f:x=>2*x-2,c:O}],pts:[{x:1,y:0,c:R}]});
+$('c3').innerHTML=plot({...cs,fns:[{f:x=>x*x-1,c:B},{f:x=>0.5*x-2,c:O}]});
+function upd4(){const a=+$('e4a').value,xs=+$('e4x').value,ys=+$('e4y').value,m=+$('e4m').value,t=+$('e4t').value;
+ [['o4a',a],['o4x',xs],['o4y',ys],['o4m',m],['o4t',t]].forEach(([i,v])=>$(i).textContent=fmt(v));
+ const fp=x=>a*(x-xs)**2+ys,fg=x=>m*x+t,A=a,Bq=-2*a*xs-m,C=a*xs*xs+ys-t,D=Bq*Bq-4*A*C;let pts=[],txt;
+ if(a===0){txt='<p class="red">a = 0 ist keine Parabel.</p>'}
+ else{if(D>1e-9){const r=Math.sqrt(D);pts=[(-Bq+r)/(2*A),(-Bq-r)/(2*A)]}else if(Math.abs(D)<1e-9)pts=[-Bq/(2*A)];
+  const typ=D>1e-9?'<span class="badge">Sekante · 2 Schnittpunkte</span>':Math.abs(D)<1e-9?'<span class="badge w">Tangente · 1 Berührpunkt</span>':'<span class="badge r">Passante · kein gemeinsamer Punkt</span>';
+  txt=`<p><span class="blue f">y<sub>P</sub> = ${vform(a,xs,ys)}</span> &nbsp; <span class="orange f">y<sub>G</sub> = ${lin(m,t)}</span></p>
+  <p>Gleichsetzen und umformen: <span class="f">0 = ${poly(A,Bq,C)}</span></p><p><span class="f">D = ${fmt(D)}</span> → ${typ}</p>
+  ${pts.length?'<p>'+pts.map((x,i)=>`<b>${pts.length>1?'S'+(i+1):'B'}${P(x,fg(x))}</b>`).join(' &nbsp; ')+'</p>':''}`}
+ $('p4').innerHTML=plot({xmin:-6,xmax:6,ymin:-6,ymax:6,fns:[...(a?[{f:fp,c:B}]:[]),{f:fg,c:O}],pts:pts.map(x=>({x,y:fg(x),c:R}))});$('l4').innerHTML=txt}
+['e4a','e4x','e4y','e4m','e4t'].forEach(i=>$(i).oninput=upd4);upd4();
+const lage=['Sekante','Tangente','Passante'];
+renderList('x4',[
+ {q:'Untersuche die Lage von <span class="f">y<sub>P</sub> = x² − 2x − 1</span> und <span class="f">y<sub>G</sub> = x + 3</span>. Berechne ggf. die gemeinsamen Punkte.',
+  fields:[{l:'D =',a:25},{l:'Lage:',opts:lage,a:'Sekante'},{l:'x₁ =',a:4,g:'x'},{l:'x₂ =',a:-1,g:'x'},{l:'y₁ =',a:7,g:'y'},{l:'y₂ =',a:2,g:'y'}],
+  hints:['Gleichsetzen: x² − 2x − 1 = x + 3 und alles auf eine Seite bringen.','0 = x² − 3x − 4 → D = (−3)² − 4 · 1 · (−4)','y-Werte: x-Werte in die Gerade y = x + 3 einsetzen.'],
+  sol:['x² − 2x − 1 = x + 3 → 0 = x² − 3x − 4','D = 9 + 16 = 25 &gt; 0 → Sekante','x<sub>1/2</sub> = (3 ± 5) / 2 → x₁ = 4, x₂ = −1','<b>S₁(4 | 7), S₂(−1 | 2)</b>']},
+ {q:'Untersuche die Lage von <span class="f">y<sub>P</sub> = 0,5x² + 1</span> und <span class="f">y<sub>G</sub> = 2x − 1</span>.',
+  fields:[{l:'D =',a:0},{l:'Lage:',opts:lage,a:'Tangente'},{l:'x =',a:2},{l:'y =',a:3}],
+  hints:['0 = 0,5x² − 2x + 2'],sol:['0,5x² + 1 = 2x − 1 → 0 = 0,5x² − 2x + 2','D = 4 − 4 · 0,5 · 2 = 0 → Tangente','x = 2 / 1 = 2, y = 2 · 2 − 1 = 3 → <b>B(2 | 3)</b>']},
+ {q:'Untersuche die Lage von <span class="f">y<sub>P</sub> = −x² + 4</span> und <span class="f">y<sub>G</sub> = x + 6</span>.',
+  fields:[{l:'D =',a:-7},{l:'Lage:',opts:lage,a:'Passante'}],
+  hints:['−x² + 4 = x + 6 → 0 = −x² − x − 2'],sol:['0 = −x² − x − 2','D = (−1)² − 4 · (−1) · (−2) = 1 − 8 = −7 &lt; 0','<b>Passante</b> – kein gemeinsamer Punkt']},
+ {q:'<b>Profi-Aufgabe:</b> Gegeben sind <span class="f">y<sub>P</sub> = x² − 4x + 5</span> und die Geradenschar <span class="f">y<sub>G</sub> = 2x + t</span>. Für welchen Wert von t ist die Gerade eine <b>Tangente</b>? Gib auch den Berührpunkt an.',
+  fields:[{l:'t =',a:-4},{l:'x =',a:3},{l:'y =',a:2}],
+  hints:['Gleichsetzen: 0 = x² − 6x + (5 − t)','Tangente bedeutet D = 0: 36 − 4 · (5 − t) = 0 → nach t auflösen.'],
+  sol:['x² − 4x + 5 = 2x + t → 0 = x² − 6x + 5 − t','D = 36 − 4(5 − t) = 16 + 4t = 0 → <b>t = −4</b>','x = 6 / 2 = 3, &nbsp; y = 2 · 3 − 4 = 2 → <b>B(3 | 2)</b>']}
+]);
+function genLage(){const a=pick([1,-1,2,-2,0.5,-0.5]),m=pick([-2,-1,-0.5,0.5,1,2,3]),t=rnd(-4,4),k=pick([2,2,1,0]);let A=a,Bc,C,xs=[];
+ if(k===2){const x1=rnd(-4,4);let x2;do x2=rnd(-4,4);while(x2===x1);Bc=m-a*(x1+x2);C=t+a*x1*x2;xs=[x1,x2]}
+ else if(k===1){const x0=rnd(-3,3);Bc=m-2*a*x0;C=t+a*x0*x0;xs=[x0]}
+ else{const h=rnd(-3,3),q=rnd(1,3);Bc=m-2*a*h;C=t+a*(h*h+q)}
+ const b2=Bc-m,c2=C-t,D=b2*b2-4*a*c2,fg=x=>m*x+t;
+ const fields=[{l:'D =',a:D},{l:'Lage:',opts:lage,a:lage[2-k]}];
+ if(k)fields.push({l:'x₁ =',a:xs[0],g:'x'},{l:'x₂ =',a:xs[1]??null,g:'x'});
+ const sol=[`${poly(A,Bc,C)} = ${lin(m,t)} → 0 = ${poly(a,b2,c2)}`,`D = ${par(b2)}² − 4 · ${par(a)} · ${par(c2)} = ${fmt(D)} → <b>${lage[2-k]}</b>`];
+ if(k)sol.push('Gemeinsame Punkte: <b>'+xs.map(x=>P(x,fg(x))).join(', ')+'</b>');
+ return {q:`Untersuche die Lage von <span class="f">y<sub>P</sub> = ${poly(A,Bc,C)}</span> und <span class="f">y<sub>G</sub> = ${lin(m,t)}</span>.${k?' Gib die x-Werte der gemeinsamen Punkte an (x₂ leer lassen, falls es nur einen gibt).':''}`,
+  fields,hints:['Gleichsetzen und alles auf eine Seite bringen: 0 = …','Berechne D = b² − 4ac der neuen Gleichung.'],sol}}
+randomBox('r4',genLage,'Lagebeziehung Gerade – Parabel');
+
+/* ===== Prüfungsaufgaben ===== */
+const SA=[
+ {t:'Aufgabe 1: Das Hallentor',pts:'ca. 8 Punkte',
+  intro:'Eine Lagerhalle hat ein parabelförmiges Einfahrtstor. Das Tor ist am Boden <b>8 m breit</b> und in der Mitte <b>6 m hoch</b>. Das Koordinatensystem wird so gelegt, dass der Ursprung in der Mitte des Tores am Boden liegt (1 LE = 1 m).',
+  fig:()=>plot({xmin:-5,xmax:5,ymin:-1,ymax:7,fns:[{f:x=>-0.375*x*x+6,c:B,from:-4,to:4}],pts:[{x:-4,y:0,label:'(−4 | 0)',an:'end',dx:-6},{x:4,y:0,label:'(4 | 0)'},{x:0,y:6,c:R,label:'S(0 | 6)'}],xl:'x in m',yl:'y in m'}),
+  parts:[
+   {q:'Bestimme die Gleichung der Parabel in der Form <span class="f">y = ax² + c</span>.',fields:[{l:'a =',a:-0.375,tol:0.002},{l:'c =',a:6}],
+    hints:['Der Scheitel liegt auf der y-Achse in 6 m Höhe. Was folgt daraus für c?','c = 6. Setze nun einen Fußpunkt des Tores, z. B. (4 | 0), ein.'],
+    sol:['Scheitel S(0 | 6) → c = 6 → y = ax² + 6','(4 | 0) einsetzen: 0 = 16a + 6 → a = −6/16 = <b>−0,375</b>','<b>y = −0,375x² + 6</b>']},
+   {q:'Ein Lkw ist <b>3 m breit</b> und <b>4,20 m hoch</b>. Er fährt genau mittig durch das Tor. Wie hoch ist das Tor an der Außenkante des Lkw? Passt der Lkw durch?',fields:[{l:'Höhe =',a:5.16,tol:0.011,u:'m'},{l:'Passt er?',opts:['ja','nein'],a:'ja'}],
+    hints:['Mittig bedeutet: Die Außenkanten liegen bei x = −1,5 und x = 1,5.','Berechne y für x = 1,5 und vergleiche mit 4,20 m.'],
+    sol:['y = −0,375 · 1,5² + 6 = −0,84375 + 6 ≈ <b>5,16 m</b>','5,16 m &gt; 4,20 m → <b>Der Lkw passt durch das Tor.</b>']},
+   {q:'Ein Fahrzeug ist <b>4,50 m</b> hoch. Wie breit darf es höchstens sein, damit es noch mittig durch das Tor passt?',fields:[{l:'Breite =',a:4,u:'m'}],
+    hints:['Jetzt ist die Höhe gegeben: Setze y = 4,5 ein und löse nach x auf.','4,5 = −0,375x² + 6 → x² = 4. Achtung: Die Breite reicht von −x bis +x!'],
+    sol:['4,5 = −0,375x² + 6 → −1,5 = −0,375x² → x² = 4 → x = ±2','Breite = 2 · 2 m = <b>4 m</b>']}]},
+ {t:'Aufgabe 2: Gewinnzone eines Unternehmens',pts:'ca. 10 Punkte',
+  intro:'Ein Unternehmen stellt Bluetooth-Lautsprecher her. Der Erlös wird beschrieben durch <span class="f">E(x) = −0,5x² + 40x</span>, die Kosten durch <span class="f">K(x) = 10x + 250</span>.<br>x: Menge in Mengeneinheiten (ME), E und K in Geldeinheiten (GE).',
+  fig:()=>plot({xmin:-4,xmax:64,ymin:-80,ymax:950,h:420,sx:10,sy:100,fns:[{f:x=>-0.5*x*x+40*x,c:B,from:0,to:80,label:'E(x)',lx:33},{f:x=>10*x+250,c:O,from:0,label:'K(x)',lx:58}],xl:'x in ME',yl:'GE'}),
+  parts:[
+   {q:'Welche besondere Lage haben die Graphen von E und K zueinander? Berechne die <b>Gewinnschwelle</b> und die <b>Gewinngrenze</b> (Schnittpunkte).',
+    fields:[{l:'Lage:',opts:lage,a:'Sekante'},{l:'x₁ =',a:10,g:'x',u:'ME'},{l:'x₂ =',a:50,g:'x',u:'ME'}],
+    hints:['Gewinnschwelle und -grenze liegen dort, wo Erlös = Kosten: E(x) = K(x).','−0,5x² + 40x = 10x + 250 → 0 = −0,5x² + 30x − 250','D = 30² − 4 · (−0,5) · (−250) = 400'],
+    sol:['−0,5x² + 40x = 10x + 250 → 0 = −0,5x² + 30x − 250','D = 900 − 500 = 400 &gt; 0 → <b>Sekante</b>','x<sub>1/2</sub> = (−30 ± 20) / (−1) → x₁ = 10, x₂ = 50','Gewinnschwelle bei <b>10 ME</b>, Gewinngrenze bei <b>50 ME</b>']},
+   {q:'Bestimme die Gewinnfunktion <span class="f">G(x) = E(x) − K(x)</span> in der Form <span class="f">G(x) = ax² + bx + c</span>.',fields:[{l:'a =',a:-0.5},{l:'b =',a:30},{l:'c =',a:-250}],
+    hints:['Klammer um K(x) setzen: G(x) = −0,5x² + 40x − (10x + 250)'],sol:['G(x) = −0,5x² + 40x − 10x − 250','<b>G(x) = −0,5x² + 30x − 250</b>']},
+   {q:'Bei welcher Menge ist der Gewinn am größten? Wie hoch ist der maximale Gewinn?',fields:[{l:'x =',a:30,u:'ME'},{l:'G<sub>max</sub> =',a:200,u:'GE'}],
+    hints:['Der maximale Gewinn liegt im Scheitelpunkt der Gewinnparabel.','x<sub>S</sub> = −b / (2a) = −30 / (2 · (−0,5))'],
+    sol:['x<sub>S</sub> = −30 / (−1) = 30','G(30) = −0,5 · 900 + 900 − 250 = 200','Bei <b>30 ME</b> ist der Gewinn mit <b>200 GE</b> maximal.']}]},
+ {t:'Aufgabe 3: Kugelstoßen',pts:'ca. 10 Punkte',
+  intro:'Die Flugbahn einer Kugel beim Kugelstoßen kann durch eine Parabel beschrieben werden. Die Kugel verlässt die Hand im Punkt <b>A(0 | 2)</b> und durchläuft die Punkte <b>B(1 | 2,7)</b> und <b>C(5 | 3,5)</b> (Angaben in Metern).',
+  fig:()=>plot({xmin:-1,xmax:12,ymin:-0.5,ymax:5,h:300,sx:1,sy:1,pts:[{x:0,y:2,label:'A',c:B},{x:1,y:2.7,label:'B',c:B},{x:5,y:3.5,label:'C',c:B}],segs:[{x1:7,y1:0,x2:7,y2:3,c:V,label:'Wand',dx:28}],xl:'x in m',yl:'y in m'}),
+  parts:[
+   {q:'Bestimme die Funktionsgleichung der Flugbahn in der Form <span class="f">y = ax² + bx + c</span>.',fields:[{l:'a =',a:-0.1},{l:'b =',a:0.8},{l:'c =',a:2}],
+    hints:['A liegt auf der y-Achse → c = 2.','B: 2,7 = a + b + 2 → a + b = 0,7 &nbsp; C: 3,5 = 25a + 5b + 2 → 25a + 5b = 1,5','Aus der ersten Gleichung: b = 0,7 − a. In die zweite einsetzen.'],
+    sol:['c = 2','B: a + b = 0,7 → b = 0,7 − a','C: 25a + 5b = 1,5 → 25a + 5(0,7 − a) = 1,5 → 20a = −2 → <b>a = −0,1</b>','b = 0,7 + 0,1 = <b>0,8</b>','<b>y = −0,1x² + 0,8x + 2</b>']},
+   {q:'Berechne die <b>maximale Flughöhe</b> der Kugel und in welcher Entfernung sie erreicht wird.',fields:[{l:'x<sub>S</sub> =',a:4,u:'m'},{l:'y<sub>S</sub> =',a:3.6,u:'m'}],
+    hints:['Gesucht ist der Scheitelpunkt: x<sub>S</sub> = −b / (2a)'],sol:['x<sub>S</sub> = −0,8 / (−0,2) = 4','y<sub>S</sub> = −0,1 · 16 + 3,2 + 2 = 3,6','Nach <b>4 m</b> erreicht die Kugel die maximale Höhe von <b>3,6 m</b>.']},
+   {q:'Wie weit fliegt die Kugel (Aufprall auf dem Boden)?',fields:[{l:'Weite =',a:10,u:'m'}],
+    hints:['Am Boden gilt y = 0.','0 = −0,1x² + 0,8x + 2 mit der Lösungsformel lösen. Nur die positive Lösung ist sinnvoll.'],
+    sol:['0 = −0,1x² + 0,8x + 2','D = 0,64 + 0,8 = 1,44','x<sub>1/2</sub> = (−0,8 ± 1,2) / (−0,2) → x₁ = −2 (entfällt), x₂ = 10','Die Kugel fliegt <b>10 m</b> weit.']},
+   {q:'In <b>7 m</b> Entfernung steht eine <b>3 m</b> hohe Schutzwand. Fliegt die Kugel darüber?',fields:[{l:'Höhe bei 7 m =',a:2.7,u:'m'},{l:'Darüber?',opts:['ja','nein'],a:'nein'}],
+    hints:['Setze x = 7 in die Funktionsgleichung ein.'],sol:['y = −0,1 · 49 + 0,8 · 7 + 2 = −4,9 + 5,6 + 2 = 2,7','2,7 m &lt; 3 m → <b>Nein</b>, die Kugel prallt gegen die Wand.']}]},
+ {t:'Aufgabe 4: Der Springbrunnen',pts:'ca. 9 Punkte',
+  intro:'Der Wasserstrahl eines Springbrunnens tritt im Punkt <b>D(0 | 1)</b> aus der Düse aus und erreicht im Scheitel <b>S(2 | 3)</b> seine größte Höhe (Angaben in Metern). Über dem Brunnen ist eine Lichterkette geradlinig gespannt, die durch <span class="f">g: y = −0,5x + 3</span> beschrieben wird.',
+  fig:()=>plot({xmin:-1,xmax:6,ymin:-0.5,ymax:4,h:300,sx:1,sy:1,fns:[{f:x=>-0.5*(x-2)**2+3,c:B,from:0,to:4.45},{f:x=>-0.5*x+3,c:O,label:'g',lx:5.3}],pts:[{x:0,y:1,label:'D',c:B},{x:2,y:3,label:'S',c:R}],xl:'x in m',yl:'y in m'}),
+  parts:[
+   {q:'Bestimme die Gleichung des Wasserstrahls in Scheitelform und in allgemeiner Form.',fields:[{l:'a =',a:-0.5},{l:'b =',a:2},{l:'c =',a:1}],
+    hints:['Ansatz Scheitelform: y = a · (x − 2)² + 3','D(0 | 1) einsetzen: 1 = a · 4 + 3'],
+    sol:['1 = a · (0 − 2)² + 3 → −2 = 4a → a = −0,5','Scheitelform: <b>y = −0,5 · (x − 2)² + 3</b>','Allgemein: −0,5(x² − 4x + 4) + 3 = <b>−0,5x² + 2x + 1</b>']},
+   {q:'In welcher Entfernung von der Düse trifft das Wasser auf die Wasseroberfläche (y = 0)? Runde auf zwei Nachkommastellen.',fields:[{l:'x =',a:4.45,tol:0.011,u:'m'}],
+    hints:['0 = −0,5 · (x − 2)² + 3 → (x − 2)² = 6','Wurzel ziehen: x − 2 = ±√6. Nur die positive Lösung ist sinnvoll.'],
+    sol:['0 = −0,5(x − 2)² + 3 → (x − 2)² = 6','x = 2 + √6 ≈ <b>4,45 m</b> (x = 2 − √6 &lt; 0 entfällt)']},
+   {q:'Berechne die Punkte, in denen der Wasserstrahl die Lichterkette kreuzt.',fields:[{l:'Lage:',opts:lage,a:'Sekante'},{l:'x₁ =',a:1,g:'x'},{l:'x₂ =',a:4,g:'x'},{l:'y₁ =',a:2.5,g:'y'},{l:'y₂ =',a:1,g:'y'}],
+    hints:['Gleichsetzen: −0,5x² + 2x + 1 = −0,5x + 3','0 = −0,5x² + 2,5x − 2 → D = 6,25 − 4 = 2,25','y-Werte über die Geradengleichung berechnen.'],
+    sol:['−0,5x² + 2x + 1 = −0,5x + 3 → 0 = −0,5x² + 2,5x − 2','D = 2,5² − 4 · (−0,5) · (−2) = 2,25 &gt; 0 → Sekante','x<sub>1/2</sub> = (−2,5 ± 1,5) / (−1) → x₁ = 1, x₂ = 4','<b>S₁(1 | 2,5), S₂(4 | 1)</b>']}]}
+];
+SA.forEach((sa,k)=>{const box=document.createElement('div');box.className='sa';
+ box.innerHTML=`<h3>${sa.t}<span class="pts">${sa.pts}</span></h3><p>${sa.intro}</p><div style="max-width:620px">${sa.fig()}</div><div class="parts"></div>`;
+ $('x5').appendChild(box);sa.parts.forEach((p,i)=>renderEx(p,box.querySelector('.parts'),String.fromCharCode(97+i)+')'))});
+
+show((location.hash.slice(1)&&$(location.hash.slice(1)))?location.hash.slice(1):'start');
+</script>
+</body>
+</html>
