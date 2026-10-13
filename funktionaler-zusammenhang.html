@@ -149,6 +149,16 @@ svg.plot text{font:13px system-ui,sans-serif}
 .zd{stroke:var(--tip);stroke-width:2;stroke-dasharray:5 4}
 .zs{stroke:var(--tip);stroke-width:2.5}.z-f{fill:var(--tip)}
 .fbrow{display:flex;gap:12px;align-items:flex-start}
+
+.sc-water{fill:#4a9be8;opacity:.38}.sc-earth{fill:#a07850;opacity:.35}.sc-stone{fill:#9a948a;opacity:.5}
+.sc-rock{fill:#8c8578;opacity:.4}.sc-wood{fill:#b9773a;opacity:.7}.sc-road{fill:#4a4a4a;opacity:.7}
+.sc-mark{stroke:#fff;stroke-width:1.5;stroke-dasharray:8 6}.sc-pillar{stroke:#9a948a;stroke-width:3}
+.sc-house{fill:#9a948a;opacity:.6}.sc-gain{fill:#2e9e5b;opacity:.2}.sc-loss{fill:#d0453a;opacity:.16}
+.sc-tg{fill:#2e9e5b;font-weight:700}.sc-tr{fill:#d0453a;font-weight:700}
+.sc-flower{fill:#e86fb0;stroke:#fff;stroke-width:1.5}.sc-ball{fill:#fff;stroke:#333;stroke-width:1.5}
+.sc-cabin{fill:#d0453a;opacity:.85}.sc-wheel{fill:#333}.sc-snow{fill:#bcd8f2;opacity:.7}.sc-sand{fill:#e3c27a;opacity:.8}
+.sc-tree{fill:#3c9a4c;opacity:.6}.sc-post{stroke:#6b6b6b;stroke-width:2.5}.sc-net{fill:#9a948a;opacity:.35;stroke:#6b6b6b;stroke-width:1}
+.sc-b0{fill:#d0453a;opacity:.75}.sc-b1{fill:#2357c6;opacity:.65}.sc-b2{fill:#2e9e5b;opacity:.7}.sc-b3{fill:#e0a020;opacity:.8}
 </style>
 </head>
 <body>
@@ -563,7 +573,7 @@ const STRAT_AUFGABEN = [
   { kontext:R`Ein Wasserstrahl verläuft auf \(p:\ y=-0,4x^2+2x+1\) (in m). Der Brunnen steht bei \(x=0\).`,
     frage:'In welcher Entfernung vom Brunnen trifft der Strahl auf den Boden?', l:'null', sig:'trifft auf den Boden',
     wie:R`Boden heißt Höhe \(y=0\): \(0=-0,4x^2+2x+1\) lösen, positive Lösung nehmen.` },
-  { kontext:R`Ein Seil wird geradlinig vom Mast \(A(0\mid 12)\) zum Boden \(B(20\mid 2)\) gespannt.`,
+  { kontext:R`Ein Seil wird geradlinig vom Mast \(A(0\mid 12)\) zu einem Pfosten \(B(20\mid 2)\) gespannt.`,
     frage:'Bestimmen Sie die Funktionsgleichung des Seils.', l:'gerade', sig:'geradlinig + zwei Punkte',
     wie:R`\(m=\dfrac{y_2-y_1}{x_2-x_1}\), dann einen Punkt in \(y=mx+t\) einsetzen und \(t\) berechnen.` },
   { kontext:R`Ein Ball fliegt auf der Bahn \(p:\ y=-0,2x^2+1,6x\). Ein schräges Dach verläuft auf \(g:\ y=0,5x+0,4\).`,
@@ -776,6 +786,15 @@ function plotSVG(P, zeigeZiel){
   let s=`<svg class="plot" viewBox="0 0 ${PW} ${PH}" role="img" aria-label="Skizze zur Situation">
   <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" class="ax-f"/></marker>
   <marker id="arz" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" class="z-f"/></marker></defs>`;
+  // Szene (Hintergrund)
+  const sp=list=>list.map(q=>{ if(Array.isArray(q)) return [q]; const F=P.fns[q.fn].f, n=40, a=[]; for(let k=0;k<=n;k++){const x=q.a+(q.b-q.a)*k/n; a.push([x,F(x)]);} return a; }).flat().map(([x,y])=>X(x).toFixed(1)+','+Y(y).toFixed(1)).join(' ');
+  if(P.scene){ s+=`<g clip-path="url(#clip)">`; P.scene.forEach(e=>{
+    if(e.t==='rect') s+=`<rect x="${X(e.x1)}" y="${Y(e.y2)}" width="${X(e.x2)-X(e.x1)}" height="${Y(e.y1)-Y(e.y2)}" class="sc-${e.c}"/>`;
+    if(e.t==='poly') s+=`<polygon points="${sp(e.p)}" class="sc-${e.c}"/>`;
+    if(e.t==='circ') s+=`<circle cx="${X(e.x)}" cy="${Y(e.y)-e.r+2}" r="${e.r}" class="sc-${e.c}"/>`;
+    if(e.t==='line') s+=`<line x1="${X(e.x1)}" y1="${Y(e.y1)}" x2="${X(e.x2)}" y2="${Y(e.y2)}" class="sc-${e.c}"/>`;
+    if(e.t==='txt') s+=`<text x="${X(e.x)}" y="${Y(e.y)}" class="${e.c==='ctx'?'ctx':'sc-'+e.c}" ${e.end?'text-anchor="end"':e.mid?'text-anchor="middle"':''}>${e.l}</text>`;
+  }); s+=`</g>`; }
   // Achsen
   const ax = (y0<=0&&y1>=0)?Y(0):PH-PAD, ay=(x0<=0&&x1>=0)?X(0):PAD;
   s+=`<line x1="${PAD-8}" y1="${ax}" x2="${PW-8}" y2="${ax}" class="ax" marker-end="url(#ar)"/><text x="${PW-14}" y="${ax-8}" class="axl">x</text>`;
@@ -805,7 +824,7 @@ function plotSVG(P, zeigeZiel){
     if(z.t==='span') s+=`<line x1="${X(z.x1)}" y1="${Y(z.y)}" x2="${X(z.x2)}" y2="${Y(z.y)}" class="zs" marker-start="url(#arz)" marker-end="url(#arz)"/>${z.l?`<text x="${(X(z.x1)+X(z.x2))/2}" y="${Y(z.y)+(z.dy??18)}" class="zl" text-anchor="middle">${z.l}</text>`:''}`;
     if(z.t==='vspan') s+=`<line x1="${X(z.x)}" y1="${Y(z.y1)}" x2="${X(z.x)}" y2="${Y(z.y2)}" class="zs" marker-start="url(#arz)" marker-end="url(#arz)"/>${z.l?`<text x="${X(z.x)+(z.dx??8)}" y="${(Y(z.y1)+Y(z.y2))/2+4}" class="zl" ${z.end?'text-anchor="end"':''}>${z.l}</text>`:''}`;
   });
-  s+=`<clipPath id="clip"><rect x="0" y="0" width="${PW}" height="${PH}"/></clipPath></svg>`;
+  s+=`<clipPath id="clip"><rect x="${PAD-8}" y="4" width="${PW-PAD}" height="${PH-PAD}"/></clipPath></svg>`;
   return s;
 }
 
@@ -836,7 +855,7 @@ const PLOTS = [
   {x:[180,360],y:[-10,160],fns:[{f:x=>-0.9*x+317,d:[190,352],name:'h',lx:240}],extras:[{t:'txt',x:355,y:-8,l:'Boden',end:1}],ziel:[{t:'vline',x:315,y:33.5,l:'x = 315'},{t:'pt',x:315,y:33.5,l:'Höhe = ?'}]},
   {x:[30,270],y:[-10,215],fns:[{f:x=>-0.02*x*x+6*x-250,d:[50,250],name:'p = ?',unk:1,lx:235}],pts:[[90,128,'A(90|128)'],[210,128,'B(210|128)']],ziel:[{t:'fn',i:0}]},
   {x:[-5.5,5.5],y:[-0.6,5],fns:[{f:tunnel,d:[-4,4],name:'p',lx:2.6}],extras:[{t:'txt',x:5.3,y:-0.5,l:'Straße',end:1}],ziel:[{t:'pt',x:-4,y:0},{t:'pt',x:4,y:0},{t:'span',x1:-4,x2:4,y:0,l:'Breite? (y = 0)',dy:-10}]},
-  {x:[-5.5,5.5],y:[-0.6,5],fns:[{f:tunnel,d:[-4,4],name:'p',lx:2.6}],extras:[{t:'txt',x:5.3,y:-0.5,l:'Straße',end:1},{t:'rect',x1:-1.5,x2:1.5,y1:0,y2:2.4,l:'Lkw'}],ziel:[{t:'vline',x:1.5,y:3.4375,l:'x = 1,5'},{t:'pt',x:1.5,y:3.4375,l:'max. Höhe?'}]},
+  {x:[-5.5,5.5],y:[-0.6,5],fns:[{f:tunnel,d:[-4,4],name:'p',lx:2.6}],extras:[{t:'txt',x:5.3,y:-0.5,l:'Straße',end:1},{t:'rect',x1:-1.5,x2:1.5,y1:0.3,y2:2.4,l:'Lkw'}],ziel:[{t:'vline',x:1.5,y:3.4375,l:'x = 1,5'},{t:'pt',x:1.5,y:3.4375,l:'max. Höhe?'}]},
   {x:[-5.5,5.5],y:[-0.6,5],fns:[{f:tunnel,d:[-4,4],name:'p',lx:2.9}],extras:[{t:'txt',x:5.3,y:-0.5,l:'Straße',end:1}],ziel:[{t:'hline',x:2,y:3},{t:'pt',x:-2,y:3},{t:'pt',x:2,y:3},{t:'span',x1:-2,x2:2,y:3,l:'Breite in 3 m Höhe?',dy:20}]},
   {x:[-2,36],y:[-0.6,7.5],fns:[{f:x=>-0.02*x*x+0.6*x+2,d:[0,34],name:'p',lx:28}],extras:[{t:'txt',x:35,y:-0.5,l:'Boden',end:1}],ziel:[{t:'pt',x:15,y:6.5,l:'größte Höhe'},{t:'vline',x:15,y:6.5,l:'x = ?'}]},
   {x:[-0.5,11],y:[-0.5,12.5],fns:[{f:x=>0.5*x+2,d:[0,10.5],name:'g',lx:9.5},{f:x=>-x+11,d:[0,10.5],name:'h',lx:1.5}],ziel:[{t:'pt',x:6,y:5,l:'Kreuzung?',dy:24}]},
@@ -844,6 +863,54 @@ const PLOTS = [
   {x:[-80,1550],y:[650,1520],fns:[{f:x=>800+0.5*x,d:[0,1200],name:'Seilbahn',lx:500}],pts:[[0,800,'T(0|800)'],[1200,1400,'B(1200|1400)']],extras:[{t:'hseg',x1:0,x2:1200,y:800}],ziel:[{t:'vspan',x:1200,y1:800,y2:1400,l:'1400 − 800',dx:-8,end:1}]},
   {x:[-1.2,5.2],y:[-0.3,4.2],fns:[{f:x=>0.5*x*x-2*x+3,d:[-0.4,4.4],name:'p',lx:3.2}],ziel:[{t:'hline',x:4,y:3},{t:'pt',x:0,y:3},{t:'pt',x:4,y:3},{t:'span',x1:0,x2:4,y:3,l:'Breite am Rand (y = 3)?',dy:20}]}
 ];
+
+/* ---------- Szenen-Hintergründe (Charakter der Situation) ---------- */
+function brueckeSzene(){ const s=[{t:'rect',x1:-5,x2:12,y1:-3,y2:0,c:'earth'},{t:'rect',x1:12,x2:68,y1:-3,y2:0,c:'water'},{t:'rect',x1:68,x2:85,y1:-3,y2:0,c:'earth'},
+  {t:'rect',x1:-5,x2:0,y1:0,y2:16.2,c:'stone'},{t:'rect',x1:80,x2:85,y1:0,y2:16.2,c:'stone'},{t:'rect',x1:-5,x2:85,y1:16.2,y2:17.3,c:'stone'},{t:'txt',x:40,y:-2.2,l:'Fluss',c:'ctx',mid:1}];
+  [6,14,22,30,50,58,66,74].forEach(x=>s.push({t:'line',x1:x,y1:brucke(x),x2:x,y2:16.2,c:'pillar'})); return s; }
+const tunnelSzene=()=>[{t:'poly',p:[[-5.5,0],[-4,0],{fn:0,a:-4,b:4},[4,0],[5.5,0],[5.5,4.95],[-5.5,4.95]],c:'rock'},{t:'rect',x1:-5.5,x2:5.5,y1:-0.4,y2:0,c:'road'},{t:'line',x1:-5.3,y1:-0.2,x2:5.3,y2:-0.2,c:'mark'},{t:'txt',x:-4.8,y:4.4,l:'Berg',c:'ctx'}];
+const teichSzene=()=>[{t:'poly',p:[[-0.5,0],[2,0],{fn:0,a:2,b:12},[12,0],[14.5,0],[14.5,-1.6],[-0.5,-1.6]],c:'earth'},{t:'poly',p:[[2,0],{fn:0,a:2,b:12},[12,0]],c:'water'},
+  {t:'rect',x1:3.5,x2:5.3,y1:0,y2:0.07,c:'wood'},{t:'poly',p:[[3.7,0.07],[3.7,0.36],[4.4,0.6],[5.1,0.36],[5.1,0.07]],c:'house'},{t:'txt',x:4.4,y:0.66,l:'Entenhaus',c:'ctx',mid:1}];
+const boden=(x1,x2,y1,c)=>({t:'rect',x1,x2,y1,y2:0,c:c||'earth'});
+function buecher(y,x0,n){ const r=[]; for(let k=0;k<n;k++) r.push({t:'rect',x1:x0+k*0.42,x2:x0+k*0.42+0.34,y1:y,y2:y+0.55+((k*37)%5)*0.06,c:'b'+(k%4)}); return r; }
+const baum=(x,y)=>[{t:'rect',x1:x-0.08,x2:x+0.08,y1:y,y2:y+0.4,c:'wood'},{t:'poly',p:[[x-0.45,y+0.35],[x,y+1.5],[x+0.45,y+0.35]],c:'tree'}];
+const rampe=()=>({t:'poly',p:[[1,0],[2.5,0.6],[2.5,0]],c:'wood'});
+const netz=()=>[{t:'line',x1:6,y1:0,x2:6,y2:0.9,c:'post'},{t:'poly',p:[[6,0.9],[6.4,0.5],[6.9,0.55],[7.2,0.95]],c:'net'},{t:'line',x1:7.2,y1:0,x2:7.2,y2:0.95,c:'post'}];
+
+const SCENES = {
+  0:brueckeSzene(),1:brueckeSzene(),2:brueckeSzene(),3:brueckeSzene(),
+  4:[boden(-0.6,4.9,-0.5),{t:'rect',x1:4.9,x2:6.2,y1:-0.5,y2:0,c:'water'},{t:'rect',x1:-0.09,x2:0.09,y1:0,y2:1,c:'stone'},{t:'txt',x:0.15,y:0.25,l:'Düse',c:'ctx'}],
+  5:[boden(-0.6,4.9,-0.5),{t:'rect',x1:4.9,x2:6.2,y1:-0.5,y2:0,c:'water'},{t:'rect',x1:-0.09,x2:0.09,y1:0,y2:1,c:'stone'},{t:'txt',x:0.15,y:0.25,l:'Düse',c:'ctx'}],
+  6:[boden(-2,23,-1),{t:'rect',x1:-0.35,x2:0.35,y1:0,y2:12.6,c:'wood'},{t:'rect',x1:19.7,x2:20.3,y1:0,y2:2,c:'wood'},{t:'txt',x:0.7,y:6,l:'Mast',c:'ctx'},{t:'txt',x:20.7,y:0.6,l:'Pfosten',c:'ctx'}],
+  7:[boden(-0.5,8.5,-0.4),{t:'poly',p:[[3.5,0],[3.5,2.15],[8.5,4.65],[8.5,0]],c:'house'},{t:'circ',x:0,y:0.06,r:6,c:'ball'},{t:'txt',x:6,y:1,l:'Haus',c:'ctx',mid:1}],
+  8:[{t:'poly',p:[[10,0],{fn:0,a:10,b:30},[30,0]],c:'gain'},{t:'poly',p:[[0,0],{fn:0,a:0,b:10}],c:'loss'},{t:'poly',p:[[30,0],{fn:0,a:30,b:40},[40,0]],c:'loss'},{t:'txt',x:20,y:70,l:'Gewinn',c:'tg',mid:1},{t:'txt',x:4,y:-150,l:'Verlust',c:'tr'},{t:'txt',x:39,y:-150,l:'Verlust',c:'tr',end:1}],
+  9:[{t:'poly',p:[[10,0],{fn:0,a:10,b:30},[30,0]],c:'gain'},{t:'poly',p:[[0,0],{fn:0,a:0,b:10}],c:'loss'},{t:'poly',p:[[30,0],{fn:0,a:30,b:40},[40,0]],c:'loss'},{t:'txt',x:20,y:70,l:'Gewinn',c:'tg',mid:1},{t:'txt',x:4,y:-150,l:'Verlust',c:'tr'},{t:'txt',x:39,y:-150,l:'Verlust',c:'tr',end:1}],
+  10:[{t:'poly',p:[{fn:1,a:20,b:40},{fn:0,a:40,b:20}],c:'gain'},{t:'poly',p:[{fn:0,a:0,b:20},{fn:1,a:20,b:0}],c:'loss'},{t:'txt',x:33,y:1260,l:'Gewinn',c:'tg',mid:1},{t:'txt',x:5,y:420,l:'Verlust',c:'tr',mid:1},{t:'txt',x:1,y:1750,l:'Euro (€)',c:'ctx'}],
+  11:[{t:'txt',x:1,y:1750,l:'Kosten in €',c:'ctx'}],
+  12:[{t:'txt',x:1,y:1750,l:'Kosten in €',c:'ctx'}],
+  13:teichSzene(),
+  14:[...teichSzene(),{t:'circ',x:10,y:0.04,r:7,c:'flower'}],
+  15:[boden(30,270,-10),{t:'rect',x1:90,x2:210,y1:123,y2:128,c:'stone'},{t:'txt',x:150,y:134,l:'Skywalk',c:'ctx',mid:1}],
+  16:[...buecher(0,2.4,6),...buecher(2.1,2.5,8),{t:'rect',x1:1,x2:3,y1:-2.95,y2:-2.7,c:'road'}],
+  17:[boden(-0.2,3,-0.15),rampe(),{t:'circ',x:0.3,y:0.03,r:5,c:'ball'}],
+  18:[boden(-0.3,7,-0.15),rampe(),{t:'circ',x:1.8,y:0.36,r:5,c:'ball'},...netz()],
+  19:[boden(-0.3,7,-0.15),rampe(),...netz(),{t:'circ',x:4.5,y:0.92,r:5,c:'ball'}],
+  20:[boden(180,360,-10),{t:'rect',x1:345,x2:360,y1:0,y2:12,c:'stone'},{t:'line',x1:315,y1:33.5,x2:315,y2:30,c:'post'},{t:'rect',x1:309,x2:321,y1:17,y2:30,c:'cabin'}],
+  21:[boden(30,270,-10),{t:'rect',x1:90,x2:210,y1:123,y2:128,c:'stone'}],
+  22:tunnelSzene(),
+  23:[...tunnelSzene(),{t:'circ',x:-1,y:0.15,r:6,c:'wheel'},{t:'circ',x:1,y:0.15,r:6,c:'wheel'}],
+  24:tunnelSzene(),
+  25:[{t:'rect',x1:-2,x2:36,y1:-0.6,y2:0,c:'snow'},{t:'poly',p:[[-2,4.6],[0,2],[0,0],[-2,0]],c:'stone'},{t:'circ',x:0.2,y:2.25,r:5,c:'cabin'},{t:'txt',x:-1.8,y:0.5,l:'Schanze',c:'ctx'}],
+  26:[{t:'rect',x1:-0.5,x2:11,y1:-0.5,y2:0,c:'tree'},...baum(1.5,8),...baum(8.5,9.6),...baum(2.2,0.6),...baum(9.3,2.3),...baum(4.8,10.4)],
+  27:[boden(-0.4,7,-0.3),{t:'rect',x1:5.3,x2:7,y1:-0.3,y2:0,c:'sand'},{t:'line',x1:-0.3,y1:0,x2:-0.3,y2:4,c:'post'},{t:'line',x1:0,y1:0,x2:0,y2:4,c:'post'},
+       ...[0.5,1,1.5,2,2.5,3,3.5].map(y=>({t:'line',x1:-0.3,y1:y,x2:0,y2:y,c:'post'})),{t:'txt',x:6.1,y:-0.22,l:'Sand',c:'ctx',mid:1}],
+  28:[{t:'poly',p:[[-80,650],[-80,780],[200,850],[700,1050],[1150,1380],[1300,1470],[1550,1000],[1550,650]],c:'rock'},
+      {t:'rect',x1:-40,x2:40,y1:800,y2:850,c:'house'},{t:'rect',x1:1160,x2:1240,y1:1400,y2:1450,c:'house'},
+      {t:'line',x1:590,y1:1095,x2:590,y2:1075,c:'post'},{t:'rect',x1:555,x2:625,y1:1015,y2:1075,c:'cabin'}],
+  29:[{t:'poly',p:[{fn:0,a:-0.4,b:4.4},[4.4,0.3],[-0.4,0.3]],c:'stone'},{t:'poly',p:[[0.905,1.6],{fn:0,a:0.905,b:3.095},[3.095,1.6]],c:'water'},{t:'txt',x:2,y:0.55,l:'Rinne',c:'ctx',mid:1}]
+};
+PLOTS[7].fns[1].d=[3.5,8.5]; PLOTS[7].fns[1].lx=7.2; PLOTS[7].ziel=PLOTS[7].ziel.filter(z=>!(z.t==='pt'&&z.x<1));
+Object.entries(SCENES).forEach(([i,sc])=>{ PLOTS[i].scene=sc; });
 
 STRAT_AUFGABEN.forEach((a,i)=>{ a.plot=PLOTS[i]; });
 
