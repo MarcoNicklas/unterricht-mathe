@@ -73,6 +73,7 @@ main{max-width:960px;margin:0 auto;padding:20px 16px 60px}
 .answer .lbl{font-size:13px;color:var(--muted);margin-bottom:6px}
 .fields{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
 .field{display:flex;align-items:center;gap:6px}
+.pm{padding:4px 9px;font-weight:700;font-size:16px;line-height:1.2}
 .field input,.field select{font:inherit;width:96px;padding:6px 8px;border:1.5px solid var(--line);border-radius:7px;background:var(--card);color:var(--ink)}
 .field select{width:auto}
 .field input.ok,.field select.ok{border-color:var(--ok);background:var(--ok-soft)}
@@ -126,7 +127,7 @@ footer{max-width:960px;margin:0 auto;padding:0 16px 30px;color:var(--muted);font
   <div class="actions"><button class="primary" onclick="closeModal()">Schließen</button></div>
 </div></div>
 
-<footer>Eingabe mit Komma oder Punkt möglich (z. B. 0,9). Dein Fortschritt wird nur in diesem Browser gespeichert.</footer>
+<footer>Eingabe mit Komma oder Punkt möglich (z. B. 0,9). Minus direkt tippen oder mit der ±-Taste setzen. Dein Fortschritt wird nur in diesem Browser gespeichert.</footer>
 
 <script>
 const R = String.raw;
@@ -390,7 +391,7 @@ function renderTask(k){
   let fields=a.felder.map(f=>{
     const v=s.vals[f.key]??'';
     if(f.typ==='wahl') return `<label class="field">${f.label} <select data-k="${f.key}"><option value="">–</option>${f.optionen.map(o=>`<option ${v===o?'selected':''}>${o}</option>`).join('')}</select></label>`;
-    return `<label class="field">${f.label} <input data-k="${f.key}" inputmode="decimal" autocomplete="off" value="${v}">${f.einheit?`<span class="unit">${f.einheit}</span>`:''}</label>`;
+    return `<label class="field">${f.label} <button type="button" class="pm" title="Vorzeichen +/− wechseln" onclick="toggleSign(this)">±</button><input data-k="${f.key}" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="${v}">${f.einheit?`<span class="unit">${f.einheit}</span>`:''}</label>`;
   }).join('');
   let tips='';
   for(let t=0;t<s.tips;t++) tips+=`<div class="tipbox"><b>Tipp ${t+1}:</b> ${a.tipps[t]}</div>`;
@@ -454,6 +455,11 @@ function showSol(k){
     fb.innerHTML='Versuch es zuerst mit den Tipps! Die Lösung wird frei, sobald du alle Tipps angesehen oder die Aufgabe richtig gelöst hast.'; return;
   }
   s.sol=true; save(); renderTask(k);
+}
+function toggleSign(btn){
+  const inp=btn.nextElementSibling; let v=inp.value.trim().replace(/^[−–]/,'-');
+  inp.value = v.startsWith('-') ? v.slice(1) : '-'+v;
+  inp.focus(); inp.classList.remove('ok','bad');
 }
 function saveVals(k){
   const ex=PRUEFUNGEN[cur], a=ex.aufgaben[k], s=st(ex.id,a.nr), box=document.getElementById('t'+k);
