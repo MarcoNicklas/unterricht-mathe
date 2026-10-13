@@ -467,6 +467,16 @@ const PRUEFUNGEN = [
 }
 ];
 
+/* Dezimalkomma in Formeln korrekt setzen (0,5 statt 0, 5) */
+const dc=x=>x.replace(/(\d),(\d)/g,'$1{,}$2');
+const fixM=s=>s.replace(/\\\(([\s\S]*?)\\\)/g,(m,x)=>'\\('+dc(x)+'\\)').replace(/\\\[([\s\S]*?)\\\]/g,(m,x)=>'\\['+dc(x)+'\\]');
+PRUEFUNGEN.forEach(ex=>{ ex.intro=fixM(ex.intro); ex.aufgaben.forEach(a=>{
+  ['vortext','text','ergebnis','eingabe'].forEach(k=>{ if(a[k]) a[k]=fixM(a[k]); });
+  a.tipps=a.tipps.map(fixM); a.loesung=a.loesung.map(dc);
+  a.felder.forEach(f=>{ f.label=fixM(f.label); });
+});});
+document.querySelectorAll('.f-item').forEach(el=>{ el.innerHTML=fixM(el.innerHTML); });
+
 /* ====================== Speicher ====================== */
 const KEY='fz-pruefungstrainer-v1';
 let state={};
