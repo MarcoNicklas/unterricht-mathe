@@ -118,6 +118,37 @@ footer{max-width:960px;margin:0 auto;padding:0 16px 30px;color:var(--muted);font
 .mbtn.bad:disabled{opacity:.7}
 table.sig{width:100%;border-collapse:collapse;font-size:14px}
 table.sig th,table.sig td{border-top:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
+
+svg.mi{width:56px;height:35px;flex:none;fill:none}
+svg.mi.big{width:80px;height:50px}
+.ic-l,.ic-q{stroke:var(--accent);stroke-width:2.5;fill:none}
+.ic-q{stroke-dasharray:4 3}
+.ic-l2{stroke:var(--sol);stroke-width:2.5}
+.ic-a{stroke:var(--muted);stroke-width:1.5}
+.ic-p{fill:var(--ink)}
+.ic-h{fill:var(--tip)}
+.ic-d{stroke:var(--tip);stroke-width:2;stroke-dasharray:3 3}
+.ic-d2{stroke:var(--tip);stroke-width:2.5;fill:none}
+.ic-t{fill:var(--ink);font:bold 13px system-ui}
+.mbtn{flex-direction:row!important;align-items:center;gap:10px!important}
+.mbtn .mt{display:flex;flex-direction:column;gap:2px}
+.plotwrap{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px;margin:10px 0}
+svg.plot{width:100%;height:auto;display:block}
+svg.plot text{font:13px system-ui,sans-serif}
+.ax{stroke:var(--muted);stroke-width:1.3}.ax-f{fill:var(--muted)}.axl{fill:var(--muted);font-style:italic}
+.fn0{stroke:var(--accent);stroke-width:2.6;fill:none}.fn1{stroke:var(--sol);stroke-width:2.6;fill:none}
+.fu{stroke:var(--muted);stroke-width:2.2;fill:none;stroke-dasharray:6 5}
+.fz{stroke:var(--tip);stroke-width:4;fill:none}
+.fl{fill:var(--ink);font-weight:600}
+.pt{fill:var(--ink)}.lbl{fill:var(--ink)}
+.ex{stroke:var(--ink);stroke-width:3}
+.rc{fill:var(--line);stroke:var(--muted)}
+.ctx{fill:var(--muted);font-size:12px!important}
+.zp{fill:var(--tip);stroke:var(--card);stroke-width:2}
+.zl{fill:var(--tip);font-weight:700}
+.zd{stroke:var(--tip);stroke-width:2;stroke-dasharray:5 4}
+.zs{stroke:var(--tip);stroke-width:2.5}.z-f{fill:var(--tip)}
+.fbrow{display:flex;gap:12px;align-items:flex-start}
 </style>
 </head>
 <body>
@@ -630,7 +661,7 @@ function renderStrategie(){
   app.innerHTML = `
   <div class="panel">
     <h2 style="margin:0 0 6px">Was ist zu tun?</h2>
-    <p style="margin:0">Du kannst Nullstellen, Scheitelpunkte und Schnittpunkte berechnen – aber welche Rechnung passt zu welcher Frage? Lies die Situation und wähle aus, <b>was</b> du rechnen musst. Gerechnet wird hier nicht.</p>
+    <p style="margin:0">Du kannst Nullstellen, Scheitelpunkte und Schnittpunkte berechnen – aber welche Rechnung passt zu welcher Frage? Lies die Situation, schau dir die Skizze an und wähle aus, <b>was</b> du rechnen musst. Gerechnet wird hier nicht. Nach der richtigen Antwort wird in der Skizze <b>orange</b> markiert, was gesucht ist.</p>
     <p class="meta" style="margin:8px 0 0">${STRAT_AUFGABEN.length} Situationen · zufällige Reihenfolge${best?` · Dein Bestwert: ${best.r} von ${best.n} beim ersten Versuch`:''}</p>
     <div class="actions"><button class="primary" onclick="stratStart()">Training starten</button><button onclick="toggleSig()">Signalwörter anzeigen</button></div>
     <div id="sigbox" style="display:none;margin-top:12px">${sigTable()}</div>
@@ -639,7 +670,7 @@ function renderStrategie(){
 }
 function sigTable(){
   return `<table class="sig"><thead><tr><th>Rechnung</th><th>Typische Signalwörter in der Aufgabe</th></tr></thead><tbody>${
-    SIGNALE.map(([id,t])=>`<tr><td><b>${mname(id)}</b><br><span class="meta">${METHODEN.find(m=>m.id===id).kurz}</span></td><td>${t}</td></tr>`).join('')
+    SIGNALE.map(([id,t])=>`<tr><td>${icon(id)}<br><b>${mname(id)}</b><br><span class="meta">${METHODEN.find(m=>m.id===id).kurz}</span></td><td>${t}</td></tr>`).join('')
   }</tbody></table>`;
 }
 function toggleSig(){ const b=document.getElementById('sigbox'); b.style.display=b.style.display==='none'?'block':'none'; }
@@ -658,9 +689,10 @@ function stratRender(){
     <div class="meta">Situation ${SQ.i+1} von ${SQ.order.length} · beim ersten Versuch richtig: <b>${SQ.richtig}</b></div>
     <div class="bar"><i style="width:${pct}%"></i></div>
     <p style="margin:14px 0 6px">${a.kontext}</p>
+    ${a.plot?`<div class="plotwrap" id="splot">${plotSVG(a.plot,false)}</div>`:''}
     <p class="aufg" style="font-size:18px">${a.frage}</p>
     <div class="lbl meta" style="margin-top:10px">Was musst du rechnen?</div>
-    <div class="mgrid">${METHODEN.map(m=>`<button class="mbtn" data-m="${m.id}" onclick="stratWahl('${m.id}')"><b>${m.name}</b><span>${m.kurz}</span></button>`).join('')}</div>
+    <div class="mgrid">${METHODEN.map(m=>`<button class="mbtn" data-m="${m.id}" onclick="stratWahl('${m.id}')">${icon(m.id)}<span class="mt"><b>${m.name}</b><span>${m.kurz}</span></span></button>`).join('')}</div>
     <div class="feedback" id="sfb"></div>
     <div id="snext"></div>
   </div>`;
@@ -677,7 +709,8 @@ function stratWahl(id){
     SQ.geloest=true; btn.classList.add('ok');
     app.querySelectorAll('.mbtn').forEach(b=>b.disabled=true);
     fb.className='feedback ok';
-    fb.innerHTML=`<b>Richtig: ${mname(a.l)}</b><br>Signalwort: <i>${a.sig}</i><br>So geht's: ${a.wie}`;
+    fb.innerHTML=`<div class="fbrow">${icon(a.l,true)}<div><b>Richtig: ${mname(a.l)}</b><br>Signalwort: <i>${a.sig}</i><br>So geht's: ${a.wie}${a.plot?'<br><span class="meta">In der Skizze ist jetzt <b style="color:var(--tip)">orange</b> markiert, was gesucht ist.</span>':''}</div></div>`;
+    const sp=document.getElementById('splot'); if(sp&&a.plot) sp.innerHTML=plotSVG(a.plot,true);
     document.getElementById('snext').innerHTML=`<div class="actions"><button class="primary" onclick="SQ.i++;stratRender()">${SQ.i+1<SQ.order.length?'Nächste Situation →':'Auswertung →'}</button></div>`;
     math(fb);
   } else {
@@ -717,6 +750,103 @@ function stratEnde(){
 }
 
 STRAT_AUFGABEN.forEach(a=>{ a.kontext=fixM(a.kontext); a.wie=fixM(a.wie); });
+/* =====================================================================
+   BILDER für „Was ist zu tun?“
+   - ICONS: kleines Bild pro Rechenmethode (Buttons + Signalwort-Tabelle)
+   - PLOTS: Skizze pro Situation; nach richtiger Antwort wird das Gesuchte orange markiert
+   ===================================================================== */
+const ICON_SVG = {
+  para:   `<path d="M6 34 Q32 -14 58 34" class="ic-q"/><circle cx="14" cy="22" r="3" class="ic-p"/><circle cx="46" cy="15" r="3" class="ic-p"/><text x="28" y="30" class="ic-t">?</text>`,
+  gerade: `<line x1="6" y1="34" x2="58" y2="6" class="ic-l"/><circle cx="18" cy="27.5" r="3" class="ic-p"/><circle cx="44" cy="13.5" r="3" class="ic-p"/>`,
+  scheitel:`<path d="M6 36 Q32 -16 58 36" class="ic-l"/><circle cx="32" cy="10" r="4" class="ic-h"/>`,
+  null:   `<line x1="2" y1="30" x2="62" y2="30" class="ic-a"/><path d="M8 38 Q32 -10 56 38" class="ic-l"/><circle cx="12.5" cy="30" r="4" class="ic-h"/><circle cx="51.5" cy="30" r="4" class="ic-h"/>`,
+  schnitt:`<path d="M6 36 Q32 -16 58 36" class="ic-l"/><line x1="4" y1="30" x2="60" y2="8" class="ic-l2"/><circle cx="46.5" cy="13.3" r="4" class="ic-h"/><circle cx="12" cy="27.5" r="4" class="ic-h"/>`,
+  fwert:  `<line x1="2" y1="36" x2="62" y2="36" class="ic-a"/><path d="M6 36 Q32 -10 58 36" class="ic-l"/><line x1="18" y1="36" x2="18" y2="20" class="ic-d"/><circle cx="18" cy="20" r="4" class="ic-h"/>`,
+  xwert:  `<line x1="4" y1="2" x2="4" y2="38" class="ic-a"/><path d="M8 38 Q32 -10 56 38" class="ic-l"/><line x1="4" y1="18" x2="52" y2="18" class="ic-d"/><circle cx="17" cy="18" r="4" class="ic-h"/><circle cx="47" cy="18" r="4" class="ic-h"/>`,
+  diff:   `<circle cx="10" cy="20" r="3" class="ic-p"/><circle cx="54" cy="20" r="3" class="ic-p"/><line x1="15" y1="20" x2="49" y2="20" class="ic-d2"/><path d="M15 20 l6 -4 M15 20 l6 4 M49 20 l-6 -4 M49 20 l-6 4" class="ic-d2"/>`
+};
+function icon(id,big){ return `<svg class="mi${big?' big':''}" viewBox="0 0 64 40" aria-hidden="true">${ICON_SVG[id]}</svg>`; }
+
+/* ---------- Plot-Engine ---------- */
+const PW=520, PH=250, PAD=26;
+function plotSVG(P, zeigeZiel){
+  const [x0,x1]=P.x, [y0,y1]=P.y;
+  const X=x=>PAD+(x-x0)/(x1-x0)*(PW-2*PAD), Y=y=>PH-PAD-(y-y0)/(y1-y0)*(PH-2*PAD);
+  const f2=n=>(Math.round(n*100)/100).toString().replace('.',',');
+  let s=`<svg class="plot" viewBox="0 0 ${PW} ${PH}" role="img" aria-label="Skizze zur Situation">
+  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" class="ax-f"/></marker>
+  <marker id="arz" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" class="z-f"/></marker></defs>`;
+  // Achsen
+  const ax = (y0<=0&&y1>=0)?Y(0):PH-PAD, ay=(x0<=0&&x1>=0)?X(0):PAD;
+  s+=`<line x1="${PAD-8}" y1="${ax}" x2="${PW-8}" y2="${ax}" class="ax" marker-end="url(#ar)"/><text x="${PW-14}" y="${ax-8}" class="axl">x</text>`;
+  s+=`<line x1="${ay}" y1="${PH-PAD+8}" x2="${ay}" y2="8" class="ax" marker-end="url(#ar)"/><text x="${ay+8}" y="16" class="axl">y</text>`;
+  // Extras (gegeben)
+  (P.extras||[]).forEach(e=>{
+    if(e.t==='hseg') s+=`<line x1="${X(e.x1)}" y1="${Y(e.y)}" x2="${X(e.x2)}" y2="${Y(e.y)}" class="ex"/>${e.l?`<text x="${X(e.x2)+4}" y="${Y(e.y)+4}" class="lbl">${e.l}</text>`:''}`;
+    if(e.t==='vseg') s+=`<line x1="${X(e.x)}" y1="${Y(e.y1)}" x2="${X(e.x)}" y2="${Y(e.y2)}" class="ex"/>${e.l?`<text x="${X(e.x)+5}" y="${Y(e.y2)-4}" class="lbl">${e.l}</text>`:''}`;
+    if(e.t==='txt') s+=`<text x="${X(e.x)}" y="${Y(e.y)}" class="ctx" ${e.end?'text-anchor="end"':''}>${e.l}</text>`;
+    if(e.t==='rect') s+=`<rect x="${X(e.x1)}" y="${Y(e.y2)}" width="${X(e.x2)-X(e.x1)}" height="${Y(e.y1)-Y(e.y2)}" class="rc"/>${e.l?`<text x="${(X(e.x1)+X(e.x2))/2}" y="${(Y(e.y1)+Y(e.y2))/2+4}" class="lbl" text-anchor="middle">${e.l}</text>`:''}`;
+  });
+  // Funktionen
+  (P.fns||[]).forEach((F,i)=>{
+    const [a,b]=F.d||P.x; let d=''; const n=120;
+    for(let k=0;k<=n;k++){ const x=a+(b-a)*k/n, y=F.f(x); if(y<y0-1e9) continue; d+=(d?'L':'M')+X(x).toFixed(1)+' '+Y(y).toFixed(1); }
+    const hl = zeigeZiel && (P.ziel||[]).some(z=>z.t==='fn'&&z.i===i);
+    s+=`<path d="${d}" class="${hl?'fz':(F.unk?'fu':'fn'+(i%2))}" clip-path="url(#clip)"/>`;
+    if(F.name){ const lx=F.lx??(a+(b-a)*0.82); s+=`<text x="${X(lx)+4}" y="${Y(F.f(lx))-8}" class="${hl?'zl':'fl'}">${F.name}</text>`; }
+  });
+  // gegebene Punkte
+  (P.pts||[]).forEach(([x,y,l])=>{ s+=`<circle cx="${X(x)}" cy="${Y(y)}" r="4.5" class="pt"/>${l?`<text x="${X(x)+7}" y="${Y(y)-7}" class="lbl">${l}</text>`:''}`; });
+  // Gesuchtes
+  if(zeigeZiel) (P.ziel||[]).forEach(z=>{
+    if(z.t==='pt') s+=`<circle cx="${X(z.x)}" cy="${Y(z.y)}" r="7" class="zp"/>${z.l?`<text x="${X(z.x)+(z.dx??10)}" y="${Y(z.y)+(z.dy??-10)}" class="zl" ${z.end?'text-anchor="end"':''}>${z.l}</text>`:''}`;
+    if(z.t==='vline') s+=`<line x1="${X(z.x)}" y1="${ax}" x2="${X(z.x)}" y2="${Y(z.y)}" class="zd"/>${z.l?`<text x="${X(z.x)+5}" y="${ax-6}" class="zl">${z.l}</text>`:''}`;
+    if(z.t==='hline') s+=`<line x1="${ay}" y1="${Y(z.y)}" x2="${X(z.x)}" y2="${Y(z.y)}" class="zd"/>${z.l?`<text x="${ay+5}" y="${Y(z.y)-6}" class="zl">${z.l}</text>`:''}`;
+    if(z.t==='span') s+=`<line x1="${X(z.x1)}" y1="${Y(z.y)}" x2="${X(z.x2)}" y2="${Y(z.y)}" class="zs" marker-start="url(#arz)" marker-end="url(#arz)"/>${z.l?`<text x="${(X(z.x1)+X(z.x2))/2}" y="${Y(z.y)+(z.dy??18)}" class="zl" text-anchor="middle">${z.l}</text>`:''}`;
+    if(z.t==='vspan') s+=`<line x1="${X(z.x)}" y1="${Y(z.y1)}" x2="${X(z.x)}" y2="${Y(z.y2)}" class="zs" marker-start="url(#arz)" marker-end="url(#arz)"/>${z.l?`<text x="${X(z.x)+(z.dx??8)}" y="${(Y(z.y1)+Y(z.y2))/2+4}" class="zl" ${z.end?'text-anchor="end"':''}>${z.l}</text>`:''}`;
+  });
+  s+=`<clipPath id="clip"><rect x="0" y="0" width="${PW}" height="${PH}"/></clipPath></svg>`;
+  return s;
+}
+
+/* ---------- Skizzen pro Situation (gleiche Reihenfolge wie STRAT_AUFGABEN) ---------- */
+const brucke = x=>-0.01*x*x+0.8*x, strahl=x=>-0.4*x*x+2*x+1, gewinn=x=>-2*x*x+80*x-600,
+      teich=x=>0.05*x*x-0.7*x+1.2, tunnel=x=>-0.25*x*x+4, flug=x=>-0.12*x*x+x-1.15;
+const PLOTS = [
+  {x:[-5,85],y:[-2,19],fns:[{f:brucke,d:[0,80],name:'p'}],extras:[{t:'txt',x:82,y:-1.5,l:'Boden',end:1}],ziel:[{t:'pt',x:40,y:16,l:'höchster Punkt?'},{t:'vline',x:40,y:16}]},
+  {x:[-5,85],y:[-3,19],fns:[{f:brucke,d:[0,80],name:'p'}],extras:[{t:'txt',x:82,y:-2.5,l:'Boden',end:1}],ziel:[{t:'pt',x:0,y:0},{t:'pt',x:80,y:0},{t:'span',x1:0,x2:80,y:0,l:'Spannweite? (y = 0)',dy:-8}]},
+  {x:[-5,85],y:[-2,19],fns:[{f:brucke,d:[0,80],name:'p'}],extras:[{t:'txt',x:82,y:-1.5,l:'Boden',end:1}],ziel:[{t:'vline',x:10,y:7,l:'x = 10'},{t:'pt',x:10,y:7,l:'Höhe y = ?'}]},
+  {x:[-5,85],y:[-2,19],fns:[{f:brucke,d:[0,80],name:'p'}],extras:[{t:'txt',x:82,y:-1.5,l:'Boden',end:1}],ziel:[{t:'hline',x:60,y:12,l:'y = 12'},{t:'pt',x:20,y:12,l:'x = ?',dx:-12,end:1},{t:'pt',x:60,y:12,l:'x = ?'}]},
+  {x:[-0.6,6],y:[-0.5,4.3],fns:[{f:strahl,d:[0,5.46],name:'p = ?',unk:1,lx:4.3}],pts:[[0,1,'P(0|1)'],[2,3.4,'Q(2|3,4)']],ziel:[{t:'fn',i:0}]},
+  {x:[-0.6,6.2],y:[-0.5,4.3],fns:[{f:strahl,d:[0,5.46],name:'p'}],extras:[{t:'txt',x:5.9,y:-0.4,l:'Boden',end:1}],ziel:[{t:'pt',x:5.46,y:0,l:'Boden: y = 0 → x = ?',dx:-10,dy:-14,end:1}]},
+  {x:[-2,23],y:[-1,14],fns:[{f:x=>12-0.5*x,d:[0,20],name:'g = ?',unk:1,lx:9}],pts:[[0,12,'A(0|12)'],[20,2,'B(20|2)']],ziel:[{t:'fn',i:0}]},
+  {x:[-0.5,8.5],y:[-0.4,4],fns:[{f:x=>-0.2*x*x+1.6*x,d:[0,8],name:'p',lx:3.2},{f:x=>0.5*x+0.4,d:[0,8],name:'g (Dach)',lx:6.6}],extras:[{t:'txt',x:8.3,y:-0.33,l:'Boden',end:1}],ziel:[{t:'pt',x:5.11,y:2.96,l:'Treffpunkt?',dx:-12,end:1},{t:'pt',x:0.39,y:0.6}]},
+  {x:[-3,43],y:[-650,300],fns:[{f:gewinn,d:[0,40],name:'G',lx:33}],extras:[{t:'txt',x:42,y:-620,l:'x = Stückzahl',end:1}],ziel:[{t:'pt',x:20,y:200,l:'größter Gewinn'},{t:'vline',x:20,y:200,l:'x = ?'}]},
+  {x:[-3,43],y:[-650,300],fns:[{f:gewinn,d:[0,40],name:'G',lx:33}],extras:[{t:'txt',x:42,y:-620,l:'x = Stückzahl',end:1}],ziel:[{t:'pt',x:10,y:0,l:'G = 0 → x = ?',dx:-10,dy:-12,end:1},{t:'pt',x:30,y:0}]},
+  {x:[-3,43],y:[-100,1900],fns:[{f:x=>20*x+500,d:[0,40],name:'K',lx:36},{f:x=>45*x,d:[0,40],name:'E',lx:34}],extras:[{t:'txt',x:42,y:-80,l:'x = Stückzahl',end:1}],ziel:[{t:'pt',x:20,y:900,l:'K = E',dx:10,dy:16}]},
+  {x:[-3,43],y:[-100,1900],fns:[{f:x=>20*x+500,d:[0,40],name:'K'}],extras:[{t:'txt',x:42,y:-80,l:'x = Stückzahl',end:1}],ziel:[{t:'vline',x:30,y:1100,l:'x = 30'},{t:'pt',x:30,y:1100,l:'y = ?',dx:-12,end:1}]},
+  {x:[-3,63],y:[-100,1900],fns:[{f:x=>20*x+500,d:[0,60],name:'K',lx:56}],extras:[{t:'txt',x:62,y:-80,l:'x = Stückzahl',end:1}],ziel:[{t:'hline',x:50,y:1500,l:'y = 1500'},{t:'pt',x:50,y:1500,l:'x = ?',dx:-12,dy:20,end:1}]},
+  {x:[-0.5,14.5],y:[-1.6,0.7],fns:[{f:teich,d:[2,12],name:'p',lx:3}],extras:[{t:'txt',x:14,y:0.15,l:'Wasseroberfläche',end:1},{t:'hseg',x1:0,x2:14,y:0,l:''}],ziel:[{t:'pt',x:7,y:-1.25,l:'tiefste Stelle',dy:22},{t:'vspan',x:7,y1:0,y2:-1.25,l:'Tiefe?'}]},
+  {x:[-0.5,14.5],y:[-1.6,0.7],fns:[{f:teich,d:[2,12],name:'p',lx:3}],extras:[{t:'txt',x:14,y:0.15,l:'Wasseroberfläche',end:1}],ziel:[{t:'vspan',x:10,y1:0,y2:-0.8,l:'x = 10: Stiel?'},{t:'pt',x:10,y:-0.8}]},
+  {x:[30,270],y:[-10,215],fns:[{f:x=>-0.02*x*x+6*x-250,d:[50,250],name:'p',lx:228}],pts:[[90,128,'A(90|128)'],[210,128,'B(210|128)']],ziel:[{t:'span',x1:90,x2:210,y:128,l:'Länge = 210 − 90'}]},
+  {x:[-4.5,8.5],y:[-3,8],fns:[{f:x=>0.3*x*x-1.2*x-1.5,d:[-3.9,7.9],name:'p',lx:-3.6}],extras:[{t:'txt',x:5.2,y:0.25,l:'1. Brett'},{t:'txt',x:6.2,y:2.35,l:'2. Brett'},{t:'hseg',x1:-1,x2:5,y:0},{t:'hseg',x1:-2,x2:6,y:2.1}],pts:[[-2,2.1,'A(−2|2,1)']],ziel:[{t:'vspan',x:2,y1:0,y2:2.1,l:'Abstand = 2,1 − 0'}]},
+  {x:[-0.2,3],y:[-0.15,1],fns:[{f:x=>0.4*x-0.4,d:[1,2.5],name:'r = ?',unk:1,lx:2.1}],pts:[[1,0,'A(1|0)'],[1.5,0.2,'B(1,5|0,2)']],ziel:[{t:'fn',i:0}]},
+  {x:[-0.3,7],y:[-0.15,1.1],fns:[{f:x=>0.4*x-0.4,d:[1,2.5],name:'r',lx:1.6},{f:flug,d:[2.5,6],name:'p',lx:4.8}],extras:[{t:'txt',x:6.9,y:-0.12,l:'Boden',end:1}],ziel:[{t:'pt',x:2.5,y:0.6,l:'r und p treffen sich',dx:-10,end:1}]},
+  {x:[-0.3,7],y:[-0.15,1.1],fns:[{f:flug,d:[2.5,6.3],name:'p',lx:4}],extras:[{t:'txt',x:6.9,y:-0.12,l:'Boden',end:1},{t:'vseg',x:6,y1:0.4,y2:0.9,l:'Netz'}],ziel:[{t:'vline',x:6,y:0.53,l:'x = 6'},{t:'pt',x:6,y:0.53,l:'y = ?',dx:-12,end:1}]},
+  {x:[180,360],y:[-10,160],fns:[{f:x=>-0.9*x+317,d:[190,352],name:'h',lx:240}],extras:[{t:'txt',x:355,y:-8,l:'Boden',end:1}],ziel:[{t:'vline',x:315,y:33.5,l:'x = 315'},{t:'pt',x:315,y:33.5,l:'Höhe = ?'}]},
+  {x:[30,270],y:[-10,215],fns:[{f:x=>-0.02*x*x+6*x-250,d:[50,250],name:'p = ?',unk:1,lx:235}],pts:[[90,128,'A(90|128)'],[210,128,'B(210|128)']],ziel:[{t:'fn',i:0}]},
+  {x:[-5.5,5.5],y:[-0.6,5],fns:[{f:tunnel,d:[-4,4],name:'p',lx:2.6}],extras:[{t:'txt',x:5.3,y:-0.5,l:'Straße',end:1}],ziel:[{t:'pt',x:-4,y:0},{t:'pt',x:4,y:0},{t:'span',x1:-4,x2:4,y:0,l:'Breite? (y = 0)',dy:-10}]},
+  {x:[-5.5,5.5],y:[-0.6,5],fns:[{f:tunnel,d:[-4,4],name:'p',lx:2.6}],extras:[{t:'txt',x:5.3,y:-0.5,l:'Straße',end:1},{t:'rect',x1:-1.5,x2:1.5,y1:0,y2:2.4,l:'Lkw'}],ziel:[{t:'vline',x:1.5,y:3.4375,l:'x = 1,5'},{t:'pt',x:1.5,y:3.4375,l:'max. Höhe?'}]},
+  {x:[-5.5,5.5],y:[-0.6,5],fns:[{f:tunnel,d:[-4,4],name:'p',lx:2.9}],extras:[{t:'txt',x:5.3,y:-0.5,l:'Straße',end:1}],ziel:[{t:'hline',x:2,y:3},{t:'pt',x:-2,y:3},{t:'pt',x:2,y:3},{t:'span',x1:-2,x2:2,y:3,l:'Breite in 3 m Höhe?',dy:20}]},
+  {x:[-2,36],y:[-0.6,7.5],fns:[{f:x=>-0.02*x*x+0.6*x+2,d:[0,34],name:'p',lx:28}],extras:[{t:'txt',x:35,y:-0.5,l:'Boden',end:1}],ziel:[{t:'pt',x:15,y:6.5,l:'größte Höhe'},{t:'vline',x:15,y:6.5,l:'x = ?'}]},
+  {x:[-0.5,11],y:[-0.5,12.5],fns:[{f:x=>0.5*x+2,d:[0,10.5],name:'g',lx:9.5},{f:x=>-x+11,d:[0,10.5],name:'h',lx:1.5}],ziel:[{t:'pt',x:6,y:5,l:'Kreuzung?',dy:24}]},
+  {x:[-0.4,7],y:[-0.3,4.5],fns:[{f:x=>0.1*x*x-1.2*x+4,d:[0,6],name:'p',lx:1}],ziel:[{t:'hline',x:3.55,y:1,l:'y = 1'},{t:'pt',x:3.55,y:1,l:'x = ?',dy:-12}]},
+  {x:[-80,1550],y:[650,1520],fns:[{f:x=>800+0.5*x,d:[0,1200],name:'Seilbahn',lx:500}],pts:[[0,800,'T(0|800)'],[1200,1400,'B(1200|1400)']],extras:[{t:'hseg',x1:0,x2:1200,y:800}],ziel:[{t:'vspan',x:1200,y1:800,y2:1400,l:'1400 − 800',dx:-8,end:1}]},
+  {x:[-1.2,5.2],y:[-0.3,4.2],fns:[{f:x=>0.5*x*x-2*x+3,d:[-0.4,4.4],name:'p',lx:3.2}],ziel:[{t:'hline',x:4,y:3},{t:'pt',x:0,y:3},{t:'pt',x:4,y:3},{t:'span',x1:0,x2:4,y:3,l:'Breite am Rand (y = 3)?',dy:20}]}
+];
+
+STRAT_AUFGABEN.forEach((a,i)=>{ a.plot=PLOTS[i]; });
+
 
 window.addEventListener('DOMContentLoaded',start);
 </script>
