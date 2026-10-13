@@ -105,6 +105,19 @@ main{max-width:960px;margin:0 auto;padding:20px 16px 60px}
 .back{margin-bottom:14px}
 footer{max-width:960px;margin:0 auto;padding:0 16px 30px;color:var(--muted);font-size:13px}
 @media (max-width:520px){ .field input{width:80px} .task-body{padding:12px} }
+
+.tabs{max-width:960px;margin:0 auto;padding:0 16px;display:flex;gap:4px}
+.tabs button{border:0;border-bottom:3px solid transparent;border-radius:0;background:none;padding:8px 12px;font-weight:600;color:var(--muted)}
+.tabs button.active{color:var(--accent);border-bottom-color:var(--accent)}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:6px}
+.mbtn{text-align:left;display:flex;flex-direction:column;gap:2px;padding:10px 12px}
+.mbtn span{font-size:13px;color:var(--muted)}
+.mbtn.ok{border-color:var(--ok);background:var(--ok-soft)}
+.mbtn.bad{border-color:var(--bad);background:var(--bad-soft)}
+.mbtn:disabled{opacity:1}
+.mbtn.bad:disabled{opacity:.7}
+table.sig{width:100%;border-collapse:collapse;font-size:14px}
+table.sig th,table.sig td{border-top:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
 </style>
 </head>
 <body>
@@ -112,7 +125,9 @@ footer{max-width:960px;margin:0 auto;padding:0 16px 30px;color:var(--muted);font
   <h1>Funktionaler Zusammenhang<small>Prüfungstrainer · Abschlussprüfung Mathematik Wirtschaftsschule (Teil B)</small></h1>
   <button id="btnFormeln">Formeln</button>
   <button id="btnTheme" title="Hell/Dunkel umschalten">◐</button>
-</div></header>
+</div>
+<nav class="tabs"><button id="tab-pruef" onclick="renderHome()">Prüfungen</button><button id="tab-strat" onclick="renderStrategie()">Was ist zu tun?</button></nav>
+</header>
 
 <main id="app"></main>
 
@@ -345,8 +360,9 @@ function examScore(ex){
 const app=document.getElementById('app');
 
 /* ====================== Übersicht ====================== */
+function setTab(t){ ['pruef','strat'].forEach(x=>{const b=document.getElementById('tab-'+x); if(b) b.classList.toggle('active',x===t);}); }
 function renderHome(){
-  location.hash='';
+  location.hash=''; setTab('pruef');
   let h=`<p class="intro">Wähle eine Prüfungsaufgabe. Rechne zuerst selbst auf Papier und trage dann deine Ergebnisse ein. Wenn du nicht weiterkommst, hol dir Schritt für Schritt einen <b>Tipp</b>. Die vollständige <b>Lösung</b> wird freigeschaltet, wenn du richtig gerechnet oder alle Tipps angesehen hast.</p><div class="grid">`;
   PRUEFUNGEN.forEach((ex,i)=>{
     const s=examScore(ex);
@@ -364,7 +380,7 @@ function resetAll(){ if(confirm('Wirklich den gesamten Fortschritt löschen?')){
 /* ====================== Prüfungsansicht ====================== */
 let cur=null;
 function openExam(i){
-  cur=i; const ex=PRUEFUNGEN[i]; location.hash=ex.id;
+  cur=i; const ex=PRUEFUNGEN[i]; location.hash=ex.id; setTab('pruef');
   const s=examScore(ex);
   let h=`<button class="back" onclick="renderHome()">← Alle Prüfungen</button>
   <div class="panel"><span class="tag">${ex.tag}</span> <span class="meta" id="examScore">Punkte: <b>${s.p}</b> / ${s.max}</span>
@@ -479,8 +495,229 @@ try{ const t=localStorage.getItem(KEY+'-theme'); if(t) document.documentElement.
 
 function start(){
   const id=location.hash.slice(1); const i=PRUEFUNGEN.findIndex(e=>e.id===id);
-  if(i>=0) openExam(i); else renderHome();
+  if(id==='strategie') renderStrategie(); else if(i>=0) openExam(i); else renderHome();
 }
+/* =====================================================================
+   REITER „Was ist zu tun?“ – Strategie-Training für Anwendungsaufgaben
+   Erweitern: einfach weitere Objekte in STRAT_AUFGABEN anhängen.
+   l = richtige Methode (id aus METHODEN), sig = Signalwort(e)
+   ===================================================================== */
+const METHODEN = [
+  {id:'para',   name:'Parabelgleichung aufstellen', kurz:'Punkte (und a) einsetzen → Gleichungssystem lösen'},
+  {id:'gerade', name:'Geradengleichung aufstellen', kurz:'Steigung m berechnen, dann t'},
+  {id:'scheitel',name:'Scheitelpunkt berechnen',    kurz:'höchster oder tiefster Punkt'},
+  {id:'null',   name:'Nullstellen berechnen',       kurz:'y = 0 setzen, Lösungsformel'},
+  {id:'schnitt',name:'Schnittpunkt berechnen',      kurz:'Funktionsterme gleichsetzen'},
+  {id:'fwert',  name:'x einsetzen → y berechnen',   kurz:'Höhe/Wert an einer bekannten Stelle'},
+  {id:'xwert',  name:'y einsetzen → x berechnen',   kurz:'Stelle zu einer bekannten Höhe/einem Wert'},
+  {id:'diff',   name:'Abstand aus Koordinaten',     kurz:'Differenz bilden – ohne Funktion'}
+];
+
+const STRAT_AUFGABEN = [
+  { kontext:R`Ein Brückenbogen wird durch \(p:\ y=-0,01x^2+0,8x\) beschrieben (alle Angaben in m).`,
+    frage:'Wie hoch ist der Brückenbogen höchstens?', l:'scheitel', sig:'höchstens / maximal',
+    wie:R`Höchster Punkt = Scheitelpunkt: \(y_S=c-\dfrac{b^2}{4a}\).` },
+  { kontext:R`Ein Brückenbogen wird durch \(p:\ y=-0,01x^2+0,8x\) beschrieben (alle Angaben in m).`,
+    frage:'Welche Spannweite hat der Brückenbogen am Boden?', l:'null', sig:'Spannweite / am Boden',
+    wie:R`Am Boden ist die Höhe 0 → \(0=-0,01x^2+0,8x\) lösen. Spannweite \(=x_2-x_1\).` },
+  { kontext:R`Ein Brückenbogen wird durch \(p:\ y=-0,01x^2+0,8x\) beschrieben (alle Angaben in m).`,
+    frage:'Wie hoch ist der Bogen 10 m vom linken Fußpunkt entfernt?', l:'fwert', sig:'Wie hoch … bei 10 m',
+    wie:R`Die Stelle ist bekannt: \(x=10\) in \(p\) einsetzen und \(y\) ausrechnen.` },
+  { kontext:R`Ein Brückenbogen wird durch \(p:\ y=-0,01x^2+0,8x\) beschrieben (alle Angaben in m).`,
+    frage:'An welchen Stellen ist der Bogen genau 12 m hoch?', l:'xwert', sig:'An welchen Stellen … 12 m hoch',
+    wie:R`Die Höhe ist bekannt: \(12=-0,01x^2+0,8x\) → auf \(0\) bringen und mit der Lösungsformel nach \(x\) lösen.` },
+  { kontext:R`Ein Wasserstrahl eines Springbrunnens verläuft parabelförmig durch \(P(0\mid 1)\) und \(Q(2\mid 3,4)\). Der Formfaktor ist \(a=-0,4\).`,
+    frage:'Ermitteln Sie die Funktionsgleichung des Wasserstrahls.', l:'para', sig:'Funktionsgleichung + Parabel + Punkte + a',
+    wie:R`Allgemeine Form \(y=ax^2+bx+c\). Beide Punkte einsetzen → zwei Gleichungen für \(b\) und \(c\).` },
+  { kontext:R`Ein Wasserstrahl verläuft auf \(p:\ y=-0,4x^2+2x+1\) (in m). Der Brunnen steht bei \(x=0\).`,
+    frage:'In welcher Entfernung vom Brunnen trifft der Strahl auf den Boden?', l:'null', sig:'trifft auf den Boden',
+    wie:R`Boden heißt Höhe \(y=0\): \(0=-0,4x^2+2x+1\) lösen, positive Lösung nehmen.` },
+  { kontext:R`Ein Seil wird geradlinig vom Mast \(A(0\mid 12)\) zum Boden \(B(20\mid 2)\) gespannt.`,
+    frage:'Bestimmen Sie die Funktionsgleichung des Seils.', l:'gerade', sig:'geradlinig + zwei Punkte',
+    wie:R`\(m=\dfrac{y_2-y_1}{x_2-x_1}\), dann einen Punkt in \(y=mx+t\) einsetzen und \(t\) berechnen.` },
+  { kontext:R`Ein Ball fliegt auf der Bahn \(p:\ y=-0,2x^2+1,6x\). Ein schräges Dach verläuft auf \(g:\ y=0,5x+0,4\).`,
+    frage:'In welchem Punkt trifft der Ball auf das Dach?', l:'schnitt', sig:'trifft auf … (zwei Funktionen)',
+    wie:R`Zwei Graphen treffen sich → \(-0,2x^2+1,6x=0,5x+0,4\) gleichsetzen, lösen, \(x\) in \(g\) einsetzen.` },
+  { kontext:R`Der Gewinn eines Unternehmens wird durch \(G:\ y=-2x^2+80x-600\) beschrieben (x = Stückzahl, y in €).`,
+    frage:'Bei welcher Stückzahl ist der Gewinn am größten?', l:'scheitel', sig:'am größten',
+    wie:R`Maximum = Scheitelpunkt. Gesucht ist die Stückzahl, also \(x_S=-\dfrac{b}{2a}\).` },
+  { kontext:R`Der Gewinn eines Unternehmens wird durch \(G:\ y=-2x^2+80x-600\) beschrieben (x = Stückzahl, y in €).`,
+    frage:'Ab welcher Stückzahl macht das Unternehmen Gewinn (Gewinnschwelle)?', l:'null', sig:'Gewinnschwelle / ab wann Gewinn',
+    wie:R`Gewinnschwelle: Gewinn ist genau 0 → \(0=-2x^2+80x-600\) lösen; die kleinere Lösung ist die Gewinnschwelle.` },
+  { kontext:R`Die Kosten betragen \(K:\ y=20x+500\), der Erlös \(E:\ y=45x\) (x = Stückzahl, y in €).`,
+    frage:'Bei welcher Stückzahl sind Kosten und Erlös gleich hoch?', l:'schnitt', sig:'gleich hoch (zwei Funktionen)',
+    wie:R`\(20x+500=45x\) gleichsetzen und nach \(x\) auflösen.` },
+  { kontext:R`Die Kosten betragen \(K:\ y=20x+500\) (x = Stückzahl, y in €).`,
+    frage:'Wie hoch sind die Kosten bei 30 Stück?', l:'fwert', sig:'bei 30 Stück',
+    wie:R`\(x=30\) einsetzen: \(y=20\cdot30+500\).` },
+  { kontext:R`Die Kosten betragen \(K:\ y=20x+500\) (x = Stückzahl, y in €).`,
+    frage:'Wie viele Stück können für 1 500 € hergestellt werden?', l:'xwert', sig:'für 1 500 € (Wert gegeben)',
+    wie:R`Der \(y\)-Wert ist bekannt: \(1500=20x+500\) nach \(x\) auflösen.` },
+  { kontext:R`Die Teichoberfläche liegt auf der x-Achse, der Teichboden verläuft auf \(p:\ y=0,05x^2-0,7x+1,2\).`,
+    frage:'Wie tief ist der Teich an der tiefsten Stelle?', l:'scheitel', sig:'tiefste Stelle',
+    wie:R`Tiefster Punkt = Scheitelpunkt: \(y_S=c-\dfrac{b^2}{4a}\). Die Tiefe ist der Betrag von \(y_S\).` },
+  { kontext:R`Der Teichboden verläuft auf \(p:\ y=0,05x^2-0,7x+1,2\). Bei \(x=10\) wächst eine Seerose senkrecht vom Boden zur Oberfläche.`,
+    frage:'Wie lang ist der Stiel der Seerose?', l:'fwert', sig:'bei x = 10',
+    wie:R`\(x=10\) in \(p\) einsetzen. Die Stiellänge ist der Betrag des \(y\)-Werts.` },
+  { kontext:R`Beim Torbogen liegen die Punkte \(A(90\mid 128)\) und \(B(210\mid 128)\) auf gleicher Höhe. Dazwischen verläuft ein waagrechter Skywalk.`,
+    frage:'Wie lang ist der Skywalk von A nach B?', l:'diff', sig:'Länge zwischen zwei bekannten Punkten',
+    wie:R`Keine Funktion nötig: \(x_B-x_A=210-90\).` },
+  { kontext:R`Ein Regalbrett liegt auf der x-Achse. Ein zweites Brett verläuft waagrecht durch \(A(-2\mid 2,1)\).`,
+    frage:'Welchen Abstand haben die beiden Bretter?', l:'diff', sig:'Abstand zweier waagrechter Linien',
+    wie:R`Abstand = Unterschied der \(y\)-Werte: \(2,1-0=2,1\).` },
+  { kontext:R`Eine Rampe verläuft geradlinig durch \(A(1\mid 0)\) und \(B(1,5\mid 0,2)\).`,
+    frage:'Bestimmen Sie die Funktionsgleichung der Rampe.', l:'gerade', sig:'geradlinig + zwei Punkte',
+    wie:R`\(m=\dfrac{0,2-0}{1,5-1}\), danach \(t\) mit einem Punkt berechnen.` },
+  { kontext:R`Die Rampe \(r:\ y=0,4x-0,4\) geht in die Flugkurve \(p:\ y=-0,12x^2+x-1,15\) über.`,
+    frage:'In welchem Punkt verlässt der Ball die Rampe?', l:'schnitt', sig:'Übergang von einer Funktion in die andere',
+    wie:R`Gemeinsamer Punkt → \(0,4x-0,4=-0,12x^2+x-1,15\) gleichsetzen und lösen.` },
+  { kontext:R`Der Ball fliegt auf \(p:\ y=-0,12x^2+x-1,15\). Bei \(x=6\) hängt ein Netz zwischen 0,4 m und 0,9 m Höhe.`,
+    frage:'Zeigen Sie, dass der Ball ins Netz fliegt.', l:'fwert', sig:'bei x = 6 (Stelle bekannt)',
+    wie:R`\(x=6\) in \(p\) einsetzen und prüfen, ob \(y\) zwischen 0,4 und 0,9 liegt.` },
+  { kontext:R`Die Gondelbahn verläuft auf \(h:\ y=-0,9x+317\). Die Gondel befindet sich bei \(x=315\).`,
+    frage:'Wie hoch befindet sich die Gondel über dem Boden?', l:'fwert', sig:'bei x = 315',
+    wie:R`\(x=315\) in \(h\) einsetzen.` },
+  { kontext:R`Ein Torbogen hat den Formfaktor \(a=-0,02\) und verläuft durch \(A(90\mid 128)\) und \(B(210\mid 128)\).`,
+    frage:'Ermitteln Sie die Gleichung des Torbogens.', l:'para', sig:'Gleichung + Parabel + Punkte + a',
+    wie:R`\(A\) und \(B\) in \(y=-0,02x^2+bx+c\) einsetzen → Gleichungssystem für \(b\) und \(c\).` },
+  { kontext:R`Ein Tunnel hat die Form \(p:\ y=-0,25x^2+4\) (in m); die Straße liegt auf der x-Achse.`,
+    frage:'Wie breit ist der Tunnel am Boden?', l:'null', sig:'breit am Boden',
+    wie:R`\(0=-0,25x^2+4\) lösen. Breite \(=x_2-x_1\).` },
+  { kontext:R`Ein Tunnel hat die Form \(p:\ y=-0,25x^2+4\) (in m). Ein 3 m breiter Lkw fährt genau in der Mitte, seine Außenkanten liegen also bei \(x=\pm1,5\).`,
+    frage:'Wie hoch darf der Lkw höchstens sein?', l:'fwert', sig:'Außenkante bei x = 1,5',
+    wie:R`Entscheidend ist die Höhe an der Außenkante: \(x=1,5\) in \(p\) einsetzen.` },
+  { kontext:R`Ein Tunnel hat die Form \(p:\ y=-0,25x^2+4\) (in m).`,
+    frage:'Wie breit ist der Tunnel in 3 m Höhe?', l:'xwert', sig:'in 3 m Höhe (Höhe gegeben)',
+    wie:R`\(3=-0,25x^2+4\) nach \(x\) lösen. Breite \(=x_2-x_1\).` },
+  { kontext:R`Ein Skispringer fliegt auf der Bahn \(p:\ y=-0,02x^2+0,6x+2\) (in m, Schanzentisch bei \(x=0\)).`,
+    frage:'In welcher Entfernung vom Schanzentisch erreicht er seine größte Höhe?', l:'scheitel', sig:'größte Höhe',
+    wie:R`Gesucht ist die Stelle des Maximums: \(x_S=-\dfrac{b}{2a}\).` },
+  { kontext:R`Zwei Wanderwege verlaufen geradlinig auf \(g:\ y=0,5x+2\) und \(h:\ y=-x+11\).`,
+    frage:'An welchem Punkt kreuzen sich die Wege?', l:'schnitt', sig:'kreuzen sich',
+    wie:R`\(0,5x+2=-x+11\) gleichsetzen, \(x\) berechnen, in eine Gleichung einsetzen.` },
+  { kontext:R`Eine Rutsche verläuft auf \(p:\ y=0,1x^2-1,2x+4\) (in m).`,
+    frage:'An welcher Stelle ist die Rutsche nur noch 1 m hoch?', l:'xwert', sig:'nur noch 1 m hoch (Höhe gegeben)',
+    wie:R`\(1=0,1x^2-1,2x+4\) → \(0=0,1x^2-1,2x+3\) mit der Lösungsformel lösen.` },
+  { kontext:R`Die Seilbahn startet in der Talstation \(T(0\mid 800)\) und erreicht die Bergstation \(B(1200\mid 1400)\) geradlinig.`,
+    frage:'Wie viele Höhenmeter überwindet die Seilbahn?', l:'diff', sig:'Höhenunterschied zweier Punkte',
+    wie:R`\(y_B-y_T=1400-800\). Keine Gleichung nötig.` },
+  { kontext:R`Der Querschnitt einer Rinne verläuft auf \(p:\ y=0,5x^2-2x+3\) (in dm). Der Rand der Rinne liegt bei \(y=3\).`,
+    frage:'Wie breit ist die Rinne am oberen Rand?', l:'xwert', sig:'am Rand bei y = 3',
+    wie:R`\(3=0,5x^2-2x+3\) → \(0=0,5x^2-2x\) lösen. Breite \(=x_2-x_1\).` }
+];
+
+/* Signalwörter-Übersicht */
+const SIGNALE = [
+  ['para',   'Funktionsgleichung / Gleichung der Parabel; Punkte und Formfaktor a gegeben'],
+  ['gerade', 'geradlinig, linear, Strebe, Seil, Rampe; zwei Punkte gegeben'],
+  ['scheitel','maximal, höchstens, größte Höhe, tiefste Stelle, am größten / kleinsten'],
+  ['null',   'Boden, Wasseroberfläche, Spannweite, landet, Gewinnschwelle (y = 0)'],
+  ['schnitt','trifft, kreuzen, gemeinsamer Punkt, übergeht, gleich hoch (zwei Funktionen)'],
+  ['fwert',  'Wie hoch … bei x = …? Stelle/Entfernung/Stückzahl ist bekannt'],
+  ['xwert',  'Wo / an welcher Stelle ist die Höhe …? Höhe/Wert ist bekannt'],
+  ['diff',   'Länge, Abstand, Höhenunterschied zwischen zwei bekannten Punkten']
+];
+
+/* ---------- Zustand ---------- */
+let SQ = null; // {order, i, richtig, versuche, done:false}
+function mname(id){ return METHODEN.find(m=>m.id===id).name; }
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+function stratBest(){ try{ return JSON.parse(localStorage.getItem(KEY+'-strat'))||null; }catch(e){ return null; } }
+
+function renderStrategie(){
+  location.hash='strategie'; setTab('strat');
+  const best=stratBest();
+  app.innerHTML = `
+  <div class="panel">
+    <h2 style="margin:0 0 6px">Was ist zu tun?</h2>
+    <p style="margin:0">Du kannst Nullstellen, Scheitelpunkte und Schnittpunkte berechnen – aber welche Rechnung passt zu welcher Frage? Lies die Situation und wähle aus, <b>was</b> du rechnen musst. Gerechnet wird hier nicht.</p>
+    <p class="meta" style="margin:8px 0 0">${STRAT_AUFGABEN.length} Situationen · zufällige Reihenfolge${best?` · Dein Bestwert: ${best.r} von ${best.n} beim ersten Versuch`:''}</p>
+    <div class="actions"><button class="primary" onclick="stratStart()">Training starten</button><button onclick="toggleSig()">Signalwörter anzeigen</button></div>
+    <div id="sigbox" style="display:none;margin-top:12px">${sigTable()}</div>
+  </div>`;
+  math(app); window.scrollTo(0,0);
+}
+function sigTable(){
+  return `<table class="sig"><thead><tr><th>Rechnung</th><th>Typische Signalwörter in der Aufgabe</th></tr></thead><tbody>${
+    SIGNALE.map(([id,t])=>`<tr><td><b>${mname(id)}</b><br><span class="meta">${METHODEN.find(m=>m.id===id).kurz}</span></td><td>${t}</td></tr>`).join('')
+  }</tbody></table>`;
+}
+function toggleSig(){ const b=document.getElementById('sigbox'); b.style.display=b.style.display==='none'?'block':'none'; }
+
+function stratStart(){
+  SQ={order:shuffle([...STRAT_AUFGABEN.keys()]), i:0, richtig:0, falsch:{}, versucht:false, geloest:false};
+  stratRender();
+}
+function stratRender(){
+  if(SQ.i>=SQ.order.length) return stratEnde();
+  const a=STRAT_AUFGABEN[SQ.order[SQ.i]];
+  const pct=Math.round(100*SQ.i/SQ.order.length);
+  app.innerHTML=`
+  <button class="back" onclick="renderStrategie()">← Übersicht</button>
+  <div class="panel">
+    <div class="meta">Situation ${SQ.i+1} von ${SQ.order.length} · beim ersten Versuch richtig: <b>${SQ.richtig}</b></div>
+    <div class="bar"><i style="width:${pct}%"></i></div>
+    <p style="margin:14px 0 6px">${a.kontext}</p>
+    <p class="aufg" style="font-size:18px">${a.frage}</p>
+    <div class="lbl meta" style="margin-top:10px">Was musst du rechnen?</div>
+    <div class="mgrid">${METHODEN.map(m=>`<button class="mbtn" data-m="${m.id}" onclick="stratWahl('${m.id}')"><b>${m.name}</b><span>${m.kurz}</span></button>`).join('')}</div>
+    <div class="feedback" id="sfb"></div>
+    <div id="snext"></div>
+  </div>`;
+  SQ.versucht=false; SQ.geloest=false;
+  math(app); window.scrollTo(0,0);
+}
+function stratWahl(id){
+  if(SQ.geloest) return;
+  const a=STRAT_AUFGABEN[SQ.order[SQ.i]];
+  const btn=app.querySelector(`.mbtn[data-m="${id}"]`);
+  const fb=document.getElementById('sfb');
+  if(id===a.l){
+    if(!SQ.versucht) SQ.richtig++;
+    SQ.geloest=true; btn.classList.add('ok');
+    app.querySelectorAll('.mbtn').forEach(b=>b.disabled=true);
+    fb.className='feedback ok';
+    fb.innerHTML=`<b>Richtig: ${mname(a.l)}</b><br>Signalwort: <i>${a.sig}</i><br>So geht's: ${a.wie}`;
+    document.getElementById('snext').innerHTML=`<div class="actions"><button class="primary" onclick="SQ.i++;stratRender()">${SQ.i+1<SQ.order.length?'Nächste Situation →':'Auswertung →'}</button></div>`;
+    math(fb);
+  } else {
+    if(!SQ.versucht){ SQ.versucht=true; SQ.falsch[a.l]=(SQ.falsch[a.l]||0)+1; }
+    btn.classList.add('bad'); btn.disabled=true;
+    fb.className='feedback bad';
+    fb.innerHTML=`<b>${mname(id)}</b> passt hier nicht. ${warumNicht(id,a)} Achte auf das Signalwort: <i>${a.sig}</i>`;
+  }
+}
+function warumNicht(id,a){
+  const t={
+    para:'Eine Parabelgleichung stellst du nur auf, wenn sie noch <b>nicht</b> gegeben ist.',
+    gerade:'Eine Geradengleichung stellst du nur auf, wenn sie gesucht ist und zwei Punkte gegeben sind.',
+    scheitel:'Der Scheitelpunkt liefert nur den höchsten bzw. tiefsten Punkt.',
+    null:'Nullstellen brauchst du nur, wenn die Höhe bzw. der Wert genau 0 ist.',
+    schnitt:'Gleichsetzen brauchst du nur, wenn zwei Funktionen aufeinandertreffen.',
+    fwert:'x einsetzen geht nur, wenn die Stelle (x) bekannt ist.',
+    xwert:'y einsetzen geht nur, wenn die Höhe bzw. der Wert (y) bekannt ist und x gesucht wird.',
+    diff:'Eine einfache Differenz reicht nur, wenn beide Punkte schon bekannt sind.'
+  };
+  return t[id]||'';
+}
+function stratEnde(){
+  const n=SQ.order.length, r=SQ.richtig;
+  try{ const b=stratBest(); if(!b||r>b.r) localStorage.setItem(KEY+'-strat',JSON.stringify({r,n})); }catch(e){}
+  const schwach=Object.entries(SQ.falsch).sort((x,y)=>y[1]-x[1]);
+  app.innerHTML=`
+  <button class="back" onclick="renderStrategie()">← Übersicht</button>
+  <div class="panel">
+    <h2 style="margin:0 0 6px">Auswertung</h2>
+    <p style="font-size:20px;margin:6px 0"><b>${r} von ${n}</b> Situationen beim ersten Versuch richtig erkannt.</p>
+    ${schwach.length?`<p style="margin:10px 0 4px">Hier hattest du Schwierigkeiten – schau dir die Signalwörter an:</p><ul>${schwach.map(([id,c])=>`<li><b>${mname(id)}</b> (${c}× nicht erkannt)</li>`).join('')}</ul>`:'<p>Alles auf Anhieb erkannt – stark!</p>'}
+    <div class="actions"><button class="primary" onclick="stratStart()">Nochmal trainieren</button><button onclick="toggleSig()">Signalwörter anzeigen</button><button onclick="renderHome()">Zu den Prüfungen</button></div>
+    <div id="sigbox" style="display:none;margin-top:12px">${sigTable()}</div>
+  </div>`;
+  math(app); window.scrollTo(0,0);
+}
+
+STRAT_AUFGABEN.forEach(a=>{ a.kontext=fixM(a.kontext); a.wie=fixM(a.wie); });
+
 window.addEventListener('DOMContentLoaded',start);
 </script>
 </body>
