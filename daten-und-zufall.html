@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daten und Zufall – Lernseite</title>
+<style>
+:root{
+  --bg:#f5f6f8; --card:#ffffff; --ink:#1d2330; --muted:#5d6678; --line:#dfe3ea;
+  --accent:#2357c6; --accent-soft:#e8eefb; --ok:#1f8a4c; --ok-soft:#e5f5ec;
+  --bad:#c0392b; --bad-soft:#fbeae8; --tip:#b26a00; --tip-soft:#fff4e0;
+  --sol:#5b3cc4; --sol-soft:#efeafd; --radius:12px;
+  --stat:#2357c6; --ein:#0f8a8a; --ev:#c25a00; --mehr:#b0306a; --mark:#ffe680;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14171d; --card:#1d2129; --ink:#e7eaf0; --muted:#9aa3b2; --line:#2e3440;
+    --accent:#7ba2ff; --accent-soft:#1f2a44; --ok:#5fd08f; --ok-soft:#173226;
+    --bad:#ff8a7a; --bad-soft:#3a1f1c; --tip:#f2b453; --tip-soft:#3a2d14;
+    --sol:#b4a2ff; --sol-soft:#2a2347; --stat:#7ba2ff; --ein:#4fd1c5; --ev:#f6a35b; --mehr:#f48fb1; --mark:#5c4a00;
+  }
+}
+:root[data-theme="dark"]{
+    --bg:#14171d; --card:#1d2129; --ink:#e7eaf0; --muted:#9aa3b2; --line:#2e3440;
+    --accent:#7ba2ff; --accent-soft:#1f2a44; --ok:#5fd08f; --ok-soft:#173226;
+    --bad:#ff8a7a; --bad-soft:#3a1f1c; --tip:#f2b453; --tip-soft:#3a2d14;
+    --sol:#b4a2ff; --sol-soft:#2a2347; --stat:#7ba2ff; --ein:#4fd1c5; --ev:#f6a35b; --mehr:#f48fb1; --mark:#5c4a00;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body.beamer{font-size:20px}
+h2{font-size:1.35em;margin:0 0 .4em} h3{font-size:1.12em;margin:1em 0 .4em} h4{margin:.6em 0 .3em;font-size:1em}
+p{margin:.4em 0 .7em}
+header.top{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.top-in{max-width:960px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.top h1{font-size:17px;margin:0;flex:1;min-width:0}
+.top h1 small{display:block;font-weight:400;color:var(--muted);font-size:13px}
+.top button{padding:5px 10px;font-size:14px}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 12px}
+button:hover{border-color:var(--accent)}
+button.primary,.btn{background:var(--accent);color:#fff;border-color:var(--accent)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.btn{display:inline-block;border:1px solid var(--accent);border-radius:8px;padding:7px 12px;margin:2px 4px 2px 0;text-decoration:none;font-weight:500}
+.btn.sec{background:var(--card);color:var(--ink);border-color:var(--line)}
+.btn.small{font-size:14px;padding:5px 10px}
+.btn-tip{border-color:var(--tip)!important;color:var(--tip)!important;background:var(--card)!important}
+.btn-sol{border-color:var(--sol)!important;color:var(--sol)!important;background:var(--card)!important}
+.tabs{max-width:960px;margin:0 auto;padding:0 16px;display:flex;gap:2px;overflow-x:auto}
+.tabs a{border-bottom:3px solid transparent;padding:8px 12px;font-weight:600;color:var(--muted);text-decoration:none;white-space:nowrap}
+.tabs a.active{color:var(--accent);border-bottom-color:var(--accent)}
+main{max-width:960px;margin:0 auto;padding:20px 16px 60px}
+.intro{color:var(--muted);margin:0 0 18px}
+.view{display:none}.view.show{display:block}
+/* Startseite */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.ch-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:0;overflow:hidden;text-align:left;display:flex;flex-direction:column;text-decoration:none;color:var(--ink)}
+.ch-card:hover{border-color:var(--accent)}
+.ch-card .thumb{background:#fff;height:130px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--line);padding:6px}
+.ch-card .thumb svg{max-width:100%;max-height:118px}
+.ch-card .body{padding:12px 14px}
+.ch-card h3{margin:6px 0 4px;font-size:17px}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:var(--accent-soft);color:var(--accent);font-weight:600}
+.tag.stat{color:var(--stat)} .tag.ein{color:var(--ein)} .tag.ev{color:var(--ev)} .tag.mehr{color:var(--mehr)}
+.bar{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:8px}
+.bar>i{display:block;height:100%;background:var(--ok);width:0}
+.meta{font-size:13px;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:16px}
+.figure{background:#fff;border-radius:8px;padding:8px;text-align:center;margin:10px 0;border:1px solid var(--line)}
+.figure svg{max-width:100%;width:440px;max-height:210px;height:auto;display:block;margin:0 auto}
+.figure figcaption{font-size:13px;color:#5d6678;margin-top:2px}
+.back{margin-bottom:14px}
+/* Kapitel */
+.ch-head{display:flex;gap:14px;align-items:flex-start}
+.ch-head .thumb{flex:0 0 150px;background:#fff;border-radius:8px;border:1px solid var(--line);padding:4px}
+.ch-head .thumb svg{width:100%;height:auto;display:block}
+.ch-head ul{margin:.3em 0 0;padding-left:1.2em;color:var(--muted);font-size:15px}
+@media(max-width:600px){.ch-head{flex-direction:column}.ch-head .thumb{flex:none;width:170px}}
+.stepper{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+.stepper button{display:flex;align-items:center;gap:6px;font-size:14px;padding:5px 10px;border-radius:99px}
+.stepper button .n{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--line);font-size:12px;font-weight:700}
+.stepper button.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:600}
+.stepper button.active .n{background:var(--accent);color:#fff}
+.stepper button.seen .n{background:var(--ok);color:#fff}
+.stepper .all{margin-left:auto;font-size:13px}
+.step{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:14px;overflow:hidden}
+.ch.stepmode .step{display:none}.ch.stepmode .step.cur{display:block}
+.step-head{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--line)}
+.step-head .nr{font-weight:700;font-size:16px}
+.step-head .kind{margin-left:auto;font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--accent-soft);color:var(--accent)}
+.step-body{padding:14px 16px}
+.stepnav{display:flex;justify-content:space-between;gap:10px;margin:4px 0 20px}
+.ch:not(.stepmode) .stepnav{display:none}
+/* Bausteine */
+.merk{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:7px;padding:10px 14px;margin:10px 0}
+.merk b.t{display:block;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.04em}
+.warn{background:var(--tip-soft);border-left:4px solid var(--tip);border-radius:7px;padding:10px 14px;margin:10px 0}
+.warn b.t{display:block;color:var(--tip);font-size:13px;text-transform:uppercase;letter-spacing:.04em}
+.ab{display:flex;gap:10px;align-items:flex-start;background:var(--bg);border-radius:8px;padding:10px 12px;margin:12px 0;font-size:15px}
+.ab .ico{font-weight:700;color:#fff;background:var(--accent);border-radius:6px;padding:1px 7px;font-size:12px;margin-top:2px}
+.terms{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin:8px 0}
+.termcard{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--card)}
+.termcard b.tt{display:block;font-size:15px;margin-bottom:2px}
+.termcard .ex{color:var(--muted);font-size:14px;margin-top:4px}
+.term{background:linear-gradient(transparent 58%,var(--mark) 58%);font-weight:700;padding:0 .1em}
+.hl-stat{color:var(--stat)}.hl-ein{color:var(--ein)}.hl-ev{color:var(--ev)}.hl-mehr{color:var(--mehr)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+.grid2>*,.grid3>*{min-width:0}
+.step,.panel,.merk,.warn{overflow-wrap:anywhere}
+.chip{display:inline-block;padding:5px 11px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--ink);margin:3px 3px 3px 0;font-size:14px;user-select:none}
+button.chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.fb{margin-top:10px;font-size:15px;padding:8px 10px;border-radius:7px;display:none}
+.fb.show{display:block}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}
+.fb.bad{background:var(--bad-soft);color:var(--bad)}
+.fb.info{background:var(--tip-soft);color:var(--ink)}
+table.t{border-collapse:collapse;width:100%;font-size:15px}
+table.t th,table.t td{border-top:1px solid var(--line);padding:7px 8px;text-align:center;vertical-align:top}
+table.t th{color:var(--muted);font-weight:600;font-size:14px}
+table.t td.l,table.t th.l{text-align:left}
+.tablewrap{overflow-x:auto}
+input.cell{width:6.2em;padding:5px 7px;border:1.5px solid var(--line);border-radius:7px;text-align:center;background:var(--card);color:var(--ink);font:inherit}
+input.cell.ok{border-color:var(--ok);background:var(--ok-soft)} input.cell.bad{border-color:var(--bad);background:var(--bad-soft)}
+input.txt,textarea.txt,select{padding:6px 8px;border:1.5px solid var(--line);border-radius:7px;background:var(--card);color:var(--ink);font:inherit}
+input.txt{width:100%}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .12em;line-height:1.05;font-size:.92em}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 .15em}
+.frac>span:last-child{padding:0 .15em}
+.ovl{text-decoration:overline}
+.math,.set{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif;font-size:1.08em}
+.note{font-size:14px;color:var(--muted)}
+.tagline{display:inline-block;font-size:12px;font-weight:600;border-radius:99px;padding:1px 8px;vertical-align:middle}
+.tagline.obs{background:var(--ok-soft);color:var(--ok)}.tagline.theo{background:var(--sol-soft);color:var(--sol)}
+/* Würfel */
+.die{width:60px;height:60px;border-radius:12px;background:#fff;border:2px solid #37474f;display:inline-grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:7px;margin:4px;vertical-align:middle;box-shadow:0 2px 0 #37474f}
+.die i{width:10px;height:10px;border-radius:50%;background:#263238;place-self:center;visibility:hidden}
+.die.sm{width:40px;height:40px;padding:4px;border-radius:8px}.die.sm i{width:7px;height:7px}
+.die.rolling{animation:shake .45s linear}
+@keyframes shake{0%{transform:rotate(0)}25%{transform:rotate(18deg)}50%{transform:rotate(-14deg)}75%{transform:rotate(8deg)}100%{transform:rotate(0)}}
+button.diebtn{border:0;background:none;padding:0;border-radius:12px}
+button.diebtn.sel .die{background:#ffe0b2;border-color:#e65100;box-shadow:0 2px 0 #e65100}
+button.diebtn.comp .die{background:#e1f5fe;border-color:#0277bd;box-shadow:0 2px 0 #0277bd}
+.omega{border:2px solid var(--muted);border-radius:14px;padding:12px 10px 10px;position:relative;display:flex;flex-wrap:wrap;gap:4px;background:var(--bg);min-height:86px;margin-top:14px}
+.omega .lbl{position:absolute;top:-12px;left:12px;background:var(--card);padding:0 .4em;font-weight:700;color:var(--muted)}
+.hist{display:flex;gap:5px;flex-wrap:wrap}
+.hist .h{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:0 .45em;font-size:14px}
+.bars svg{width:100%;height:auto;display:block}
+#pieChart svg{max-width:300px;margin:0 auto}
+.chartbox{background:#fff;border-radius:8px;border:1px solid var(--line);padding:6px}
+.sortzone{display:flex;gap:10px;flex-wrap:wrap}
+.sortzone .bin{flex:1 1 220px;min-height:70px;border:2px dashed var(--line);border-radius:10px;padding:6px;cursor:pointer}
+.sortzone .bin h4{margin:0 0 4px;font-size:14px}
+.scale{position:relative;height:30px;margin:22px 8px 34px;background:linear-gradient(90deg,#ef5350,#ffca28 50%,#66bb6a);border-radius:8px}
+.scale .mk{position:absolute;top:-8px;width:4px;height:46px;background:var(--ink);border-radius:2px;transition:left .3s}
+.scale .mk span{position:absolute;top:48px;left:50%;transform:translateX(-50%);white-space:nowrap;font-weight:700;font-size:14px}
+.scale .ticks{position:absolute;top:34px;width:100%;display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+/* Baum */
+.treebox{overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px;margin-top:8px}
+.treebox svg{display:block;min-width:620px;width:100%;height:auto}
+.treebox svg .leaf{cursor:pointer}
+.treebox svg .leaf rect{fill:#fff;stroke:#90a4ae}
+.treebox svg .leaf.sel rect{fill:#fce4ec;stroke:#ad1457;stroke-width:2}
+.treebox svg .edge{stroke:#90a4ae;stroke-width:1.6}
+.treebox svg .edge.sel{stroke:#ad1457;stroke-width:4}
+.treebox svg .node rect{fill:#fff;stroke:#607d8b}
+.treebox svg text{font-family:system-ui,sans-serif;fill:#1d2330}
+.calc{background:var(--bg);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:15px;overflow-x:auto}
+.calc .row{margin:.2em 0;white-space:nowrap}
+/* Aufgaben (wie Prüfungstrainer) */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:14px;overflow:hidden}
+.ex.solved{border-color:var(--ok)}
+.ex .exhead{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line)}
+.ex .exhead .nr{font-weight:700}
+.ex .exhead .st{margin-left:auto;font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;display:none}
+.ex.solved .exhead .st{display:inline-block;background:var(--ok-soft);color:var(--ok)}
+.lv{font-size:12px;font-weight:600;border-radius:99px;padding:2px 8px}
+.lv.e{background:var(--ok-soft);color:var(--ok)}.lv.s{background:var(--accent-soft);color:var(--accent)}.lv.f{background:var(--tip-soft);color:var(--tip)}.lv.t{background:var(--sol-soft);color:var(--sol)}
+.ex .exbody{padding:12px 16px}
+.ex .q{font-weight:600;margin-bottom:8px}
+.ex .opts{display:flex;flex-direction:column;gap:6px}
+.ex .opt{text-align:left}
+.ex .opt.ok{background:var(--ok-soft);border-color:var(--ok)}
+.ex .opt.bad{background:var(--bad-soft);border-color:var(--bad)}
+.ex .ans{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--bg);border-radius:8px;padding:10px}
+.ex .ans input{max-width:260px}
+.ex .help{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.ex .hint{display:none;background:var(--tip-soft);border-left:4px solid var(--tip);border-radius:7px;padding:8px 12px;margin-top:8px}
+.ex .hint b{color:var(--tip)}
+.ex .sol{display:none;background:var(--sol-soft);border-left:4px solid var(--sol);border-radius:7px;padding:9px 13px;margin-top:8px}
+.ex .sol b{color:var(--sol)}
+.inl .ex{box-shadow:none}
+.filters{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.filters b{font-size:14px;margin:0 4px 0 6px}
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;z-index:20;overflow:auto}
+.modal.show{display:flex}
+.modal .box{background:var(--card);border-radius:var(--radius);max-width:680px;width:100%;padding:18px 20px}
+.f-item{border-top:1px solid var(--line);padding:9px 0}.f-item:first-of-type{border-top:0}.f-item h4{margin:0 0 3px}
+footer{max-width:960px;margin:0 auto;padding:0 16px 30px;color:var(--muted);font-size:13px}
+details.teacher{background:var(--bg);border-radius:8px;padding:8px 12px;margin:10px 0}
+details.teacher summary{cursor:pointer;font-weight:600}
+/* ============ Übersicht / Mindmap ============ */
+.ov-tools{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+#ov{background:#fff;color:#1d2330;border:1px solid var(--line);border-radius:var(--radius);padding:12px;margin-top:10px}
+#ov .ovf textarea{color:#1d2330}
+.ov-title{text-align:center;margin-bottom:4px}
+.ov-title span{display:inline-block;font-size:1.35em;font-weight:800;padding:.1em .9em;border:3px solid #2e7d32;border-radius:12px;background:#f1f8e9;font-style:italic}
+.ov-branches{display:grid;grid-template-columns:1fr 2fr;gap:10px}
+.ov-arrows{display:grid;grid-template-columns:1fr 2fr;text-align:center;font-weight:800;color:#2e7d32;line-height:1;font-size:1.1em}
+.ov-branch>.bh{text-align:center;font-weight:800;letter-spacing:.04em;border-radius:8px;padding:.15em .4em;margin-bottom:6px;font-size:.95em}
+.ov-branch.stat>.bh{border:2px solid #1565c0;color:#1565c0;background:#e3eefc}
+.ov-branch.ws>.bh{border:2px solid #2e7d32;color:#2e7d32;background:#e6f4e7}
+.ov-sub{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ov-sub>div>.sh{text-align:center;font-weight:700;font-style:italic;border-radius:6px;margin-bottom:6px;font-size:.92em}
+.ov-sub .ein>.sh{color:#00838f;background:#e0f5f6}
+.ov-sub .mehr>.sh{color:#ad1457;background:#fbe6ef}
+.ovc{border:1.5px solid #dfe3ea;border-radius:10px;padding:6px 8px 4px;margin-bottom:8px;position:relative;background:#fff}
+.ovc.stat{border-color:#90caf9}.ovc.ein{border-color:#80deea}.ovc.ev{border-color:#ffcc80}.ovc.mehr{border-color:#f48fb1}
+.ovc h4{margin:0 0 3px;font-size:.92em}
+.ovc.stat h4{color:#1565c0}.ovc.ein h4{color:#00838f}.ovc.ev h4{color:#e65100}.ovc.mehr h4{color:#ad1457}
+.ovf{display:grid;grid-template-columns:auto 1fr;gap:2px 6px;align-items:start;font-size:.86em;margin:2px 0}
+.ovf .k{font-weight:700;white-space:nowrap}
+.ovf .v{min-width:0}
+.ovf textarea{width:100%;border:0;border-bottom:1px dotted #90a4ae;background:#fffef6;resize:none;padding:1px 3px;font-size:1em;line-height:1.35;overflow:hidden;min-height:1.6em;font-family:inherit}
+.ovf .own{display:none}
+.ovf .mu{display:none;color:#4527a0;font-size:.98em}
+.ovf .hi{display:none;color:#8a6d00;font-size:.92em;font-style:italic}
+#ov.showmu .ovf .mu{display:block}
+#ov.showmu .ovf textarea{display:none}
+.ovf.showhint .hi{display:block}
+.ovf .qh{border:0;background:#fff4e0;color:#b26a00;border-radius:50%;width:1.35em;height:1.35em;font-size:.75em;font-weight:800;padding:0;margin-left:3px;vertical-align:middle}
+.rel{display:block;text-align:center;font-size:.8em;color:#37474f;margin:-2px 0 6px}
+.rel b{background:#eceff1;border-radius:6px;padding:.05em .45em}
+.bridge{border:2px dashed #7cb342;border-radius:10px;padding:4px 8px;font-size:.82em;background:#f9fbe7;margin-top:4px}
+.ovc.locked{opacity:.35;filter:grayscale(1)}
+.ovc.locked:after{content:attr(data-lock);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;color:#37474f;font-size:.85em;text-align:center;padding:8px}
+.ovc.locked>*{visibility:hidden}
+.minitree{width:100%;max-width:300px;height:auto;display:block;margin:2px auto}
+@media(max-width:900px){.ov-branches,.ov-arrows{grid-template-columns:1fr}.ov-sub{grid-template-columns:1fr}.ov-arrows span:nth-child(2){display:none}}
+/* Druck */
+@media print{
+  @page{size:A4 landscape;margin:7mm}
+  :root{--bg:#fff;--card:#fff;--ink:#1d2330;--line:#dfe3ea}
+  body{background:#fff;font-size:10px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  header.top,footer,.noprint,.view:not(#uebersicht),#uebersicht>*:not(#ovWrap),#ovWrap>*:not(#ov),.modal{display:none !important}
+  #uebersicht{display:block !important}
+  main{padding:0;margin:0;max-width:none}
+  #ov{border:0;padding:0;margin:0}
+  .ovc.locked{opacity:1;filter:none}.ovc.locked>*{visibility:visible}.ovc.locked:after{display:none}
+  .ov-title span{font-size:15px;padding:1px 14px}
+  .ov-branches{gap:6px;grid-template-columns:1fr 2fr !important}.ov-sub{gap:6px;grid-template-columns:1fr 1fr !important}.ov-arrows{grid-template-columns:1fr 2fr !important}.ov-arrows span{display:inline !important}
+  .ovc{padding:3px 5px 2px;margin-bottom:4px;break-inside:avoid;border-width:1.2px}
+  .ovc h4{font-size:12px;margin-bottom:1px}
+  .ovf{font-size:10px;gap:0 4px;margin:1.5px 0}
+  .ovf .qh,.ovf .hi{display:none !important}
+  .rel{font-size:8.5px;margin:-2px 0 3px}
+  .bridge{font-size:8.5px;padding:2px 5px}
+  .ov-arrows{font-size:11px}
+  .minitree{max-width:230px}
+  body.pr-mu .ovf{line-height:1.3}
+  body.pr-blank .ovf .v textarea,body.pr-blank .ovf .v .mu{display:none !important}
+  body.pr-blank .ovf .v:after{content:"";display:block;border-bottom:.8px dotted #444;height:19px}
+  body.pr-blank .ovf .v.l2:before{content:"";display:block;border-bottom:.8px dotted #444;height:19px}
+  body.pr-blank .ovf .k{padding-top:6px}
+  body.pr-blank .bl-hide{visibility:hidden}
+  body.pr-own .ovf .mu,body.pr-own .ovf textarea{display:none !important}
+  body.pr-own .ovf .own{display:block !important;border-bottom:.8px dotted #555;min-height:12px;white-space:pre-wrap}
+  body.pr-mu .ovf textarea{display:none !important}
+  body.pr-mu .ovf .mu{display:block !important;color:#1b2430}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <h1>Daten und Zufall<small>Lernseite · Mathematik 10 · Wirtschaftsschule</small></h1>
+  <button id="btnMerk">Merkzettel</button>
+  <button id="btnBeamer" title="Größere Schrift für den Beamer" aria-pressed="false">A+</button>
+  <button id="btnTheme" title="Hell/Dunkel umschalten">◐</button>
+</div>
+<nav class="tabs" aria-label="Bereiche"><a href="#start" data-v="start">Kapitel</a><a href="#training" data-v="training">Training</a><a href="#uebersicht" data-v="uebersicht">Meine Übersicht</a><a href="#lehrkraft" data-v="lehrkraft">Für Lehrkräfte</a></nav>
+</header>
+
+<main>
+<!-- ================= START ================= -->
+<section class="view" id="start">
+  <p class="intro">Willkommen auf der Kirchweih in Gunzenhausen! An den Buden wird gewürfelt, Münzen werden geworfen und Kugeln gezogen. Arbeite die Kapitel der Reihe nach durch – jedes Kapitel führt dich Schritt für Schritt vom Beispiel zum Merksatz. Nach jedem Kapitel ergänzt du <a href="#uebersicht">deine Übersicht</a>.</p>
+  <div class="grid" id="chGrid"></div>
+  <div class="panel" style="margin-top:18px">
+    <h3 style="margin-top:0">Der rote Faden</h3>
+    <div class="grid2">
+      <div><span class="tag stat">Statistik</span><p>Wir werten <b>Daten aus, die schon da sind</b>: Wie alt sind die Schülerinnen und Schüler der V10B?</p></div>
+      <div><span class="tag ein">Wahrscheinlichkeitsrechnung</span><p>Wir sagen voraus, <b>wie wahrscheinlich etwas Zukünftiges</b> ist: eine Sechs? dreimal Kopf?</p></div>
+    </div>
+    <p class="note" style="margin-bottom:0">Brücke zwischen beiden: Wiederholt man ein Zufallsexperiment sehr oft, nähert sich die relative Häufigkeit der Wahrscheinlichkeit an (Kapitel 3).</p>
+  </div>
+</section>
+
+<!-- ================= K1 STATISTIK ================= -->
+<section class="view ch stepmode" id="k1" data-ov="Statistik (Karten 1–3)">
+  <div class="step" data-kind="Beispiel" data-title="Datenerhebung"><div class="step-body">
+    <figure class="figure" data-img="umfrage"><figcaption>Umfrage in der V10B: „Wie alt bist du?“</figcaption></figure>
+    <p>Untersucht wird das <span class="term">Merkmal</span> „Alter“. Die 20 Antworten wurden in der Reihenfolge der Befragung notiert – das ist die <span class="term">Urliste</span>:</p>
+    <div id="urliste" class="hist" style="margin:.4em 0 .7em"></div>
+    <button class="btn" id="btnSort">sortieren → Rangliste</button> <button class="btn sec" id="btnUnsort">zurück zur Urliste</button>
+    <p id="sortInfo" class="note"></p>
+  </div></div>
+
+  <div class="step" data-kind="Fachbegriffe" data-title="Merkmale und Listen"><div class="step-body">
+    <div class="terms">
+      <div class="termcard"><b class="tt">Urliste</b>ungeordnete Datenreihe, so wie erhoben</div>
+      <div class="termcard"><b class="tt">Rangliste</b>Daten sortiert – numerisch oder alphabetisch</div>
+      <div class="termcard"><b class="tt">Merkmalsausprägung</b>ein möglicher Wert des Merkmals<div class="ex">hier: 15, 16, 17 oder 18 Jahre</div></div>
+      <div class="termcard"><b class="tt hl-stat">quantitatives Merkmal</b>wird in Zahlen gemessen<div class="ex">Körpergröße, Gewicht, Alter</div></div>
+      <div class="termcard"><b class="tt hl-ev">qualitatives Merkmal</b>beschreibt eine Eigenschaft/Kategorie<div class="ex">Augenfarbe, Geschlecht</div></div>
+    </div>
+    <h4>Sortiere: Tippe ein Merkmal an, dann den passenden Kasten.</h4>
+    <div id="merkPool"></div>
+    <div class="sortzone" style="margin-top:8px">
+      <div class="bin" data-bin="quant" tabindex="0"><h4 class="hl-stat">quantitativ</h4><div class="in"></div></div>
+      <div class="bin" data-bin="qual" tabindex="0"><h4 class="hl-ev">qualitativ</h4><div class="in"></div></div>
+    </div>
+    <div class="fb" id="merkFb"></div>
+  </div></div>
+
+  <div class="step" data-kind="Anwenden" data-title="Häufigkeitstabelle"><div class="step-body">
+    <div class="grid3">
+      <div class="termcard"><b class="tt">absolute Häufigkeit H</b>Anzahl einer Merkmalsausprägung<div class="ex">7 Personen sind 16</div></div>
+      <div class="termcard"><b class="tt">relative Häufigkeit h</b>Anteil an der Grundgesamtheit n<div class="ex math">h = <span class="frac"><span>H</span><span>n</span></span> = <span class="frac"><span>7</span><span>20</span></span> = 35 %</div></div>
+      <div class="termcard"><b class="tt">Winkelmaß</b>für das Kreisdiagramm<div class="ex math">h · 360° = 35 · 3,6° = 126°</div></div>
+    </div>
+    <p>Zähle in der Rangliste und fülle die Tabelle aus. <span class="term">Grundgesamtheit</span>: n = 20.</p>
+    <div class="tablewrap"><table class="t" id="tabH">
+      <thead><tr><th>Alter</th><th>H</th><th>h (in %)</th><th>Winkel (in °)</th></tr></thead><tbody></tbody>
+      <tfoot><tr><th>Summe</th><th>n = 20</th><th>100 %</th><th>360°</th></tr></tfoot>
+    </table></div>
+    <div style="margin-top:8px"><button class="btn" id="btnCheckH">Prüfen</button> <button class="btn sec btn-tip" id="btnHelpH">Tipp</button> <button class="btn sec btn-sol" id="btnSolH">Lösung</button></div>
+    <div class="fb" id="fbH"></div>
+  </div></div>
+
+  <div class="step" data-kind="Beobachten" data-title="Diagramme"><div class="step-body">
+    <div class="grid2">
+      <div><h4>absolute Häufigkeiten → Balken-/Säulendiagramm</h4><button class="btn small sec" id="btnBarToggle">Balken ↔ Säulen</button><div class="chartbox bars" id="barChart" style="margin-top:6px"></div></div>
+      <div><h4>relative Häufigkeiten → Kreisdiagramm</h4><div class="chartbox bars" id="pieChart"></div><p class="note">Beschriftung: Merkmalsausprägung und Prozentsatz.</p></div>
+    </div>
+  </div></div>
+
+  <div class="step" data-kind="Erklärung" data-title="Kennzahlen"><div class="step-body">
+    <div class="terms">
+      <div class="termcard"><b class="tt">arithmetisches Mittel x̄</b>Durchschnitt: Summe aller Werte : n<div class="ex math">x̄ = <span class="frac"><span>4·15 + 7·16 + 5·17 + 4·18</span><span>20</span></span> = <span class="frac"><span>329</span><span>20</span></span> = 16,45 Jahre</div></div>
+      <div class="termcard"><b class="tt">Modalwert x<sub>mod</sub></b>Ausprägung, die am häufigsten vorkommt<div class="ex">x<sub>mod</sub> = 16 Jahre</div></div>
+      <div class="termcard"><b class="tt">Median x<sub>med</sub></b>Wert genau in der Mitte der <b>Rangliste</b><div class="ex">n ungerade: <span class="frac"><span>n+1</span><span>2</span></span>-ter Wert (n = 35 → 18. Wert)<br>n gerade: Mittel aus <span class="frac"><span>n</span><span>2</span></span>-tem und (<span class="frac"><span>n</span><span>2</span></span>+1)-tem Wert (n = 58 → 29. und 30.)<br>V10B: (16 + 16) : 2 = 16 Jahre</div></div>
+      <div class="termcard"><b class="tt">Spannweite R</b>Maximum − Minimum<div class="ex">R = 18 − 15 = 3 Jahre</div></div>
+    </div>
+    <div class="warn"><b class="t">Typischer Fehler</b>Den Median nie in der unsortierten Urliste suchen! Das arithmetische Mittel reagiert stark auf Ausreißer, der Median kaum.</div>
+  </div></div>
+
+  <div class="step" data-kind="Anwenden" data-title="Kennzahlen-Rechner"><div class="step-body">
+    <p>Rechne zuerst selbst, dann kontrolliere. Werte mit Semikolon trennen.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><input class="txt" id="kzIn" style="flex:1 1 300px" value="52,6; 57,8; 51,4; 53,7; 55,1; 57,6; 55,3; 58,9"><button class="btn" id="kzGo">Auswerten</button></div>
+    <p class="note">Voreingestellt: Schwimmzeiten (s) aus der AP 2022. Weitere: <button class="btn small sec" data-kz="0,80; 1,20; 2,30; 1,40; 0,30; 21,80; 2,70; 1,90">AP 2021 (Ausreißer)</button><button class="btn small sec" data-kz="16; 18; 16; 16; 15; 15; 16; 17; 17; 15; 16; 17; 16; 15; 17; 16; 18; 18; 17; 18">V10B</button></p>
+    <div id="kzOut" class="calc" style="display:none"></div>
+    <div class="ab"><span class="ico">AB 01</span><div><b>Wiederholung, Teil Statistik</b> (Pausenverkauf der V 10C): Häufigkeitstabelle, Diagramme, Kennzahlen, Aussagen prüfen.</div></div>
+  </div></div>
+</section>
+
+<!-- ================= K2 ZUFALLSEXPERIMENT ================= -->
+<section class="view ch stepmode" id="k2" data-ov="Zufallsexperiment &amp; Ergebnisraum">
+  <div class="step" data-kind="Beispiel" data-title="Die Würfelbude"><div class="step-body">
+    <figure class="figure" data-img="wuerfelbude"></figure>
+    <p><b>Bevor du würfelst:</b> Welche Zahl fällt? Tippe deine Vorhersage an.</p>
+    <div id="predict"></div>
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:8px"><button class="btn" id="btnRoll">Würfeln</button><div id="bigDie"></div><div id="rollMsg" style="font-weight:600"></div></div>
+    <p class="note">Bisherige Würfe:</p><div class="hist" id="rollHist"></div>
+    <div style="margin-top:10px"><button class="btn sec small" data-reveal="obs2">Was fällt dir auf?</button></div>
+    <div id="obs2" class="fb info"><ul style="margin:.2em 0">
+      <li>Man kann <b>nicht vorhersagen</b>, welche Zahl fällt.</li>
+      <li>Es gibt <b>mehrere mögliche Ausgänge</b>, und man weiß genau welche: 1, 2, 3, 4, 5, 6.</li>
+      <li>Das Würfeln lässt sich unter gleichen Bedingungen <b>beliebig oft wiederholen</b>.</li></ul></div>
+  </div></div>
+
+  <div class="step" data-kind="Fachbegriffe" data-title="Experiment, Ergebnis, Ω"><div class="step-body">
+    <div class="terms">
+      <div class="termcard"><b class="tt">Zufallsexperiment</b>Ausgang nicht vorhersagbar, mehrere mögliche Ausgänge, beliebig oft wiederholbar<div class="ex">Würfeln, Münzwurf, Losziehen</div></div>
+      <div class="termcard"><b class="tt">Ergebnis</b>ein möglicher Ausgang<div class="ex">„3“</div></div>
+      <div class="termcard"><b class="tt">Ergebnisraum Ω</b> (auch: Ergebnismenge, „Omega“) – alle Ergebnisse zusammen, „alles, was vorkommen kann“<div class="ex set">Ω = {1; 2; 3; 4; 5; 6}</div></div>
+    </div>
+  </div></div>
+
+  <div class="step" data-kind="Anwenden" data-title="Ω bauen"><div class="step-body">
+    <p>Tippe <b>alle</b> möglichen Ergebnisse des Würfelwurfs an. Achtung, es sind auch falsche Kandidaten dabei!</p>
+    <div id="omegaPool"></div>
+    <div class="omega" id="omegaBox"><span class="lbl">Ω</span></div>
+    <p id="omegaSet" class="set" style="margin:.6em 0"></p>
+    <button class="btn" id="btnOmegaCheck">Prüfen</button> <button class="btn sec" id="btnOmegaReset">Neu</button>
+    <div class="fb" id="omegaFb"></div>
+  </div></div>
+
+  <div class="step" data-kind="Erklärung" data-title="Mengenschreibweise, Mächtigkeit"><div class="step-body">
+    <div class="grid2">
+      <div><p class="set" style="font-size:1.3em;margin:.2em 0">Ω = {1; 2; 3; 4; 5; 6}</p>
+        <ul><li>Elemente in <b>geschweiften Klammern</b>, getrennt durch <b>Semikolon</b></li><li>jedes Element nur <b>einmal</b></li><li>Reihenfolge egal</li></ul></div>
+      <div class="merk"><b class="t">Mächtigkeit</b>Anzahl der Elemente einer Menge, geschrieben mit senkrechten Strichen:<p class="math" style="font-size:1.25em;margin:.3em 0 0">|Ω| = 6</p></div>
+    </div>
+    <details class="teacher"><summary>Ergebnisraum, Ergebnismenge, Ereignisraum – was ist was?</summary>
+      <ul><li><b>Ergebnisraum</b> (Lehrplan) = <b>Ergebnismenge</b> (Zusammenfassung): die Menge Ω aller Ergebnisse.</li>
+      <li>Ein <b>Ereignis</b> ist eine Teilmenge von Ω (Kapitel 4); ein Ereignis mit genau einem Ergebnis, z. B. {3}, heißt <b>Elementarereignis</b>.</li>
+      <li>Der <b>Ereignisraum</b> ist die Menge <i>aller</i> Ereignisse (beim Würfel 64 Stück) – nicht mit dem Ergebnisraum verwechseln; wird nicht benötigt.</li></ul></details>
+  </div></div>
+
+  <div class="step" data-kind="Anwenden" data-title="Übung Ω"><div class="step-body">
+    <p>Gib den Ergebnisraum (z. B. {A; B}) bzw. die Mächtigkeit an.</p>
+    <div id="omegaTasks" class="inl"></div>
+  </div></div>
+</section>
+
+<!-- ================= K3 WAHRSCHEINLICHKEIT ================= -->
+<section class="view ch stepmode" id="k3" data-ov="Wahrscheinlichkeit">
+  <div class="step" data-kind="Beispiel" data-title="Laplace-Würfel"><div class="step-body">
+    <figure class="figure" data-img="laplace"><figcaption>Nur beim Würfel sind alle Ausgänge gleich wahrscheinlich.</figcaption></figure>
+    <p>Beim idealen Würfel ist keine Zahl bevorzugt. Wie groß ist die Wahrscheinlichkeit für eine 3?</p>
+    <button class="btn sec small" data-reveal="laplace1">Überlegung anzeigen</button>
+    <div id="laplace1" class="fb info">6 Ergebnisse, alle <b>gleich wahrscheinlich</b> → jedes bekommt den gleichen Anteil: <span class="math">P(3) = <span class="frac"><span>1</span><span>6</span></span> = P(4) = …</span> ≈ 16,67 %</div>
+    <div class="merk"><b class="t">Laplace-Experiment</b>Alle Ergebnisse sind gleich wahrscheinlich. Bei n Ergebnissen gilt für jedes Ergebnis <span class="math">p = <span class="frac"><span>1</span><span>n</span></span></span>.<br>Wahrscheinlichkeiten liegen immer zwischen <b>0 %</b> und <b>100 %</b>.</div>
+  </div></div>
+
+  <div class="step" data-kind="Anwenden" data-title="Laplace – ja oder nein?"><div class="step-body"><div id="lapTasks" class="inl"></div></div></div>
+
+  <div class="step" data-kind="Beobachten" data-title="Simulation"><div class="step-body">
+    <p>Lass den Computer würfeln: Nähern sich die <b>beobachteten</b> relativen Häufigkeiten dem <b>theoretischen</b> Wert 1/6?</p>
+    <div><button class="btn" data-sim="10">+10</button><button class="btn" data-sim="100">+100</button><button class="btn" data-sim="1000">+1000</button><button class="btn" data-sim="10000">+10 000</button><button class="btn sec" id="simReset">Zurücksetzen</button></div>
+    <p>Würfe: <b id="simN">0</b></p>
+    <div class="chartbox bars" id="simChart"></div>
+    <p class="note"><span class="tagline obs">beobachtet</span> Säulen (ändern sich bei jedem Versuch) · <span class="tagline theo">theoretisch</span> gestrichelte Linie 1/6 ≈ 16,67 % (steht vorher fest)</p>
+    <button class="btn sec small" data-reveal="obs3">Was beobachtest du?</button>
+    <div id="obs3" class="fb info">Bei wenigen Würfen weichen die Werte stark ab, bei vielen Würfen liegen sie meist nahe bei 16,67 %. Eine Abweichung bleibt aber möglich – die Simulation <b>bestätigt</b> die Wahrscheinlichkeit, sie <b>beweist</b> sie nicht (Gesetz der großen Zahlen).</div>
+  </div></div>
+
+  <div class="step" data-kind="Erklärung" data-title="Drei Wahrscheinlichkeitsbegriffe"><div class="step-body">
+    <figure class="figure" data-img="begriffe"></figure>
+    <div class="grid3">
+      <div class="termcard"><b class="tt hl-ein">Laplace</b> <span class="tagline theo">theoretisch</span><br>wird <b>vor</b> dem Versuch berechnet; alle Ergebnisse gleich wahrscheinlich<div class="ex">P(6) = 1/6</div></div>
+      <div class="termcard"><b class="tt hl-stat">statistisch</b> <span class="tagline obs">beobachtet</span><br>relative Häufigkeit bei <b>sehr vielen</b> Versuchen<div class="ex">Reißzwecke: 620 von 1000 → P ≈ 62 %</div></div>
+      <div class="termcard"><b class="tt" style="color:#8d6e63">subjektiv</b><br>persönliche Einschätzung, ohne Rechnung oder Versuchsreihe<div class="ex">„Zu 90 % gewinnen wir.“</div></div>
+    </div>
+    <div class="warn"><b class="t">Achtung</b>Die Laplace-Formel gilt nur, wenn alle Ergebnisse gleich wahrscheinlich sind – nicht bei Reißzwecke, Legostein oder Glücksrad mit ungleichen Feldern.</div>
+  </div></div>
+
+  <div class="step" data-kind="Anwenden" data-title="Reißzwecken-Versuch"><div class="step-body">
+    <p>Werft in Gruppen eine Reißzwecke und tragt die Anzahlen ein. Die relative Häufigkeit ist eure <b>statistische</b> Schätzung.</p>
+    <div class="tablewrap"><table class="t" id="rzTab">
+      <thead><tr><th class="l">Gruppe</th><th>Spitze oben</th><th>Seitenlage</th><th>Würfe</th><th>h(Spitze oben)</th></tr></thead><tbody></tbody>
+      <tfoot><tr><th class="l">alle zusammen</th><th id="rzA">0</th><th id="rzB">0</th><th id="rzN">0</th><th id="rzH">–</th></tr></tfoot>
+    </table></div>
+    <p class="note">Die Gruppenwerte schwanken – der Gesamtwert aller Gruppen ist die verlässlichste Schätzung.</p>
+  </div></div>
+
+  <div class="step" data-kind="Anwenden" data-title="Zuordnen"><div class="step-body">
+    <p>Welcher Wahrscheinlichkeitsbegriff passt?</p><div id="begTasks" class="inl"></div>
+  </div></div>
+</section>
+
+<!-- ================= K4 EREIGNISSE ================= -->
+<section class="view ch stepmode" id="k4" data-ov="Ereignisse">
+  <div class="step" data-kind="Beispiel" data-title="Ereignis-Labor"><div class="step-body">
+    <figure class="figure" data-img="ereignis"></figure>
+    <p>Kein einzelnes Ergebnis, sondern ein <b>Wunsch</b>, zu dem mehrere Ergebnisse passen. Wähle ein Ereignis oder tippe selbst Würfelseiten an.</p>
+    <div id="evPresets"></div>
+    <div class="omega" id="evBox" style="justify-content:center"><span class="lbl">Ω = {1; 2; 3; 4; 5; 6}</span></div>
+    <div style="margin-top:8px"><label><input type="checkbox" id="evComp"> Gegenereignis <span class="math">E̅</span> einblenden</label></div>
+    <div class="calc" id="evOut"></div>
+    <div class="scale" id="evScale"><div class="mk" id="evMk" style="left:0"><span>0 %</span></div><div class="ticks"><span>0 % unmöglich</span><span>50 %</span><span>100 % sicher</span></div></div>
+  </div></div>
+
+  <div class="step" data-kind="Fachbegriffe" data-title="Ereignis und Ereignisarten"><div class="step-body">
+    <div class="grid2">
+      <div>
+        <p>Ein <span class="term">Ereignis</span> E fasst alle Ergebnisse zusammen, die einen Wunsch erfüllen – es ist eine <b>Teilmenge</b> von Ω.</p>
+        <div class="merk"><b class="t">Laplace-Formel</b><span class="math" style="font-size:1.15em">P(E) = <span class="frac"><span>|E|</span><span>|Ω|</span></span> = <span class="frac"><span>Anzahl passende Ergebnisse</span><span>Anzahl aller Ergebnisse</span></span></span><br><span class="math">P(E₂) = <span class="frac"><span>4</span><span>6</span></span> = 66,<span class="ovl">6</span> % ≈ 66,67 %</span></div>
+      </div>
+      <div class="tablewrap"><table class="t">
+        <tr><th class="l">Art</th><th class="l">Beispiel</th><th>P</th></tr>
+        <tr><td class="l"><b>unmöglich</b></td><td class="l">E₁: „eine 8“<br><span class="set">E₁ = { } = ∅</span> (leere Menge)</td><td>0 %</td></tr>
+        <tr><td class="l"><b>möglich</b></td><td class="l">E₂: „größer als 2“<br><span class="set">E₂ = {3; 4; 5; 6}</span></td><td>zwischen 0 und 100 %</td></tr>
+        <tr><td class="l"><b>sicher</b></td><td class="l">E₃: „zwischen 0 und 7“<br><span class="set">E₃ = Ω</span></td><td>100 %</td></tr>
+      </table></div>
+    </div>
+  </div></div>
+
+  <div class="step" data-kind="Erklärung" data-title="Gegenereignis"><div class="step-body">
+    <div class="grid2">
+      <div><p>Das <span class="term">Gegenereignis</span> <span class="math">E̅</span> („E quer“, Komplementärereignis) enthält <b>alle übrigen Ergebnisse</b> aus Ω – den „Rest“.</p>
+        <p class="set">E₂ = {3; 4; 5; 6} → E̅₂ = {1; 2}<br>E̅₂: „Ich werfe eine Zahl kleiner als 3.“<br>P(E̅₂) = <span class="frac"><span>2</span><span>6</span></span> ≈ 33,33 %</p></div>
+      <div class="merk"><b class="t">Es gilt</b><span class="math">E ∪ E̅ = Ω</span> – zusammen alle Ergebnisse<br><span class="math">E ∩ E̅ = ∅</span> – kein gemeinsames Ergebnis<br><span class="math">P(E) + P(E̅) = 1 = 100 %</span> → <span class="math">P(E̅) = 1 − P(E)</span>
+        <p class="note" style="margin-bottom:0">In der Zusammenfassung steht „E ∩ E̅ = Ω“ – richtig ist <b>E ∪ E̅ = Ω</b>.</p></div>
+    </div>
+    <div class="warn"><b class="t">Typischer Fehler</b>Gegenereignis von „größer als 2“ ist <b>nicht</b> „kleiner als 2“ – die 2 fehlt! Gegenereignis von „höchstens 4“ ist „mindestens 5“, von „mindestens einmal“ ist es „keinmal“.</div>
+  </div></div>
+
+  <div class="step" data-kind="Anwenden" data-title="Zwölfseitiger Würfel"><div class="step-body">
+    <p>Kirchweih-Bude „Der zwölfseitige Würfel“ (AB 01): Ω = {1; 2; …; 12}.</p>
+    <div id="evTasks" class="inl"></div>
+    <div class="ab"><span class="ico">AB</span><div><b>AB 01, Teil einstufige Zufallsexperimente</b> (zwölfseitiger Würfel, bunte Urne) und <b>AB 01b</b> (Ergebnisraum, Ereignisse, Wahrscheinlichkeitsbegriffe).</div></div>
+  </div></div>
+</section>
+
+<!-- ================= K5 BAUMDIAGRAMM ================= -->
+<section class="view ch stepmode" id="k5" data-ov="Baumdiagramm und Pfadregeln">
+  <div class="step" data-kind="Beispiel" data-title="Münze dreimal werfen"><div class="step-body">
+    <figure class="figure" data-img="muenze"></figure>
+    <p>Eine Laplace-Münze wird dreimal nacheinander geworfen (K = Kopf, Z = Zahl; manchmal heißt Kopf auch „Wappen“). Schalte die Stufen dazu:</p>
+    <div>Stufen: <button class="btn small sec" data-coin="1">1</button><button class="btn small sec" data-coin="2">2</button><button class="btn small" data-coin="3">3</button>
+      <label style="margin-left:10px"><input type="checkbox" id="coinProbs" checked> Wahrscheinlichkeiten</label></div>
+    <div class="treebox" id="coinTree"></div>
+    <p class="note">Tippe Ergebnisse rechts an oder wähle ein Ereignis:</p>
+    <div id="coinPresets"></div>
+    <div class="calc" id="coinCalc"></div>
+  </div></div>
+
+  <div class="step" data-kind="Fachbegriffe" data-title="Stufe, Pfad, Mächtigkeit"><div class="step-body">
+    <div class="terms">
+      <div class="termcard"><b class="tt hl-mehr">mehrstufiges Zufallsexperiment</b>mehrere Zufallsexperimente nacheinander → Baumdiagramm</div>
+      <div class="termcard"><b class="tt hl-mehr">Stufe</b>jeder Wurf; der Baum verzweigt sich in die möglichen Ausgänge</div>
+      <div class="termcard"><b class="tt hl-mehr">Pfad</b>Weg vom Start bis zum Ende = genau <b>ein Ergebnis</b><div class="ex">ZKK</div></div>
+      <div class="termcard"><b class="tt hl-mehr">Übergangswahrscheinlichkeit</b>steht am Ast; an jeder Verzweigung Summe = 1</div>
+    </div>
+    <div class="merk"><b class="t">Zählprinzip – Mächtigkeit</b>Möglichkeiten je Stufe multiplizieren: <span class="math">|Ω| = 2 · 2 · 2 = 8</span> Pfade (Kombinationsmöglichkeiten)<br><span class="set">Ω = {KKK; KKZ; KZK; KZZ; ZKK; ZKZ; ZZK; ZZZ}</span></div>
+  </div></div>
+
+  <div class="step" data-kind="Erklärung" data-title="Die Pfadregeln"><div class="step-body">
+    <figure class="figure" data-img="baum"><figcaption>Pfad = Ergebnis · mehrere Pfade = Ereignis</figcaption></figure>
+    <div class="grid2">
+      <div class="merk"><b class="t">1. Pfadregel – multiplizieren</b>Wahrscheinlichkeit eines <b>Ergebnisses</b>: entlang des Pfades multiplizieren.<br><span class="math">P(ZKK) = <span class="frac"><span>1</span><span>2</span></span> · <span class="frac"><span>1</span><span>2</span></span> · <span class="frac"><span>1</span><span>2</span></span> = <span class="frac"><span>1</span><span>8</span></span> = 12,5 %</span></div>
+      <div class="merk"><b class="t">2. Pfadregel – addieren</b>Wahrscheinlichkeit eines <b>Ereignisses</b>: Pfadwahrscheinlichkeiten addieren.<br>E: „genau einmal Zahl“ = {ZKK; KZK; KKZ}<br><span class="math">P(E) = 3 · <span class="frac"><span>1</span><span>8</span></span> = <span class="frac"><span>3</span><span>8</span></span> = 37,5 %</span></div>
+    </div>
+    <p><b>Deuten:</b> In etwa 37,5 % aller Dreierserien – rund 3 von 8 – kommt genau einmal Zahl vor.</p>
+    <div class="warn"><b class="t">Tipp</b>„Mindestens einmal …“ → Gegenereignis „keinmal …“: P(mind. einmal Zahl) = 1 − P(KKK) = 1 − <span class="frac"><span>1</span><span>8</span></span> = 87,5 %</div>
+  </div></div>
+
+  <div class="step" data-kind="Anwenden" data-title="Max hat verschlafen"><div class="step-body">
+    <figure class="figure" data-img="schrank"><figcaption>2 graue, 1 roter, 1 schwarzer Pullover · 1 blaue, 2 schwarze Hosen · weiße und schwarze Schuhe</figcaption></figure>
+    <p>Max greift blind zu. Hier sind die Äste <b>nicht</b> gleich wahrscheinlich! Zählprinzip (Farben): 3 · 2 · 2 = 12.</p>
+    <div class="treebox" id="maxTree"></div>
+    <div id="maxPresets" style="margin-top:6px"></div>
+    <div class="calc" id="maxCalc"></div>
+    <p class="note">G = grau, R = rot, S = schwarz, B = blau, W = weiß · Reihenfolge: Pullover – Hose – Schuhe</p>
+    <div class="ab"><span class="ico">AB 02</span><div><b>Zusammengesetzte Zufallsexperimente</b> (Max): Baum, Kombinationsmöglichkeiten, Pfadregeln, E₁–E₆. Der Baum hier dient zur Kontrolle.</div></div>
+  </div></div>
+</section>
+
+<!-- ================= K6 URNE ================= -->
+<section class="view ch stepmode" id="k6" data-ov="mit / ohne Zurücklegen">
+  <div class="step" data-kind="Beispiel" data-title="Die Losbude"><div class="step-body">
+    <figure class="figure" data-img="urne"></figure>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+      <span>blau: <select id="uB"></select></span><span>grün: <select id="uG"></select></span><span>Züge: <select id="uN"><option>2</option><option selected>3</option></select></span>
+      <span style="flex:1"></span><button class="btn" id="uMit">mit Zurücklegen</button><button class="btn sec" id="uOhne">ohne Zurücklegen</button>
+    </div>
+    <div class="treebox" id="urnTree"></div>
+    <div id="urnPresets" style="margin-top:6px"></div>
+    <div class="calc" id="urnCalc"></div>
+  </div></div>
+
+  <div class="step" data-kind="Beobachten" data-title="Vergleich"><div class="step-body">
+    <p>Schalte oben zwischen „mit“ und „ohne Zurücklegen“ um und vergleiche die Brüche der 2. und 3. Stufe.</p>
+    <div class="grid2">
+      <div class="merk"><b class="t">mit Zurücklegen</b>Wahrscheinlichkeiten bleiben auf jeder Stufe <b>gleich</b> – die Anzahl der Kugeln ändert sich nicht.<div class="note">Würfel, Münze, Glücksrad, Roulette</div></div>
+      <div class="merk"><b class="t">ohne Zurücklegen</b>Wahrscheinlichkeiten <b>ändern sich</b> – Nenner (und Zähler der gezogenen Farbe) werden kleiner.<div class="note">Lotto, Lose, Kartenspiel, Bingo, Fahrkartenkontrolle</div></div>
+    </div>
+  </div></div>
+
+  <div class="step" data-kind="Beobachten" data-title="Simulation"><div class="step-body">
+    <p>Markiere oben ein Ereignis (z. B. E₁). Der Computer zieht dann 1000-mal mit der gewählten Einstellung.</p>
+    <button class="btn" id="urnSim">1000-mal ziehen</button> <span id="urnSimOut"></span>
+    <div class="ab"><span class="ico">AB 03</span><div><b>Zufallsexperimente mit und ohne Zurücklegen</b> (6 blaue, 4 grüne Kugeln). Danach <b>04 – AP-Aufgaben</b>.</div></div>
+  </div></div>
+</section>
+<!-- ===================== 7 ÜBERSICHT ===================== -->
+<section class="view" id="uebersicht">
+  <div class="panel noprint">
+    <h2>Meine Übersicht „Daten und Zufall“</h2>
+    <p>Trage nach jedem Kapitel die Begriffe, Beispiele und Merksätze in deinen eigenen Worten ein. Karten späterer Kapitel werden freigeschaltet, sobald du das Kapitel geöffnet hast.</p>
+  </div>
+  <div id="ovWrap">
+    <div class="panel noprint" style="padding:10px 14px">
+      <div class="ov-tools">
+        <button class="btn sec small" id="ovMu" aria-pressed="false">Musterübersicht einblenden</button>
+        <button class="btn sec small" id="ovHints" aria-pressed="false">alle Hilfen einblenden</button>
+        <button class="btn sec small" id="ovUnlock">alle Karten freischalten</button>
+        <button class="btn sec small" id="ovClear">meine Einträge löschen</button>
+        <span style="flex:1"></span>
+        <b style="font-size:.85em">Drucken (A4 quer):</b>
+        <button class="btn small" id="prBlank">ausfüllbare Vorlage</button>
+        <button class="btn small" id="prOwn">meine Übersicht</button>
+        <button class="btn small ok" id="prMu">Musterlösung</button>
+      </div>
+      <p class="note" style="margin:.4em 0 0">Tipp: Im Druckdialog „Querformat“ und „Ränder: Standard/Minimal“ wählen; als PDF speichern ist möglich. Das „?“ neben einer Zeile zeigt eine Hilfe.</p>
+    </div>
+    <div id="ov"></div>
+  </div>
+  </section>
+
+<section class="view" id="training">
+  <p class="intro">Aufgaben zu allen Themen – vom Einstieg bis zur Prüfungsaufgabe. Rechne zuerst selbst. Wenn du nicht weiterkommst, hol dir einen <b>Tipp</b>; die <b>Lösung</b> kannst du bewusst aufrufen.</p>
+  <div class="panel">
+    <div class="filters" id="exFilters"></div>
+    <div class="bar" style="margin-top:10px"><i id="exProg"></i></div><div class="meta" id="exProgT" style="margin-top:4px"></div>
+    <p class="note" style="margin-bottom:0">Eingaben: Bruch 3/8 · Dezimalzahl 0,375 · Prozent 37,5 % · Menge {1; 2; 3}. Prozentwerte auf zwei Nachkommastellen runden.</p>
+  </div>
+  <div id="exList"></div>
+</section>
+<section class="view" id="lehrkraft">
+<div class="panel">
+    <h3 style="margin-top:0">Empfohlener Unterrichtsaufbau (ca. 14 Unterrichtsstunden)</h3>
+    <div class="tablewrap"><table class="t">
+      <thead><tr><th>Std.</th><th class="l">Kapitel</th><th class="l">Schwerpunkt / Sozialform</th><th class="l">Material</th></tr></thead>
+      <tbody>
+      <tr><td>1–2</td><td class="l"><b>1 Statistik</b> (Wiederholung)</td><td class="l">Einstieg Altersumfrage in der eigenen Klasse (Urliste an der Tafel) → Rangliste, Häufigkeiten, Diagramme, Kennzahlen; Partnerarbeit am AB</td><td class="l">Kapitel 1, AB 01 (Teil Statistik)</td></tr>
+      <tr><td>3–4</td><td class="l"><b>2 Zufallsexperiment &amp; Ω</b> und <b>3 Wahrscheinlichkeit</b></td><td class="l">Würfeln im Plenum, Ω gemeinsam aufbauen; Reißzwecken-Versuch in Gruppen (statistische WS), Simulation am Beamer; Abgrenzung der WS-Begriffe</td><td class="l">Kapitel 2–3, AB 01b (Aufgaben 1–3), Reißzwecken/Legosteine</td></tr>
+      <tr><td>5–6</td><td class="l"><b>4 Ereignisse</b></td><td class="l">Ereignis-Labor (Lehrkraft-Demo, dann Einzelarbeit), Gegenereignis; Übung zwölfseitiger Würfel und Urne</td><td class="l">Kapitel 4, AB 01 (Teil einstufig), AB 01b (Aufgaben 4–6)</td></tr>
+      <tr><td>7–8</td><td class="l"><b>5 Baumdiagramm</b>, Zählprinzip, 1. Pfadregel</td><td class="l">Münze 3× gemeinsam; Max-Situation selbstständig in Partnerarbeit mit dem interaktiven Baum als Kontrolle</td><td class="l">Kapitel 5, AB 02 (Baum, Kombinationsmöglichkeiten, Pfadwahrscheinlichkeiten)</td></tr>
+      <tr><td>9–10</td><td class="l"><b>5 2. Pfadregel</b>, Gegenereignis bei „mindestens“</td><td class="l">E₁–E₆ von Max, Training</td><td class="l">AB 02 (Ereignisse), Lehrbuch laut AB</td></tr>
+      <tr><td>11–12</td><td class="l"><b>6 Mit / ohne Zurücklegen</b></td><td class="l">Problemstellung Urne, Vergleich der Bäume am Beamer, Simulation</td><td class="l">Kapitel 6, AB 03</td></tr>
+      <tr><td>13–14</td><td class="l"><b>Sicherung &amp; Prüfungstraining</b></td><td class="l">Übersicht fertigstellen und mit Muster vergleichen; AP-Aufgaben in Stationen; Training nach Niveau</td><td class="l">Meine Übersicht (Druck), 04 AP-Aufgaben, Training</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">Begründung der Reihenfolge: Statistik zuerst, weil die relative Häufigkeit die Brücke zur statistischen Wahrscheinlichkeit bildet. Einstufige Begriffe (Ω, Ereignis, Gegenereignis) werden am Würfel vollständig aufgebaut, bevor das Baumdiagramm sie auf mehrere Stufen überträgt: Ein Pfad ist ein Ergebnis, ein Ereignis ist eine Menge von Pfaden. Mit/ohne Zurücklegen kommt zuletzt, weil es die Pfadregeln voraussetzt.</p>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-top:0">Zuordnung: Themen der Zusammenfassung → Material → Lehrplan → Seite</h3>
+    <div class="tablewrap"><table class="t" id="mapTab">
+      <thead><tr><th class="l">Thema / Begriff (Zusammenfassungs-PDF)</th><th class="l">vorhandenes Material</th><th class="l">Lehrplanbezug</th><th class="l">Umsetzung auf dieser Seite</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+    <p class="note">LP 10 = Lehrplanauszug „Kompetenzerwartungen/Inhalte“ (Entwurf, Jgst. 10); LP M11 = LehrplanPLUS Wirtschaftsschule M 11 (zweistufig), Lernbereich 5 „Daten und Zufall“; GW = Grundwissen/Abschlussprüfung.</p>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-top:0">Lehrplanbezug</h3>
+    <ul>
+      <li><b>Lehrplanauszug Jahrgangsstufe 10 (vorliegender Entwurf)</b>: Kompetenzerwartungen „erfassen den möglichen Ausgang eines Zufallsexperiments als Ergebnis …“, „benutzen den Begriff der Wahrscheinlichkeit nach Laplace und grenzen ihn von anderen Wahrscheinlichkeitsbegriffen ab“, „betrachten geeignete reale Problemsituationen als ein- und mehrstufige Zufallsexperimente“, „berechnen die Wahrscheinlichkeiten einzelner Ereignisse in einem mehrstufigen Zufallsexperiment und interpretieren diese“. Inhalte: Zufallsexperiment; Ereignis, Gegenereignis, Ergebnis; Ergebnisraum; Mengenschreibweise; Mächtigkeit; Wahrscheinlichkeit, Laplace-Wahrscheinlichkeit; ein- und mehrstufiges Baumdiagramm; Pfadregeln. <i>Dieser Text war online nicht auffindbar und konnte nur am vorliegenden Auszug geprüft werden.</i></li>
+      <li><a href="https://www.lehrplanplus.bayern.de/fachlehrplan/wirtschaftsschule/10/mathematik/vierstufig" target="_blank" rel="noopener">LehrplanPLUS Wirtschaftsschule, Mathematik 10 (vierstufig), Lernbereich 5 „Zusammengesetzte Zufallsexperimente“</a> – auf der Seite als „gültig bis Schuljahr 2025/26“ gekennzeichnet; inhaltlich identisch zu den mehrstufigen Kompetenzerwartungen oben (Baumdiagramm, Pfadregeln, interpretieren).</li>
+      <li><a href="https://www.lehrplanplus.bayern.de/fachlehrplan/wirtschaftsschule/11/mathematik" target="_blank" rel="noopener">LehrplanPLUS Wirtschaftsschule, Mathematik 11 (zweistufig), Lernbereich 5 „Daten und Zufall“</a> (gültig ab 2026/27): Modalwert, Median, arithmetisches Mittel, Spannweite, mehrstufiges Baumdiagramm, Pfadregeln.</li>
+      <li>Statistik (Datenerhebung, Häufigkeiten, Diagramme, Kennzahlen) ist in der Jgst. 10 Wiederholung bzw. Grundwissen, wird aber in jeder Abschlussprüfung (Aufgabenteil B, Aufgabe 4) geprüft und ist deshalb vollständig enthalten.</li>
+      <li><b>Notwendig</b>: alle Inhalte der Kapitel 1–6. <b>Optional/Vertiefung</b>: Simulationen, Augensumme zweier Würfel, „mindestens“-Aufgaben mit mehr als drei Stufen, Ereignisraum-Hinweis.</li>
+    </ul>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-top:0">Hinweise zu den vorhandenen Materialien</h3>
+    <ul>
+      <li><b>Zusammenfassung (PDF):</b> „E ∩ E̅ = Ω“ ist fachlich falsch; richtig ist E ∪ E̅ = Ω (und E ∩ E̅ = ∅). Auf dieser Seite und in der Musterübersicht korrigiert, im Unterricht ansprechen.</li>
+      <li><b>AB 03 LÖSUNG:</b> Der Situationstext nannte 6 blaue, 5 grüne und 4 weiße Kugeln und E₁ „… aber keine weiße Kugel“, gerechnet wurde aber mit 6 blauen und 4 grünen Kugeln; außerdem 352/1000 = 35,2 % (nicht 35,23 %). Korrigierte Fassung liegt bei.</li>
+      <li><b>AB 03 (Schülerfassung):</b> Randnotiz „26 passende Ergebnisse“ zu E₂ stammt aus der Drei-Farben-Version; richtig sind 7 von 8 Ergebnissen. Korrigiert.</li>
+      <li><b>AB 01 LÖSUNG:</b> Tippfehler 38,98 % → 38,89 %; Laplace-Begründung „gleich häufig“ → „gleich wahrscheinlich“; „ein sichere“ → „ein sicheres“. Korrigiert.</li>
+    </ul>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-top:0">Nutzung im Unterricht</h3>
+    <ul>
+      <li><b>Beamer:</b> Oben rechts „A+“ für größere Schrift, „◐“ für hell/dunkel, „Merkzettel“ für alle Formeln. Die Labore (Würfel, Ereignisse, Bäume, Simulation) eignen sich als Demonstration im Unterrichtsgespräch: Erst Vermutungen sammeln, dann klicken.</li>
+      <li><b>Tablet/PC der Lernenden:</b> Kapitel der Reihe nach bearbeiten – jedes Kapitel wird Schritt für Schritt angezeigt („alle Schritte zeigen“ blendet alles ein). Beobachtungen erst nach eigenem Nachdenken aufdecken lassen.</li>
+      <li><b>Übersicht:</b> Am Ende jeder Stunde 5 Minuten Sicherung in „Meine Übersicht“ (digital oder auf der gedruckten ausfüllbaren Vorlage). Musterlösung zum Vergleich ausgeben oder einblenden.</li>
+      <li><b>Differenzierung:</b> Training nach Niveau filtern (Einstieg – Standard – Fehlvorstellung – Transfer). Schwächere nutzen Hinweis 1 und 2 und die Labore als Kontrolle; Schnellere bearbeiten Transfer- und AP-Aufgaben.</li>
+      <li><b>Offline/GitHub:</b> Die Datei funktioniert ohne Internet und ohne Installation; sie kann unverändert über GitHub Pages bereitgestellt werden.</li>
+    </ul>
+  </div>
+</section>
+</main>
+
+<div class="modal" id="merkModal"><div class="box">
+  <h2>Merkzettel</h2>
+  <div class="f-item"><h4>Relative Häufigkeit · Winkelmaß</h4><span class="math">h = H : n</span> · <span class="math">Winkel = h · 360°</span></div>
+  <div class="f-item"><h4>Kennzahlen</h4>x̄ = Summe : n · x<sub>mod</sub> = häufigster Wert · x<sub>med</sub> = Mitte der Rangliste (n ungerade: (n+1)/2-ter Wert; n gerade: Mittel aus n/2-tem und (n/2+1)-tem Wert) · R = Max − Min</div>
+  <div class="f-item"><h4>Laplace-Formel</h4><span class="math">P(E) = <span class="frac"><span>|E|</span><span>|Ω|</span></span></span> – nur wenn alle Ergebnisse gleich wahrscheinlich sind</div>
+  <div class="f-item"><h4>Gegenereignis</h4><span class="math">P(E̅) = 1 − P(E)</span> · E ∪ E̅ = Ω · E ∩ E̅ = ∅</div>
+  <div class="f-item"><h4>Zählprinzip</h4>Anzahl der Pfade = Produkt der Möglichkeiten je Stufe (z. B. 2 · 2 · 2 = 8)</div>
+  <div class="f-item"><h4>Pfadregeln</h4>1. Pfadregel: entlang eines Pfades <b>multiplizieren</b> (Ergebnis) · 2. Pfadregel: Pfadwahrscheinlichkeiten <b>addieren</b> (Ereignis)</div>
+  <div class="f-item"><h4>Ohne Zurücklegen</h4>Nenner wird bei jedem Zug um 1 kleiner, Zähler der gezogenen Farbe ebenso.</div>
+  <div style="margin-top:10px"><button class="primary" id="merkClose">Schließen</button></div>
+</div></div>
+
+<footer>Eingaben mit Komma oder Punkt möglich. Dein Fortschritt und deine Übersicht werden nur in diesem Browser gespeichert. Simulationen zeigen zufällige, beobachtete Werte – die theoretischen Wahrscheinlichkeiten stehen jeweils daneben.</footer>
+<script>
+// ================= DATEN =================
+const AGES=[16,18,16,16,15,15,16,17,17,15,16,17,16,15,17,16,18,18,17,18];
+
+// ---------- Übersicht (Muster + Hilfen) ----------
+const OV={
+ stat:[
+  {id:'a1',cls:'stat',title:'1) Datenerhebung',unlock:'s1',fields:[
+   {k:'Merkmal',mu:'untersuchte Eigenschaft, z. B. „Alter in der V10B“',hi:'Was wird bei der Umfrage untersucht?'},
+   {k:'quantitative Merkmale',mu:'Zahlenwerte: Körpergröße, Gewicht, Alter',hi:'quantus = wie viel → messbar'},
+   {k:'qualitative Merkmale',mu:'Kategorien: Augenfarbe, Geschlecht',hi:'qualis = wie beschaffen → Eigenschaft'},
+   {k:'Urliste',mu:'ungeordnete Datenreihe (so wie erhoben)',hi:'Reihenfolge der Befragung'},
+   {k:'Rangliste',mu:'sortierte Daten (numerisch / alphabetisch)',hi:'Wie entsteht sie aus der Urliste?'}]},
+  {id:'a2',cls:'stat',title:'2) Häufigkeitsverteilung',unlock:'s1',rel:'Grundlage: Rangliste',fields:[
+   {k:'Grundgesamtheit n',mu:'Anzahl aller Daten, V10B: n = 20',hi:'Wie viele wurden befragt?'},
+   {k:'absolute Häufigkeit H',mu:'Anzahl einer Merkmalsausprägung (16 Jahre: H = 7)',hi:'gibt die Anzahl … an'},
+   {k:'relative Häufigkeit h',mu:'Anteil an der Gesamtheit: h = H : n = 7/20 = 35 %',hi:'Formel mit H und n'},
+   {k:'Winkelmaß',mu:'h · 360°  (35 · 3,6° = 126°), Summe 360°',hi:'für das Kreisdiagramm'},
+   {k:'Darstellung',mu:'H → Balken-/Säulendiagramm; h → Kreisdiagramm',hi:'Welches Diagramm passt zu H, welches zu h?',l2:1}]},
+  {id:'a3',cls:'stat',title:'3) Datenauswertung – Kennzahlen',unlock:'s1',fields:[
+   {k:'arithm. Mittel x̄',mu:'Durchschnitt: Summe aller Werte : n; V10B: 329 : 20 = 16,45 Jahre',hi:'Häufigkeiten als Faktoren nutzen',l2:1},
+   {k:'Modalwert x_mod',mu:'häufigste Merkmalsausprägung: 16 Jahre',hi:'am häufigsten …'},
+   {k:'Median x_med',mu:'Mitte der Rangliste; n ungerade: (n+1)/2-ter Wert; n gerade: Mittel aus n/2-tem und (n/2+1)-tem Wert; V10B: (16+16) : 2 = 16',hi:'Fallunterscheidung gerade/ungerade',l2:1},
+   {k:'Spannweite R',mu:'Maximum − Minimum: 18 − 15 = 3 Jahre',hi:'Differenz aus …'}],
+   extra:'<div class="bridge"><b>Brücke →</b> Relative Häufigkeit bei sehr vielen Versuchen ≈ Wahrscheinlichkeit (statistische Wahrscheinlichkeit).</div>'}
+ ],
+ ein:[
+  {id:'b1',cls:'ein',title:'Zufallsexperiment & Ergebnisraum',unlock:'s2',fields:[
+   {k:'Zufallsexperiment',mu:'Ausgang nicht vorhersagbar, mehrere mögliche Ausgänge, wiederholbar (Laplace-Würfel)',hi:'drei Merkmale',l2:1},
+   {k:'Ergebnis',mu:'ein möglicher Ausgang, z. B. „3“',hi:'Was ist ein einzelner Ausgang?'},
+   {k:'Ergebnisraum Ω',mu:'„alles, was vorkommen kann“: Ω = {1; 2; 3; 4; 5; 6} (= Ergebnismenge)',hi:'Mengenschreibweise mit { } und ;'},
+   {k:'Mächtigkeit',mu:'Anzahl der Elemente: |Ω| = 6',hi:'senkrechte Striche'}]},
+  {id:'b2',cls:'ein',title:'Wahrscheinlichkeit (WS)',unlock:'s3',fields:[
+   {k:'Laplace-Experiment',mu:'alle Ergebnisse gleich wahrscheinlich: p = 1/n → P(3) = 1/6 = P(4)',hi:'Was gilt für alle Ergebnisse?'},
+   {k:'Laplace-Formel',mu:'P(E) = |E| : |Ω| (Anzahl passend : Anzahl alle)',hi:'mit Mächtigkeiten'},
+   {k:'Wertebereich',mu:'0 ≤ P ≤ 1, also zwischen 0 % und 100 %',hi:'kleinster und größter Wert'},
+   {k:'andere WS-Begriffe',mu:'statistisch: rel. Häufigkeit vieler Versuche (Reißzwecke); subjektiv: persönliche Einschätzung',hi:'Reißzwecke? Bauchgefühl?',l2:1}]},
+  {id:'b3',cls:'ev',title:'Ereignisse',unlock:'s4',fields:[
+   {k:'Ereignis E',mu:'„Wunsch“, Teilmenge von Ω; E₂: „größer als 2“ = {3; 4; 5; 6}, P(E₂) = 4/6 ≈ 66,67 %',hi:'Beispiel mit Menge und P',l2:1},
+   {k:'unmögliches E.',mu:'E₁: „eine 8“, E₁ = { } = ∅ (leere Menge), P = 0 %',hi:'Zeichen für die leere Menge'},
+   {k:'sicheres E.',mu:'E₃: „zwischen 0 und 7“, E₃ = Ω, P = 100 %',hi:'Welche Menge ist E?'},
+   {k:'Gegenereignis E̅',mu:'alle übrigen Ergebnisse: E̅₂: „kleiner als 3“ = {1; 2}, P = 2/6 ≈ 33,33 %',hi:'der „Rest“ von Ω',l2:1},
+   {k:'Es gilt',mu:'E ∪ E̅ = Ω; E ∩ E̅ = ∅; P(E) + P(E̅) = 1 = 100 %',hi:'drei Beziehungen',l2:1}]}
+ ],
+ mehr:[
+  {id:'c1',cls:'mehr',title:'Baumdiagramm',unlock:'s5',tree:true,fields:[
+   {k:'mehrstufig',mu:'mehrere Zufallsexperimente nacheinander, z. B. Laplace-Münze 3×',hi:'Was passiert nacheinander?'},
+   {k:'Stufe / Pfad',mu:'jeder Wurf = Stufe; Pfad = ein Ergebnis, z. B. ZKK',hi:'Was entspricht einem Pfad?'},
+   {k:'Äste',mu:'Übergangs-WS; an jeder Verzweigung Summe = 1',hi:'Was steht an den Ästen?'},
+   {k:'Mächtigkeit',mu:'Zählprinzip: 2 · 2 · 2 = 8 Pfade (Kombinationsmöglichkeiten)',hi:'Möglichkeiten je Stufe …'}]},
+  {id:'c2',cls:'mehr',title:'Pfadregeln',unlock:'s5',rel:'Pfad = Ergebnis · mehrere Pfade = Ereignis',fields:[
+   {k:'1. Pfadregel',mu:'WS eines Ergebnisses: entlang des Pfades multiplizieren; P(ZKK) = ½ · ½ · ½ = 1/8 = 12,5 %',hi:'Produkt oder Summe?',l2:1},
+   {k:'2. Pfadregel',mu:'WS eines Ereignisses: Pfadwahrscheinlichkeiten addieren; E: „genau einmal Zahl“ = {ZKK; KZK; KKZ}, P = 3 · 1/8 = 37,5 %',hi:'Produkt oder Summe?',l2:1},
+   {k:'Tipp',mu:'„mindestens einmal“: 1 − P(keinmal)',hi:'Gegenereignis nutzen'}]},
+  {id:'c3',cls:'mehr',title:'mit / ohne Zurücklegen',unlock:'s6',fields:[
+   {k:'mit Zurücklegen',mu:'WS bleiben auf jeder Stufe gleich (Würfel, Münze, Glücksrad)',hi:'Anzahl der Kugeln bleibt …'},
+   {k:'ohne Zurücklegen',mu:'WS ändern sich, Nenner wird kleiner (Lotto, Lose, Karten): 6/10 · 5/9 · 4/8',hi:'Anzahl der Kugeln ändert sich …',l2:1}]}
+ ]
+};
+
+// ---------- Zuordnungstabelle ----------
+const MAP=[
+ ['Merkmal; quantitative / qualitative Merkmale','AB 01 (Ausgaben), AP 2022–2024','GW, LP M11','Kapitel 1: Sortierspiel; Übersicht Karte 1'],
+ ['Datenerhebung, Urliste, ungeordnete Datenreihe → Sortierung (numerisch/alphabetisch), Rangliste','AB 01, AP','GW','Kapitel 1: Urliste → Rangliste (Animation, Median-Positionen)'],
+ ['Häufigkeitsverteilung: absolute Häufigkeit H, relative Häufigkeit h = H/n, Grundgesamtheit n, Winkelmaß (·3,6)','AB 01 Aufg. 1, AP','GW','Kapitel 1: Häufigkeitstabelle mit Prüfung, Hinweis, Lösung'],
+ ['Darstellung im Balken-/Säulendiagramm und Kreisdiagramm','AB 01 Aufg. 2–3, AP 2022/2024','GW','Kapitel 1: Diagramme (umschaltbar)'],
+ ['Kennzahlen: arithmetisches Mittel, Modalwert, Median (gerade/ungerade Datenmenge), Spannweite','AB 01 Aufg. 4, AP 2018–2024','LP M11 LB 5','Kapitel 1: Kennzahlen-Rechner; Training'],
+ ['einstufige Zufallsexperimente, Laplace-Würfel, WS der einzelnen Ergebnisse gleich, p = 1/n','AB 01 Teil 2, AB 01b','LP 10: Zufallsexperiment, Ergebnis, Laplace-WS','Kapitel 2–3: Würfel, Laplace ja/nein'],
+ ['Ergebnismenge Ω („alles, was vorkommen kann“), Omega','AB 01 Aufg. 1','LP 10: Ergebnisraum, Mengenschreibweise','Kapitel 2: Ω-Baukasten, Ω-Aufgaben, Begriffsklärung'],
+ ['Anzahl |E|, |Ω| (Mächtigkeit)','AB 02, AB 01b','LP 10: Mächtigkeit','Kapitel 2, 4, 5'],
+ ['Ereignis („Wunsch“), P(E) = |E| / |Ω|','AB 01 Aufg. 2','LP 10: Ereignis, WS','Kapitel 4: Ereignis-Labor'],
+ ['a) unmögliches Ereignis, { } bzw. ∅ leere Menge; b) mögliches Ereignis, WS zwischen 0 % und 100 %; c) sicheres Ereignis E = Ω','AB 01 Aufg. 4','LP 10','Kapitel 4: Labor + WS-Skala, Tabelle'],
+ ['d) Gegenereignis E̅; E ∪ E̅ = Ω; P(E) + P(E̅) = 1 = 100 %','AB 01 Aufg. 3, AB 03','LP 10: Gegenereignis','Kapitel 4: Gegenereignis-Schalter, Fehlvorstellungen; PDF-Fehler korrigiert'],
+ ['mehrstufige Zufallsexperimente, Laplace-Münze dreimal, dreistufiges Baumdiagramm, Pfad','AB 02, Abfragen','LP 10 / M11: mehrstufiges Baumdiagramm','Kapitel 5: interaktiver Münzbaum (1–3 Stufen)'],
+ ['Mächtigkeit = 2·2·2 = 8 Kombinationsmöglichkeiten / Pfade','AB 02 (Zählprinzip)','LP 10: Mächtigkeit','Kapitel 5: Zählprinzip, Max (3·2·2)'],
+ ['1. Pfadregel (multiplizieren), P(ZKK) = 1/8 = 12,5 %','AB 02','LP: Pfadregeln','Kapitel 5: Pfad markieren → Rechnung'],
+ ['2. Pfadregel (addieren), E: „genau einmal Zahl“ = {ZKK; KZK; KKZ}, P = 37,5 %','AB 02, AB 03, AP','LP: Pfadregeln, interpretieren','Kapitel 5: Ereignis-Schaltflächen, Deutung'],
+ ['(zusätzlich aus Material) mit / ohne Zurücklegen','AB 03, AP 2023 (Trambahn)','LP: reale Problemsituationen','Kapitel 6: Urnen-Baum + Simulation'],
+ ['(zusätzlich aus Lehrplan) Abgrenzung Laplace / statistische / subjektive WS','AB 01b (neu)','LP 10: „grenzen … ab“','Kapitel 3: Simulation, Reißzwecken-Tabelle, Zuordnung']
+];
+
+// ---------- Übungsaufgaben ----------
+// lv: e=Einstieg, s=Standard, f=Fehlvorstellung, t=Transfer/AP
+const EX=[
+// ---- Statistik
+{id:'S1',top:'stat',lv:'e',type:'mc',q:'Welches Merkmal ist <b>qualitativ</b>?',opts:[
+ {t:'Körpergröße',fb:'Die Körpergröße misst man in Zahlen (cm) → quantitativ.'},
+ {t:'Augenfarbe',ok:1,fb:'Richtig: Die Augenfarbe ist eine Kategorie, keine Zahl.'},
+ {t:'Gewicht',fb:'Das Gewicht wird in kg gemessen → quantitativ.'},
+ {t:'Taschengeld pro Woche',fb:'Geldbeträge sind Zahlenwerte → quantitativ.'}],
+ h:['Quantitativ heißt: Man kann es in Zahlen messen.','Kann man „blau“ messen?'],sol:'Augenfarbe (qualitativ). Körpergröße, Gewicht und Taschengeld sind quantitativ.'},
+{id:'S2',top:'stat',lv:'e',type:'num',kind:'n',q:'Von 20 Befragten sind 7 Personen 16 Jahre alt. Gib die relative Häufigkeit in Prozent an.',ans:35,unit:'%',
+ wrong:[{v:7,fb:'7 ist die absolute Häufigkeit. Gesucht ist der Anteil: H : n.'},{v:0.35,fb:'0,35 ist richtig als Dezimalzahl – gib den Wert in Prozent an (· 100).'}],
+ h:['h = H : n','7 : 20 = 0,35'],sol:'h = 7/20 = 0,35 = 35 %'},
+{id:'S3',top:'stat',lv:'s',type:'num',kind:'n',q:'Welches Winkelmaß gehört im Kreisdiagramm zu einer relativen Häufigkeit von 35 %?',ans:126,unit:'°',
+ wrong:[{v:35,fb:'Das ist der Prozentwert. Für den Winkel: h · 360°.'},{v:12.6,fb:'Kommafehler: 0,35 · 360° = 126°.'}],
+ h:['Der ganze Kreis hat 360°.','35 % von 360° bzw. 35 · 3,6°'],sol:'0,35 · 360° = 126°'},
+{id:'S4',top:'stat',lv:'s',type:'num',kind:'n',q:'Bestimme den <b>Median</b> der Werte 12; 15; 9; 20; 14; 11.',ans:13,
+ wrong:[{v:14.5,fb:'Du hast die beiden mittleren Werte der <b>Urliste</b> (9 und 20) genommen. Zuerst sortieren!'},{v:12,fb:'Bei n = 6 (gerade) gibt es zwei mittlere Werte – nimm ihren Mittelwert.'},{v:14,fb:'Bei n = 6 (gerade) gibt es zwei mittlere Werte – nimm ihren Mittelwert.'},{v:13.5,fb:'13,5 ist das arithmetische Mittel. Gesucht ist der Median (Mitte der Rangliste).'}],
+ h:['Erstelle zuerst die Rangliste.','Rangliste: 9; 11; 12; 14; 15; 20 – n = 6 ist gerade: 3. und 4. Wert.'],sol:'Rangliste 9; 11; <b>12; 14</b>; 15; 20 → x<sub>med</sub> = (12 + 14) : 2 = 13'},
+{id:'S5',top:'stat',lv:'t',type:'num',kind:'n',q:'AP 2022: Schwimmzeiten in s: 52,6; 57,8; 51,4; 53,7; 55,1; 57,6; 55,3; 58,9. Berechne das <b>arithmetische Mittel</b>.',ans:55.3,tol:0.006,unit:'s',
+ wrong:[{v:55.2,fb:'55,2 s ist der Median. Für das arithmetische Mittel alle Werte addieren und durch 8 teilen.'}],
+ h:['Summe aller 8 Werte bilden.','Summe = 442,4 s'],sol:'x̄ = 442,4 s : 8 = 55,3 s'},
+{id:'S6',top:'stat',lv:'t',type:'num',kind:'n',q:'AP 2022: Bestimme den <b>Median</b> derselben Schwimmzeiten.',ans:55.2,tol:0.006,unit:'s',
+ wrong:[{v:55.3,fb:'55,3 s ist das arithmetische Mittel bzw. der 5. Wert. n = 8 ist gerade → Mittel aus 4. und 5. Wert.'},{v:54.4,fb:'Du hast die Urliste verwendet (4. und 5. Wert ohne Sortieren). Zuerst sortieren!'}],
+ h:['Rangliste: 51,4; 52,6; 53,7; 55,1; 55,3; 57,6; 57,8; 58,9','n = 8 → 4. und 5. Wert'],sol:'x<sub>med</sub> = (55,1 + 55,3) : 2 = 55,2 s'},
+{id:'S7',top:'stat',lv:'f',type:'mc',q:'AP 2021: Tageskilometer 0,80; 1,20; 2,30; 1,40; 0,30; 21,80; 2,70; 1,90 (x̄ = 4,05 km). Warum ist das arithmetische Mittel hier keine geeignete Kennzahl?',opts:[
+ {t:'Weil die Werte Dezimalzahlen sind.',fb:'Dezimalzahlen sind kein Problem.'},
+ {t:'Weil der Ausreißer 21,80 km den Durchschnitt stark nach oben verzerrt.',ok:1,fb:'Genau: 7 von 8 Werten liegen unter 3 km, der Mittelwert 4,05 km ist nicht typisch. Der Median (1,65 km) ist robuster.'},
+ {t:'Weil n gerade ist.',fb:'Das betrifft nur die Berechnung des Medians.'},
+ {t:'Weil man das arithmetische Mittel nur bei ganzen Zahlen berechnen darf.',fb:'Das stimmt nicht.'}],
+ h:['Schau dir die einzelnen Werte genau an. Fällt einer auf?'],sol:'Der Ausreißer (21,80 km) verzerrt x̄. Der Median (1,40 + 1,90) : 2 = 1,65 km beschreibt die typische Strecke besser.'},
+// ---- einstufig
+{id:'E1',top:'ein',lv:'e',type:'mc',q:'Welcher Vorgang ist <b>kein</b> Zufallsexperiment?',opts:[
+ {t:'Ziehen eines Loses an der Losbude',fb:'Hier weiß man vorher nicht, welches Los man zieht → Zufallsexperiment.'},
+ {t:'Drehen eines Glücksrads',fb:'Der Ausgang ist nicht vorhersagbar → Zufallsexperiment.'},
+ {t:'Berechnen von 3 · 4 mit dem Taschenrechner',ok:1,fb:'Richtig: Das Ergebnis steht vorher fest (12). Kein Zufall.'},
+ {t:'Werfen einer Münze',fb:'Kopf oder Zahl ist nicht vorhersagbar → Zufallsexperiment.'}],
+ h:['Bei einem Zufallsexperiment kann man den Ausgang nicht vorhersagen.'],sol:'3 · 4 zu berechnen ist kein Zufallsexperiment – das Ergebnis ist immer 12.'},
+{id:'E2',top:'ein',lv:'e',type:'set',q:'Ein Glücksrad hat die Felder rot, blau und gelb. Gib den Ergebnisraum Ω an.',ans:['rot','blau','gelb'],
+ h:['Schreibe alle möglichen Ausgänge in geschweifte Klammern.','Form: {…; …; …}'],sol:'Ω = {rot; blau; gelb}, |Ω| = 3'},
+{id:'E3',top:'ein',lv:'e',type:'num',kind:'n',q:'Gib die Mächtigkeit |Ω| beim Werfen eines zwölfseitigen Würfels an.',ans:12,
+ h:['Mächtigkeit = Anzahl der Ergebnisse.'],sol:'Ω = {1; 2; …; 12}, also |Ω| = 12'},
+{id:'E4',top:'ein',lv:'s',type:'mc',q:'Bunte Urne (AB 01): 7 blaue, 11 rote, 9 grüne, 6 gelbe, 12 weiße Kugeln. Ω = {blau; rot; grün; gelb; weiß}. Liegt ein Laplace-Experiment vor?',opts:[
+ {t:'Ja, weil es fünf Farben gibt.',fb:'Die Anzahl der Farben allein sagt nichts darüber, ob alle gleich wahrscheinlich sind.'},
+ {t:'Nein, weil die Farben unterschiedlich oft vorkommen und damit nicht gleich wahrscheinlich sind.',ok:1,fb:'Richtig: P(blau) = 7/45, P(weiß) = 12/45 – nicht gleich.'},
+ {t:'Ja, weil jede Kugel gleich groß ist.',fb:'Jede einzelne Kugel ist gleich wahrscheinlich – aber die Ergebnisse in Ω sind Farben, und die sind nicht gleich wahrscheinlich.'}],
+ h:['Laplace heißt: Alle Ergebnisse in Ω sind gleich wahrscheinlich.','Vergleiche P(blau) und P(weiß).'],sol:'Kein Laplace-Experiment: P(blau) = 7/45 ≈ 15,56 %, P(weiß) = 12/45 ≈ 26,67 %.'},
+{id:'E5',top:'ein',lv:'s',type:'set',q:'Zwölfseitiger Würfel: E: „Der Spieler würfelt eine Primzahl.“ Gib die Teilmenge E an.',ans:['2','3','5','7','11'],
+ rules:[{has:'1',fb:'1 ist keine Primzahl – Primzahlen haben genau zwei Teiler.'},{has:'9',fb:'9 = 3 · 3 ist keine Primzahl.'}],
+ h:['Primzahlen haben genau zwei Teiler: 1 und sich selbst.','Prüfe alle Zahlen von 1 bis 12.'],sol:'E = {2; 3; 5; 7; 11}, |E| = 5'},
+{id:'E6',top:'ein',lv:'s',type:'num',kind:'p',q:'Berechne P(E) für E: „Primzahl“ beim zwölfseitigen Würfel.',ans:[5,12],
+ wrong:[{v:5/6,fb:'Der Würfel hat 12 Seiten, nicht 6: |Ω| = 12.'}],
+ h:['P(E) = |E| : |Ω|','|E| = 5, |Ω| = 12'],sol:'P(E) = 5/12 ≈ 41,67 %'},
+{id:'E7',top:'ein',lv:'s',type:'num',kind:'p',q:'Bunte Urne (45 Kugeln): E₁: „Der Spieler zieht eine blaue, grüne oder weiße Kugel.“ Berechne P(E₁).',ans:[28,45],
+ wrong:[{v:3/5,fb:'3 von 5 Farben – aber die Farben sind nicht gleich wahrscheinlich. Zähle die Kugeln!'}],
+ h:['Zähle die passenden Kugeln: blau + grün + weiß.','7 + 9 + 12 = 28'],sol:'P(E₁) = (7 + 9 + 12)/45 = 28/45 ≈ 62,22 %'},
+{id:'E8',top:'ein',lv:'s',type:'mc',q:'Laplace-Würfel: E: „Ich werfe höchstens eine Vier.“ Wie lautet das Gegenereignis?',opts:[
+ {t:'„Ich werfe höchstens eine Drei.“',fb:'Das ist ein Teil von E, nicht der Rest.'},
+ {t:'„Ich werfe mindestens eine Fünf.“',ok:1,fb:'Richtig: E = {1; 2; 3; 4}, E̅ = {5; 6}.'},
+ {t:'„Ich werfe mindestens eine Vier.“',fb:'Die 4 gehört schon zu E – sie darf nicht auch im Gegenereignis sein (E ∩ E̅ = ∅).'},
+ {t:'„Ich werfe keine Vier.“',fb:'Dann wären 1, 2, 3 doppelt (in E und E̅).'}],
+ h:['Schreibe E als Menge.','E̅ enthält alle Ergebnisse aus Ω, die nicht in E sind.'],sol:'E = {1; 2; 3; 4} → E̅ = {5; 6}: „Ich werfe mindestens eine Fünf.“ P(E̅) = 2/6 ≈ 33,33 %'},
+{id:'E9',top:'ein',lv:'f',type:'mc',q:'Laplace-Würfel: Das Gegenereignis von „Ich werfe eine Zahl größer als 2“ ist …',opts:[
+ {t:'„… eine Zahl kleiner als 2“',fb:'Dann fehlt die 2! Die 2 ist weder größer als 2 noch kleiner als 2.'},
+ {t:'„… eine Zahl kleiner als 3“',ok:1,fb:'Richtig: E̅ = {1; 2}. Zusammen mit E = {3; 4; 5; 6} ergibt sich Ω.'},
+ {t:'„… eine Zahl kleiner als 2 oder gleich 3“',fb:'Die 3 gehört zu E.'}],
+ h:['Prüfe mit Mengen: E ∪ E̅ muss Ω ergeben.'],sol:'E̅ = {1; 2}: „Ich werfe eine Zahl kleiner als 3“ (bzw. „höchstens eine 2“).'},
+{id:'E10',top:'ein',lv:'f',type:'mc',q:'Lena hat fünfmal hintereinander keine Sechs gewürfelt. Sie sagt: „Jetzt ist die Sechs wahrscheinlicher.“ Stimmt das?',opts:[
+ {t:'Ja, irgendwann muss die Sechs ja kommen.',fb:'Der Würfel hat kein Gedächtnis. Jeder Wurf ist unabhängig.'},
+ {t:'Nein, die Wahrscheinlichkeit bleibt bei jedem Wurf 1/6.',ok:1,fb:'Richtig. Die Würfe beeinflussen sich nicht (Ziehen „mit Zurücklegen“).'},
+ {t:'Nein, jetzt ist die Sechs sogar unwahrscheinlicher.',fb:'Auch das stimmt nicht – sie bleibt 1/6.'}],
+ h:['Weiß der Würfel, was vorher gefallen ist?'],sol:'P(6) = 1/6 bei jedem Wurf – unabhängig von den vorherigen Würfen.'},
+{id:'E11',top:'ein',lv:'f',type:'mc',q:'Welche Angabe kann <b>keine</b> Wahrscheinlichkeit sein?',opts:[
+ {t:'P(E) = 0',fb:'0 ist möglich: unmögliches Ereignis.'},
+ {t:'P(E) = 1',fb:'1 = 100 % ist möglich: sicheres Ereignis.'},
+ {t:'P(E) = 1,2',ok:1,fb:'Richtig: 1,2 = 120 % ist größer als 1 – unmöglich.'},
+ {t:'P(E) = 0,05',fb:'5 % ist möglich.'}],
+ h:['Wahrscheinlichkeiten liegen zwischen 0 % und 100 %.'],sol:'1,2 = 120 % > 100 % ist keine Wahrscheinlichkeit.'},
+{id:'E12',top:'ein',lv:'s',type:'mc',q:'Ordne zu: „In einem Versuch landete die Reißzwecke in 620 von 1000 Würfen mit der Spitze nach oben. Also P ≈ 62 %.“',opts:[
+ {t:'Laplace-Wahrscheinlichkeit',fb:'Bei der Reißzwecke sind die beiden Lagen nicht gleich wahrscheinlich – Laplace geht nicht.'},
+ {t:'statistische Wahrscheinlichkeit',ok:1,fb:'Richtig: Schätzung aus der relativen Häufigkeit vieler Versuche.'},
+ {t:'subjektive Wahrscheinlichkeit',fb:'Hier steckt eine Versuchsreihe dahinter, kein Bauchgefühl.'}],
+ h:['Woher kommt die Zahl 62 %?'],sol:'Statistische Wahrscheinlichkeit (relative Häufigkeit bei vielen Versuchen).'},
+{id:'E13',top:'ein',lv:'t',type:'num',kind:'p',q:'Zwölfseitiger Würfel: Ein Spieler gewinnt bei einer Quadratzahl. Wie groß ist die Wahrscheinlichkeit, <b>nicht</b> zu gewinnen?',ans:[3,4],
+ wrong:[{v:1/4,fb:'1/4 ist die Gewinnwahrscheinlichkeit. Gesucht ist das Gegenereignis.'},{v:2/12,fb:'Du hast die 1 vergessen: 1 = 1 · 1 ist auch eine Quadratzahl.'},{v:10/12,fb:'Die 1 ist auch eine Quadratzahl (1 · 1).'}],
+ h:['Quadratzahlen bis 12: 1, 4, 9','P(E̅) = 1 − P(E)'],sol:'E = {1; 4; 9}, P(E) = 3/12 = 1/4 → P(E̅) = 1 − 1/4 = 3/4 = 75 %'},
+// ---- mehrstufig
+{id:'M1',top:'mehr',lv:'e',type:'num',kind:'n',q:'Eine Laplace-Münze wird dreimal geworfen. Wie viele Ergebnisse (Pfade) gibt es?',ans:8,
+ wrong:[{v:6,fb:'2 + 2 + 2 = 6 ist falsch: Die Möglichkeiten werden multipliziert (Zählprinzip).'},{v:3,fb:'3 ist die Anzahl der Stufen, nicht der Pfade.'}],
+ h:['Zählprinzip: Möglichkeiten je Stufe multiplizieren.'],sol:'|Ω| = 2 · 2 · 2 = 8'},
+{id:'M2',top:'mehr',lv:'e',type:'num',kind:'n',q:'Ein Menü: 3 Vorspeisen, 4 Hauptgerichte, 2 Nachspeisen. Wie viele verschiedene Menüs gibt es?',ans:24,
+ wrong:[{v:9,fb:'Nicht addieren – multiplizieren (Zählprinzip).'}],h:['Baumdiagramm mit 3 Stufen gedanklich zeichnen.'],sol:'3 · 4 · 2 = 24 Menüs'},
+{id:'M3',top:'mehr',lv:'e',type:'mc',q:'Wie berechnet man die Wahrscheinlichkeit eines einzelnen Pfades?',opts:[
+ {t:'Wahrscheinlichkeiten entlang des Pfades addieren',fb:'Addiert wird bei der 2. Pfadregel (mehrere Pfade).'},
+ {t:'Wahrscheinlichkeiten entlang des Pfades multiplizieren',ok:1,fb:'Richtig: 1. Pfadregel.'},
+ {t:'Anzahl der Pfade : Anzahl der Stufen',fb:'Das ergibt keine Wahrscheinlichkeit.'}],
+ h:['Ein Pfad = ein Ergebnis.'],sol:'1. Pfadregel: entlang des Pfades multiplizieren.'},
+{id:'M4',top:'mehr',lv:'s',type:'num',kind:'p',q:'Münze dreimal: Berechne P(„genau zweimal Kopf“).',ans:[3,8],
+ wrong:[{v:1/8,fb:'Das ist nur ein Pfad. Es gibt drei passende Pfade: KKZ, KZK, ZKK.'},{v:1/4,fb:'Pfade zählen: KKZ, KZK, ZKK – jeder mit 1/8.'}],
+ h:['Welche Pfade passen? Schreibe sie als Menge.','E = {KKZ; KZK; ZKK}, jeder Pfad 1/8'],sol:'P = 1/8 + 1/8 + 1/8 = 3/8 = 37,5 %'},
+{id:'M5',top:'mehr',lv:'s',type:'num',kind:'p',q:'Max (AB 02): P(„Max trägt einen roten Pullover und schwarze Schuhe“)? Pullover: R 1/4; Hose: B 1/3, S 2/3; Schuhe: S 1/2.',ans:[1,8],
+ wrong:[{v:1/24,fb:'Das ist nur der Pfad RBS. Auch RSS passt (rote Pullover, schwarze Hose, schwarze Schuhe).'}],
+ h:['Passende Pfade: RBS und RSS','P(RBS) = 1/4 · 1/3 · 1/2 = 1/24; P(RSS) = 1/4 · 2/3 · 1/2 = 1/12'],sol:'P = 1/24 + 1/12 = 3/24 = 1/8 = 12,5 %'},
+{id:'M6',top:'mehr',lv:'s',type:'num',kind:'p',q:'Urne mit 6 blauen und 4 grünen Kugeln. Zwei Kugeln werden <b>mit</b> Zurücklegen gezogen. P(beide grün)?',ans:[4,25],
+ wrong:[{v:2/15,fb:'Das wäre ohne Zurücklegen. Mit Zurücklegen bleibt es bei 4/10 auf beiden Stufen.'},{v:4/5,fb:'Nicht addieren: 1. Pfadregel → multiplizieren.'}],
+ h:['Pfad GG: 4/10 · 4/10'],sol:'P(GG) = 4/10 · 4/10 = 16/100 = 16 %'},
+{id:'M7',top:'mehr',lv:'s',type:'num',kind:'p',q:'Gleiche Urne (6 B, 4 G), aber <b>ohne</b> Zurücklegen. P(beide grün)?',ans:[2,15],
+ wrong:[{v:4/25,fb:'Das ist mit Zurücklegen. Ohne Zurücklegen sind beim 2. Zug nur noch 3 grüne von 9 Kugeln da.'}],
+ h:['2. Zug: Es sind nur noch 9 Kugeln, davon 3 grüne.'],sol:'P(GG) = 4/10 · 3/9 = 12/90 = 2/15 ≈ 13,33 %'},
+{id:'M8',top:'mehr',lv:'f',type:'mc',q:'Tim sagt: „Bei zwei Würfen mit einem Würfel ist P(mindestens eine Sechs) = 1/6 + 1/6 = 1/3.“ Was ist falsch?',opts:[
+ {t:'Nichts, das stimmt.',fb:'Dann wäre bei 6 Würfen P = 6/6 = 100 % – aber man kann sechsmal keine Sechs werfen!'},
+ {t:'Der Pfad „6 und 6“ wird doppelt gezählt; außerdem darf man Stufenwahrscheinlichkeiten nicht einfach addieren.',ok:1,fb:'Richtig. Besser über das Gegenereignis: 1 − (5/6)² = 11/36 ≈ 30,56 %.'},
+ {t:'Man muss 1/6 · 1/6 rechnen.',fb:'1/36 ist P(zwei Sechsen) – das ist ein anderes Ereignis.'}],
+ h:['Zeichne das Baumdiagramm mit „6“ und „keine 6“.','Gegenereignis von „mindestens eine Sechs“?'],sol:'P = 1 − P(keine 6, keine 6) = 1 − 5/6 · 5/6 = 1 − 25/36 = 11/36 ≈ 30,56 %'},
+{id:'M9',top:'mehr',lv:'f',type:'mc',q:'Welche Aussage über das Ziehen <b>ohne</b> Zurücklegen ist richtig?',opts:[
+ {t:'Die Wahrscheinlichkeiten sind auf jeder Stufe gleich.',fb:'Das gilt nur mit Zurücklegen.'},
+ {t:'Die Wahrscheinlichkeiten ändern sich, weil sich die Anzahl der Kugeln ändert.',ok:1,fb:'Richtig: Der Nenner wird bei jedem Zug um 1 kleiner.'},
+ {t:'Es gibt immer mehr Pfade als mit Zurücklegen.',fb:'Eher weniger oder gleich viele: Ist eine Farbe aufgebraucht, fällt ein Ast weg.'}],
+ h:['Was passiert mit der gezogenen Kugel?'],sol:'Ohne Zurücklegen ändern sich die Wahrscheinlichkeiten von Stufe zu Stufe.'},
+{id:'M10',top:'mehr',lv:'t',type:'num',kind:'p',q:'AP 2023: In einer Trambahn sind unter 16 Fahrgästen 2 Schwarzfahrer. Der Kontrolleur kontrolliert nacheinander 3 Personen. Berechne P(„alle drei haben ein gültiges Ticket“).',ans:[13,20],
+ wrong:[{v:0.669921875,fb:'Mit Zurücklegen gerechnet (14/16)³. Eine kontrollierte Person wird nicht nochmal kontrolliert → ohne Zurücklegen.'}],
+ h:['Ohne Zurücklegen: 14/16, dann 13/15, dann 12/14','Pfad TTT multiplizieren'],sol:'P(TTT) = 14/16 · 13/15 · 12/14 = 2184/3360 = 13/20 = 65 %'},
+{id:'M11',top:'mehr',lv:'t',type:'num',kind:'p',q:'AP 2023: Berechne P(„Bei der Kontrolle werden beide Schwarzfahrer erwischt“) (3 Kontrollen, 2 von 16 sind Schwarzfahrer).',ans:[1,40],
+ wrong:[{v:1/120,fb:'Das ist nur ein Pfad. Passend sind SST, STS und TSS.'}],
+ h:['Passende Pfade: SST, STS, TSS','P(SST) = 2/16 · 1/15 · 14/14 = 1/120; die anderen beiden genauso'],sol:'P = 3 · 1/120 = 1/40 = 2,5 %'},
+{id:'M12',top:'mehr',lv:'t',type:'num',kind:'p',q:'AP 2022: Tag 1: Frau Sommer, Herr Herbst, Herr Winter (je 1/3); Tag 2: nur Frau Sommer oder Herr Winter (je 1/2). Berechne P(„höchstens einmal bei Herrn Winter“).',ans:[5,6],
+ wrong:[{v:1/6,fb:'1/6 ist P(WW) – das Gegenereignis. Gesucht: 1 − P(WW).'}],
+ h:['Gegenereignis von „höchstens einmal Winter“ ist „zweimal Winter“.','P(WW) = 1/3 · 1/2'],sol:'P = 1 − 1/3 · 1/2 = 1 − 1/6 = 5/6 ≈ 83,33 %'},
+{id:'M13',top:'mehr',lv:'t',type:'num',kind:'p',q:'Zwei Laplace-Würfel werden geworfen. Wie groß ist P(„Augensumme 7“)?',ans:[1,6],
+ wrong:[{v:1/11,fb:'Die Summen 2 bis 12 sind nicht gleich wahrscheinlich – kein Laplace-Experiment für die Summe! Zähle die 36 Pfade.'},{v:1/36,fb:'Das ist ein einzelner Pfad. Für Summe 7 passen 6 Pfade.'}],
+ h:['Es gibt 6 · 6 = 36 gleich wahrscheinliche Pfade.','Passend: (1|6), (2|5), (3|4), (4|3), (5|2), (6|1)'],sol:'P = 6/36 = 1/6 ≈ 16,67 %'},
+{id:'M14',top:'mehr',lv:'s',type:'num',kind:'p',q:'Münze dreimal: P(„mindestens einmal Kopf“)?',ans:[7,8],
+ wrong:[{v:3/8,fb:'Das ist „genau einmal Kopf“. „Mindestens einmal“ heißt 1-, 2- oder 3-mal.'},{v:1/8,fb:'1/8 ist P(ZZZ) – das Gegenereignis.'}],
+ h:['Gegenereignis: „keinmal Kopf“ = ZZZ'],sol:'P = 1 − P(ZZZ) = 1 − 1/8 = 7/8 = 87,5 %'}
+];
+
+// ================= ILLUSTRATIONEN (SVG) =================
+const PIPP={1:[[.5,.5]],2:[[.25,.25],[.75,.75]],3:[[.25,.25],[.5,.5],[.75,.75]],4:[[.25,.25],[.75,.25],[.25,.75],[.75,.75]],5:[[.25,.25],[.75,.25],[.5,.5],[.25,.75],[.75,.75]],6:[[.25,.22],[.75,.22],[.25,.5],[.75,.5],[.25,.78],[.75,.78]]};
+function dSvg(x,y,s,n,fill='#fff',stroke='#37474f',rot=0){let g=`<g transform="rotate(${rot} ${x+s/2} ${y+s/2})"><rect x="${x}" y="${y}" width="${s}" height="${s}" rx="${s*.18}" fill="${fill}" stroke="${stroke}" stroke-width="${Math.max(1.5,s/22)}"/>`;
+  PIPP[n].forEach(([a,b])=>g+=`<circle cx="${x+a*s}" cy="${y+b*s}" r="${s*.08}" fill="#263238"/>`);return g+'</g>'}
+function person(x,y,c,lbl){return `<g><circle cx="${x}" cy="${y}" r="11" fill="#f2c9a5"/><path d="M${x-16},${y+42} q0,-26 16,-26 q16,0 16,26 z" fill="${c}"/>${lbl?`<rect x="${x-14}" y="${y-38}" width="28" height="18" rx="5" fill="#fff" stroke="#90a4ae"/><text x="${x}" y="${y-24}" font-size="12" text-anchor="middle" font-weight="700" fill="#1d2330">${lbl}</text>`:''}</g>`}
+function ball(x,y,c,l,r=13){return `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}" stroke="rgba(0,0,0,.25)"/><text x="${x}" y="${y+4.5}" font-size="${r*.95}" text-anchor="middle" fill="#fff" font-weight="700">${l}</text>`}
+function coin(x,y,r,side){return `<circle cx="${x}" cy="${y}" r="${r}" fill="#f2c94c" stroke="#b8860b" stroke-width="3"/><circle cx="${x}" cy="${y}" r="${r*.78}" fill="none" stroke="#d4a017" stroke-width="1.5"/>`+
+  (side==='K'?`<circle cx="${x}" cy="${y-r*.18}" r="${r*.22}" fill="#b8860b"/><path d="M${x-r*.38},${y+r*.45} q${r*.38},-${r*.55} ${r*.76},0 z" fill="#b8860b"/>`:`<text x="${x}" y="${y+r*.36}" font-size="${r}" text-anchor="middle" font-weight="800" fill="#8a6100">1</text>`)}
+function awning(x,w,y,cols){let s='';const n=8,sw=w/n;for(let i=0;i<n;i++)s+=`<path d="M${x+i*sw},${y} h${sw} v18 q-${sw/2},12 -${sw},0 z" fill="${i%2?cols[1]:cols[0]}"/>`;return s}
+const IMG={
+umfrage:()=>`<svg viewBox="0 0 330 170" role="img" aria-label="Umfrage zum Alter in der Klasse">
+ ${person(30,62,'#5c8fd6','16')}${person(68,62,'#e57373','18')}${person(106,62,'#81c784','16')}${person(144,62,'#ffb74d','15')}
+ <rect x="10" y="118" width="160" height="10" rx="3" fill="#cfd8dc"/>
+ <text x="90" y="150" font-size="13" text-anchor="middle" fill="#5d6678">Urliste: 16; 18; 16; 15; …</text>
+ <line x1="196" y1="20" x2="196" y2="140" stroke="#5d6678" stroke-width="1.5"/><line x1="196" y1="140" x2="320" y2="140" stroke="#5d6678" stroke-width="1.5"/>
+ ${[[15,4,'#1e88e5'],[16,7,'#e91e63'],[17,5,'#43a047'],[18,4,'#fb8c00']].map(([a,h,c],i)=>`<rect x="${206+i*28}" y="${140-h*16}" width="20" height="${h*16}" rx="3" fill="${c}"/><text x="${216+i*28}" y="${156}" font-size="12" text-anchor="middle" fill="#1d2330">${a}</text><text x="${216+i*28}" y="${135-h*16}" font-size="11" text-anchor="middle" fill="#1d2330">${h}</text>`).join('')}
+ <text x="258" y="14" font-size="12" text-anchor="middle" fill="#5d6678">Häufigkeit</text></svg>`,
+wuerfelbude:()=>`<svg viewBox="0 0 330 180" role="img" aria-label="Würfelbude auf der Kirchweih">
+ <rect x="40" y="40" width="250" height="125" fill="#fdf3e1" stroke="#a1887f" stroke-width="2"/>${awning(30,270,26,['#e53935','#fff'])}
+ <rect x="30" y="18" width="270" height="10" fill="#8d6e63"/>
+ <rect x="120" y="54" width="90" height="22" rx="4" fill="#3949ab"/><text x="165" y="70" font-size="13" text-anchor="middle" fill="#fff" font-weight="700">WÜRFELBUDE</text>
+ <rect x="30" y="128" width="270" height="20" fill="#8d6e63"/>
+ ${dSvg(118,84,42,5,'#fff','#37474f',-12)}${dSvg(172,90,36,2,'#fff','#37474f',10)}
+ <circle cx="262" cy="104" r="16" fill="#c49a6c"/><circle cx="252" cy="88" r="6" fill="#c49a6c"/><circle cx="272" cy="88" r="6" fill="#c49a6c"/><circle cx="257" cy="100" r="2" fill="#333"/><circle cx="267" cy="100" r="2" fill="#333"/>
+ <text x="72" y="112" font-size="26" text-anchor="middle" fill="#7e57c2" font-weight="800">?</text>
+ <text x="165" y="172" font-size="12" text-anchor="middle" fill="#5d6678">Welche Zahl fällt? – Das weiß vorher niemand.</text></svg>`,
+laplace:()=>`<svg viewBox="0 0 330 160" role="img" aria-label="Laplace-Würfel, Reißzwecke und Glücksrad">
+ ${dSvg(28,38,58,6)}<text x="57" y="122" font-size="12" text-anchor="middle" fill="#1d2330" font-weight="700">Würfel</text><text x="57" y="138" font-size="11" text-anchor="middle" fill="#1f8a4c">alle Seiten gleich</text>
+ <g transform="translate(130,48)"><circle cx="20" cy="22" r="18" fill="#cfd8dc" stroke="#78909c" stroke-width="2"/><line x1="20" y1="22" x2="20" y2="-8" stroke="#78909c" stroke-width="4" stroke-linecap="round"/>
+ <g transform="translate(52,10) rotate(70 18 20)"><circle cx="18" cy="20" r="16" fill="#cfd8dc" stroke="#78909c" stroke-width="2"/><line x1="18" y1="20" x2="18" y2="-8" stroke="#78909c" stroke-width="4" stroke-linecap="round"/></g></g>
+ <text x="168" y="122" font-size="12" text-anchor="middle" fill="#1d2330" font-weight="700">Reißzwecke</text><text x="168" y="138" font-size="11" text-anchor="middle" fill="#c0392b">Lagen ungleich</text>
+ <g transform="translate(272,62)"><path d="M0,0 L0,-36 A36,36 0 0 1 0,36 Z" fill="#e57373"/><path d="M0,0 L0,36 A36,36 0 0 1 -36,0 Z" fill="#64b5f6"/><path d="M0,0 L-36,0 A36,36 0 0 1 0,-36 Z" fill="#ffd54f"/><circle r="36" fill="none" stroke="#546e7a" stroke-width="2"/><path d="M-5,-44 L5,-44 L0,-34 Z" fill="#37474f"/></g>
+ <text x="272" y="122" font-size="12" text-anchor="middle" fill="#1d2330" font-weight="700">Glücksrad</text><text x="272" y="138" font-size="11" text-anchor="middle" fill="#c0392b">Felder ungleich groß</text></svg>`,
+ereignis:()=>`<svg viewBox="0 0 330 160" role="img" aria-label="Gewinnschild: Zahl größer als 2">
+ <rect x="35" y="8" width="260" height="34" rx="8" fill="#fff3e0" stroke="#e65100" stroke-width="2"/><text x="165" y="31" font-size="15" text-anchor="middle" fill="#c25a00" font-weight="800">Gewinn bei mehr als 2 Augen!</text>
+ ${[1,2,3,4,5,6].map((n,i)=>dSvg(14+i*52,62,42,n,n>2?'#ffe0b2':'#eceff1',n>2?'#e65100':'#90a4ae')).join('')}
+ <path d="M118,116 h196" stroke="#e65100" stroke-width="3"/><text x="216" y="134" font-size="13" text-anchor="middle" fill="#c25a00" font-weight="700">E = {3; 4; 5; 6}</text>
+ <path d="M14,116 h94" stroke="#0277bd" stroke-width="3"/><text x="61" y="134" font-size="13" text-anchor="middle" fill="#0277bd" font-weight="700">Ē = {1; 2}</text>
+ <text x="165" y="154" font-size="11" text-anchor="middle" fill="#5d6678">Ereignis = alle Ergebnisse, die den Wunsch erfüllen</text></svg>`,
+muenze:()=>`<svg viewBox="0 0 330 150" role="img" aria-label="Münze dreimal werfen">
+ ${coin(60,62,36,'Z')}${coin(165,62,36,'K')}${coin(270,62,36,'K')}
+ <text x="60" y="118" font-size="13" text-anchor="middle" fill="#1d2330" font-weight="700">1. Wurf: Z</text><text x="165" y="118" font-size="13" text-anchor="middle" fill="#1d2330" font-weight="700">2. Wurf: K</text><text x="270" y="118" font-size="13" text-anchor="middle" fill="#1d2330" font-weight="700">3. Wurf: K</text>
+ <text x="165" y="142" font-size="12" text-anchor="middle" fill="#b0306a">Ergebnis ZKK – ein Pfad im Baumdiagramm</text></svg>`,
+schrank:()=>{const hang=(x,c,t)=>`<path d="M${x},28 q0,-8 6,-8" stroke="#78909c" fill="none" stroke-width="1.5"/><path d="M${x-14},34 l14,-6 l14,6" stroke="#78909c" fill="none" stroke-width="1.5"/>`+(t==='p'?`<path d="M${x-16},36 h32 l6,14 h-8 v32 h-28 v-32 h-8 z" fill="${c}" stroke="rgba(0,0,0,.25)"/>`:`<path d="M${x-12},36 h24 v52 h-10 l-2,-34 l-2,34 h-10 z" fill="${c}" stroke="rgba(0,0,0,.25)"/>`);
+ const shoe=(x,c)=>`<path d="M${x},140 h18 q14,0 16,10 h-34 z" fill="${c}" stroke="#555"/><path d="M${x+38},140 h18 q14,0 16,10 h-34 z" fill="${c}" stroke="#555"/>`;
+ return `<svg viewBox="0 0 330 170" role="img" aria-label="Kleiderschrank von Max">
+ <rect x="6" y="8" width="318" height="156" rx="6" fill="#efe3d0" stroke="#8d6e63" stroke-width="3"/><line x1="12" y1="24" x2="318" y2="24" stroke="#8d6e63" stroke-width="3"/>
+ ${hang(36,'#9e9e9e','p')}${hang(86,'#9e9e9e','p')}${hang(136,'#e53935','p')}${hang(186,'#263238','p')}${hang(234,'#1e63c6','h')}${hang(268,'#263238','h')}${hang(302,'#263238','h')}
+ <line x1="12" y1="128" x2="318" y2="128" stroke="#8d6e63" stroke-width="2"/>${shoe(60,'#fafafa')}${shoe(190,'#263238')}
+ <text x="111" y="104" font-size="12" text-anchor="middle" fill="#5d4037" font-weight="700">4 Pullover</text><text x="268" y="104" font-size="12" text-anchor="middle" fill="#5d4037" font-weight="700">3 Hosen</text><text x="165" y="162" font-size="11" text-anchor="middle" fill="#5d4037">2 Paar Schuhe</text></svg>`},
+urne:()=>{let b='';const pos=[[120,112],[148,116],[176,112],[204,116],[134,90],[162,92],[190,90],[146,68],[174,70],[160,48]];
+ pos.forEach(([x,y],i)=>b+=ball(x,y,i<6?'#1e63c6':'#2e9d4a',i<6?'B':'G'));
+ return `<svg viewBox="0 0 330 160" role="img" aria-label="Urne mit 6 blauen und 4 grünen Kugeln">
+ <path d="M100,40 h124 q-4,14 6,26 q24,30 4,70 q-6,12 -20,16 h-104 q-14,-4 -20,-16 q-20,-40 4,-70 q10,-12 6,-26 z" fill="#f4ecdf" stroke="#8d6e63" stroke-width="3"/>
+ <rect x="94" y="32" width="136" height="12" rx="4" fill="#8d6e63"/>${b}
+ <text x="290" y="70" font-size="13" text-anchor="middle" fill="#1e63c6" font-weight="700">6 blau</text><text x="290" y="92" font-size="13" text-anchor="middle" fill="#2e9d4a" font-weight="700">4 grün</text>
+ <text x="44" y="70" font-size="12" text-anchor="middle" fill="#5d6678">mit oder</text><text x="44" y="86" font-size="12" text-anchor="middle" fill="#5d6678">ohne</text><text x="44" y="102" font-size="12" text-anchor="middle" fill="#5d6678">Zurücklegen?</text></svg>`},
+baum:()=>{let s='<svg viewBox="0 0 330 150" role="img" aria-label="Baumdiagramm">';const L=[[75],[40,110],[22,58,92,128]];
+ for(let d=0;d<2;d++)L[d+1].forEach((y,i)=>{const py=L[d][Math.floor(i/2)];s+=`<line x1="${40+d*110}" y1="${py}" x2="${130+d*110}" y2="${y}" stroke="${i===1&&d===0||i===2&&d===1?'#b0306a':'#90a4ae'}" stroke-width="${i===1&&d===0||i===2&&d===1?4:2}"/>`;s+=`<rect x="${130+d*110}" y="${y-11}" width="26" height="22" rx="5" fill="#fff" stroke="#607d8b"/><text x="${143+d*110}" y="${y+5}" font-size="13" text-anchor="middle" font-weight="700" fill="#1d2330">${i%2?'Z':'K'}</text>`});
+ return s+`<rect x="6" y="64" width="36" height="22" rx="5" fill="#eceff1" stroke="#607d8b"/><text x="24" y="79" font-size="10" text-anchor="middle" fill="#1d2330">Start</text><text x="310" y="79" font-size="11" text-anchor="end" fill="#b0306a" font-weight="700">½ · ½</text></svg>`},
+begriffe:()=>`<svg viewBox="0 0 330 150" role="img" aria-label="drei Wahrscheinlichkeitsbegriffe">
+ ${dSvg(30,30,52,3)}<text x="56" y="108" font-size="12" text-anchor="middle" font-weight="700" fill="#0f8a8a">Laplace</text><text x="56" y="124" font-size="11" text-anchor="middle" fill="#5d6678">berechnen</text>
+ <rect x="128" y="24" width="74" height="66" rx="6" fill="#fff" stroke="#90a4ae"/><text x="138" y="44" font-size="11" fill="#1d2330">oben ||||| ||</text><text x="138" y="62" font-size="11" fill="#1d2330">Seite ||||</text><text x="138" y="82" font-size="11" fill="#2357c6" font-weight="700">h ≈ 64 %</text>
+ <text x="165" y="108" font-size="12" text-anchor="middle" font-weight="700" fill="#2357c6">statistisch</text><text x="165" y="124" font-size="11" text-anchor="middle" fill="#5d6678">ausprobieren</text>
+ <ellipse cx="275" cy="52" rx="44" ry="28" fill="#fff" stroke="#90a4ae"/><circle cx="252" cy="88" r="5" fill="#fff" stroke="#90a4ae"/><circle cx="244" cy="98" r="3" fill="#fff" stroke="#90a4ae"/><text x="275" y="57" font-size="13" text-anchor="middle" fill="#1d2330" font-weight="700">„90 %!“</text>
+ <text x="275" y="108" font-size="12" text-anchor="middle" font-weight="700" fill="#8d6e63">subjektiv</text><text x="275" y="124" font-size="11" text-anchor="middle" fill="#5d6678">einschätzen</text></svg>`
+};
+function injectImages(){document.querySelectorAll('[data-img]').forEach(el=>{const f=IMG[el.dataset.img];if(f)el.insertAdjacentHTML('afterbegin',f())})}
+
+// ================= HILFSFUNKTIONEN =================
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const store={get(k,d){try{const v=localStorage.getItem('dz_'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('dz_'+k,JSON.stringify(v))}catch(e){}}};
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a||1}
+class Fr{constructor(n,d=1){if(d<0){n=-n;d=-d}const g=gcd(n,d);this.n=n/g;this.d=d/g}
+ mul(o){return new Fr(this.n*o.n,this.d*o.d)} add(o){return new Fr(this.n*o.d+o.n*this.d,this.d*o.d)}
+ sub(o){return new Fr(this.n*o.d-o.n*this.d,this.d*o.d)} val(){return this.n/this.d}
+ html(){return this.d===1?String(this.n):frac(this.n,this.d)} txt(){return this.d===1?String(this.n):this.n+'/'+this.d}}
+const ONE=new Fr(1,1), ZERO=new Fr(0,1);
+function frac(a,b){return `<span class="frac"><span>${a}</span><span>${b}</span></span>`}
+function de(x,dec=2){const r=Math.round(x*Math.pow(10,dec))/Math.pow(10,dec);let s=r.toFixed(dec);if(s.indexOf('.')>=0)s=s.replace(/0+$/,'').replace(/\.$/,'');return s.replace('.',',')}
+function isExact(x,dec=2){return Math.abs(Math.round(x*Math.pow(10,dec))-x*Math.pow(10,dec))<1e-7}
+function pct(v){return de(v*100)+' %'}
+function pctEq(v){return (isExact(v*100)?'= ':'≈ ')+pct(v)}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function setStr(arr){return '{'+(arr.length?' '+arr.join('; ')+' ':' ')+'}'}
+function el(tag,attrs={},html=''){const e=document.createElement(tag);for(const k in attrs){if(k==='class')e.className=attrs[k];else e.setAttribute(k,attrs[k])}e.innerHTML=html;return e}
+function showFb(box,cls,html){box.className='fb show '+cls;box.innerHTML=html}
+
+// ================= NAVIGATION =================
+const CH=[
+ {id:'k1',cls:'stat',tag:'Kapitel 1 · Statistik',title:'Daten erheben, darstellen, auswerten',desc:'Urliste, Rangliste, Häufigkeiten, Diagramme, Kennzahlen',img:'umfrage',ov:'s1',goals:['Merkmale unterscheiden, Rangliste erstellen','absolute/relative Häufigkeit und Winkelmaß berechnen, Diagramme wählen','arithmetisches Mittel, Modalwert, Median, Spannweite bestimmen']},
+ {id:'k2',cls:'ein',tag:'Kapitel 2 · einstufig',title:'Zufallsexperiment und Ergebnisraum',desc:'Ergebnis, Ergebnisraum Ω, Mengenschreibweise, Mächtigkeit',img:'wuerfelbude',ov:'s2',goals:['ein Zufallsexperiment erkennen','Ergebnisse und den Ergebnisraum Ω angeben','die Mächtigkeit |Ω| bestimmen']},
+ {id:'k3',cls:'ein',tag:'Kapitel 3 · einstufig',title:'Wahrscheinlichkeit',desc:'Laplace, Simulation, statistische und subjektive Wahrscheinlichkeit',img:'laplace',ov:'s3',goals:['Laplace-Experimente erkennen, p = 1/n','beobachtete und theoretische Werte unterscheiden','Wahrscheinlichkeitsbegriffe abgrenzen']},
+ {id:'k4',cls:'ev',tag:'Kapitel 4 · einstufig',title:'Ereignisse und Gegenereignis',desc:'Teilmenge, P(E) = |E| : |Ω|, unmöglich, sicher, Gegenereignis',img:'ereignis',ov:'s4',goals:['Ereignisse in Worten und als Menge angeben','P(E) = |E| : |Ω| berechnen','unmögliche, sichere Ereignisse und Gegenereignisse bestimmen']},
+ {id:'k5',cls:'mehr',tag:'Kapitel 5 · mehrstufig',title:'Baumdiagramm und Pfadregeln',desc:'Stufe, Pfad, Zählprinzip, 1. und 2. Pfadregel',img:'baum',ov:'s5',goals:['mehrstufige Zufallsexperimente im Baum darstellen','die Mächtigkeit mit dem Zählprinzip bestimmen','mit den Pfadregeln rechnen und Ergebnisse deuten']},
+ {id:'k6',cls:'mehr',tag:'Kapitel 6 · mehrstufig',title:'Mit und ohne Zurücklegen',desc:'Urne, sich ändernde Wahrscheinlichkeiten, Gegenereignis',img:'urne',ov:'s6',goals:['erkennen, ob sich die Wahrscheinlichkeiten ändern','passende Baumdiagramme erstellen','geschickt mit dem Gegenereignis rechnen']}];
+const VIEWS=['start','training','uebersicht','lehrkraft',...CH.map(c=>c.id)];
+let visited=store.get('visited2',[]); let seen=store.get('seen',{});
+injectImages();
+// Kapitel aufbauen
+CH.forEach(c=>{const sec=document.getElementById(c.id);const steps=$$('.step',sec);
+  steps.forEach((st,i)=>st.insertAdjacentHTML('afterbegin',`<div class="step-head"><span class="nr">${i+1}</span><span>${st.dataset.title}</span><span class="kind">${st.dataset.kind}</span></div>`));
+  sec.insertAdjacentHTML('afterbegin',`<button class="back" onclick="location.hash='#start'">← Alle Kapitel</button>
+   <div class="panel ch-head"><div class="thumb">${IMG[c.img]()}</div><div><span class="tag ${c.cls}">${c.tag}</span><h2 style="margin:.3em 0 .1em">${c.title}</h2><div class="meta">Du lernst:</div><ul>${c.goals.map(g=>`<li>${g}</li>`).join('')}</ul></div></div>
+   <div class="stepper">${steps.map((st,i)=>`<button data-go="${i}"><span class="n">${i+1}</span>${st.dataset.title}</button>`).join('')}<button class="all" data-all="1">alle Schritte zeigen</button></div>`);
+  const last=c.id===CH[CH.length-1].id;const nx=CH[CH.findIndex(x=>x.id===c.id)+1];
+  sec.insertAdjacentHTML('beforeend',`<div class="stepnav"><button data-prev="1">← Zurück</button><button class="primary" data-next="1">Weiter →</button></div>
+   <div class="panel" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center"><span style="flex:1;min-width:200px"><b>Sichern:</b> Ergänze in <a href="#uebersicht">Meiner Übersicht</a> die Karte(n) „${sec.dataset.ov}“.</span>${nx?`<a class="btn" href="#${nx.id}">Weiter: ${nx.title} →</a>`:`<a class="btn" href="#training">Zum Training →</a>`}</div>`);
+  sec.addEventListener('click',e=>{const g=e.target.closest('[data-go]'),p=e.target.closest('[data-prev]'),n=e.target.closest('[data-next]'),al=e.target.closest('[data-all]');
+    const cur=steps.findIndex(s=>s.classList.contains('cur'));
+    if(g)showStep(c.id,+g.dataset.go,true); if(p&&cur>0)showStep(c.id,cur-1,true); if(n){if(cur<steps.length-1)showStep(c.id,cur+1,true);else location.hash=nx?'#'+nx.id:'#training'}
+    if(al){const on=sec.classList.toggle('stepmode');al.textContent=on?'alle Schritte zeigen':'Schritt für Schritt';if(on)showStep(c.id,Math.max(cur,0),false)}});
+});
+function showStep(cid,i,scroll){const sec=document.getElementById(cid),steps=$$('.step',sec);
+  steps.forEach((s,j)=>s.classList.toggle('cur',j===i));$$('.stepper [data-go]',sec).forEach((b,j)=>{b.classList.toggle('active',j===i)});
+  seen[cid]=seen[cid]||[];if(!seen[cid].includes(i)){seen[cid].push(i);store.set('seen',seen)}
+  $$('.stepper [data-go]',sec).forEach((b,j)=>b.classList.toggle('seen',seen[cid].includes(j)&&j!==i));
+  const nb=$('[data-next]',sec);nb.textContent=i<steps.length-1?'Weiter →':'Kapitel abschließen →';$('[data-prev]',sec).disabled=i===0;
+  if(scroll){const st=$('.stepper',sec);window.scrollTo({top:st.getBoundingClientRect().top+window.scrollY-110})}
+  $$('textarea',sec).forEach(autosize)}
+function renderHome(){$('#chGrid').innerHTML=CH.map(c=>{const n=$$('.step',document.getElementById(c.id)).length,s=(seen[c.id]||[]).length;
+  return `<a class="ch-card" href="#${c.id}"><div class="thumb">${IMG[c.img]()}</div><div class="body"><span class="tag ${c.cls}">${c.tag}</span><h3>${c.title}</h3><div class="meta">${c.desc}</div><div class="meta" style="margin-top:4px">${s} von ${n} Schritten</div><div class="bar"><i style="width:${Math.round(100*s/n)}%"></i></div></div></a>`}).join('')}
+function route(){
+  let id=(location.hash||'#start').slice(1); if(!VIEWS.includes(id))id='start';
+  $$('.view').forEach(s=>s.classList.toggle('show',s.id===id));
+  const tab=id.startsWith('k')?'start':id; $$('nav.tabs a').forEach(a=>a.classList.toggle('active',a.dataset.v===tab));
+  const c=CH.find(x=>x.id===id);
+  if(c){if(!visited.includes(c.ov)){visited.push(c.ov);store.set('visited2',visited)}const sec=document.getElementById(id);
+    if(sec.classList.contains('stepmode')&&!$('.step.cur',sec))showStep(id,0,false)}
+  if(id==='start')renderHome();
+  window.scrollTo(0,0); updateLocks();
+  if(id==='uebersicht')$$('#ov textarea').forEach(autosize);
+}
+window.addEventListener('hashchange',route);
+document.addEventListener('click',e=>{
+  const r=e.target.closest('[data-reveal]'); if(r){const b=document.getElementById(r.dataset.reveal);b.classList.toggle('show')}
+});
+$('#btnBeamer').onclick=function(){const on=document.body.classList.toggle('beamer');this.setAttribute('aria-pressed',on)};
+(function(){const t=store.get('theme',null);if(t)document.documentElement.setAttribute('data-theme',t)})();
+$('#btnTheme').onclick=()=>{const cur=document.documentElement.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');const nt=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nt);store.set('theme',nt)};
+$('#btnMerk').onclick=()=>$('#merkModal').classList.add('show');$('#merkClose').onclick=()=>$('#merkModal').classList.remove('show');
+$('#merkModal').onclick=e=>{if(e.target.id==='merkModal')e.target.classList.remove('show')};
+
+// ================= 1 STATISTIK =================
+(function(){
+  const box=$('#urliste'); let sorted=false;
+  function render(){
+    const data=sorted?AGES.slice().sort((a,b)=>a-b):AGES;
+    box.innerHTML=data.map((v,i)=>{const med=sorted&&(i===9||i===10);
+      return `<span class="chip" style="${med?'background:#fff176;border-color:#f9a825;font-weight:700':''}" title="${i+1}. Wert">${v}${sorted?`<sub style="color:#78909c;font-size:.65em"> ${i+1}</sub>`:''}</span>`}).join('');
+    $('#sortInfo').innerHTML=sorted?'Rangliste (numerisch sortiert). Der 10. und 11. Wert (gelb) liegen genau in der Mitte – dort steht der <b>Median</b>.':'Urliste: Man erkennt kaum etwas. Wie viele sind 16 Jahre alt?';
+  }
+  $('#btnSort').onclick=()=>{sorted=true;render()}; $('#btnUnsort').onclick=()=>{sorted=false;render()}; render();
+
+  // Merkmale sortieren
+  const items=shuffle([['Körpergröße','quant'],['Gewicht','quant'],['Alter','quant'],['Anzahl der Geschwister','quant'],['Taschengeld','quant'],['Augenfarbe','qual'],['Geschlecht','qual'],['Lieblingsfach','qual'],['Wohnort','qual'],['Lieblingsfarbe','qual']]);
+  const pool=$('#merkPool'); let selected=null;
+  items.forEach(([t,c])=>{const b=el('button',{class:'chip','data-c':c},t);b.onclick=()=>{$$('#merkPool .chip').forEach(x=>x.classList.remove('on'));b.classList.add('on');selected=b};pool.appendChild(b)});
+  $$('.sortzone .bin').forEach(bin=>{bin.onclick=()=>{
+    if(!selected)return; const fb=$('#merkFb');
+    if(selected.dataset.c===bin.dataset.bin){selected.classList.remove('on');selected.onclick=null;$('.in',bin).appendChild(selected);
+      const left=$$('#merkPool .chip').length; showFb(fb,'ok',left?'Richtig! Noch '+left+' Merkmal(e).':'Alle richtig sortiert! Quantitative Merkmale haben Zahlenwerte, qualitative Merkmale beschreiben Kategorien.')}
+    else showFb(fb,'bad',`„${selected.textContent}“ passt nicht hierher. ${selected.dataset.c==='quant'?'Man kann es in Zahlen messen bzw. zählen → quantitativ.':'Das ist eine Kategorie, keine Zahl → qualitativ.'}`);
+    selected=null}});
+
+  // Häufigkeitstabelle
+  const vals=[15,16,17,18], H=vals.map(v=>AGES.filter(a=>a===v).length);
+  const tb=$('#tabH tbody');
+  vals.forEach((v,i)=>{tb.insertAdjacentHTML('beforeend',`<tr><td><b>${v}</b></td><td><input class="cell" data-t="H" data-i="${i}" inputmode="numeric" aria-label="H für ${v}"></td><td><input class="cell" data-t="h" data-i="${i}" inputmode="decimal" aria-label="h für ${v}"> %</td><td><input class="cell" data-t="w" data-i="${i}" inputmode="decimal" aria-label="Winkel für ${v}"> °</td></tr>`)});
+  const num=s=>parseFloat(String(s).replace(',','.').replace(/[^0-9.\-]/g,''));
+  $('#btnCheckH').onclick=()=>{let ok=0,all=0,msgs=new Set();
+    $$('#tabH input').forEach(inp=>{const i=+inp.dataset.i,t=inp.dataset.t,u=num(inp.value);all++;
+      const exp=t==='H'?H[i]:t==='h'?H[i]/20*100:H[i]/20*360; const tol=t==='H'?0:t==='h'?0.01:0.5;
+      const good=!isNaN(u)&&Math.abs(u-exp)<=tol+1e-9; inp.classList.toggle('ok',good);inp.classList.toggle('bad',!good&&inp.value!=='');
+      if(good)ok++; else if(inp.value!==''){
+        if(t==='h'&&Math.abs(u-H[i]/20)<1e-9)msgs.add('Relative Häufigkeit bitte in Prozent angeben (· 100).');
+        if(t==='h'&&Math.abs(u-H[i])<1e-9)msgs.add('Bei h hast du die absolute Häufigkeit eingetragen. h = H : n.');
+        if(t==='w'&&Math.abs(u-H[i]/20*100)<1e-9)msgs.add('Beim Winkelmaß den Prozentwert noch mit 3,6 multiplizieren.');
+      }});
+    showFb($('#fbH'),ok===all?'ok':'bad',ok===all?'Alles richtig! Kontrolle: Die Summe der H ist 20, die Summe der h ist 100 %, die Summe der Winkel 360°.':`${ok} von ${all} Feldern richtig. ${[...msgs].join(' ')}`)};
+  $('#btnHelpH').onclick=()=>showFb($('#fbH'),'info','Zähle in der Rangliste (oben „sortieren“). Dann: h = H : 20 · 100 %, Winkel = h · 360° bzw. Prozentwert · 3,6°.');
+  $('#btnSolH').onclick=()=>{$$('#tabH input').forEach(inp=>{const i=+inp.dataset.i,t=inp.dataset.t;inp.value=t==='H'?H[i]:de(t==='h'?H[i]/20*100:H[i]/20*360);inp.classList.remove('bad')});
+    showFb($('#fbH'),'info','H: 4 / 7 / 5 / 4 · h: 4/20 = 20 %, 7/20 = 35 %, 5/20 = 25 %, 4/20 = 20 % · Winkel: 72°, 126°, 90°, 72°')};
+
+  // Diagramme
+  let horiz=true; const COLS=['#1e88e5','#e91e63','#43a047','#fb8c00'];
+  function bar(){const W=420,Hh=230,pad=40;let s=`<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Diagramm der absoluten Häufigkeiten">`;
+    const max=8;
+    if(horiz){const bw=22,gap=16;s+=`<line x1="${pad}" y1="10" x2="${pad}" y2="${Hh-30}" stroke="#333"/><line x1="${pad}" y1="${Hh-30}" x2="${W-20}" y2="${Hh-30}" stroke="#333"/>`;
+      for(let k=0;k<=max;k++){const x=pad+k*(W-pad-40)/max;s+=`<line x1="${x}" y1="${Hh-30}" x2="${x}" y2="${Hh-26}" stroke="#333"/><text x="${x}" y="${Hh-14}" font-size="11" text-anchor="middle">${k}</text>`}
+      vals.slice().reverse().forEach((v,j)=>{const i=3-j,y=20+j*(bw+gap),w=H[i]*(W-pad-40)/max;s+=`<rect x="${pad}" y="${y}" width="${w}" height="${bw}" fill="${COLS[i]}" rx="3"/><text x="${pad-8}" y="${y+bw-6}" font-size="13" text-anchor="end">${v}</text><text x="${pad+w+5}" y="${y+bw-6}" font-size="13" font-weight="700">${H[i]}</text>`});
+      s+=`<text x="${W-20}" y="${Hh-2}" font-size="11" text-anchor="end">absolute Häufigkeit</text><text x="${pad-30}" y="12" font-size="11">Alter</text>`;}
+    else{const bw=40,gap=36,base=Hh-30;s+=`<line x1="${pad}" y1="10" x2="${pad}" y2="${base}" stroke="#333"/><line x1="${pad}" y1="${base}" x2="${W-20}" y2="${base}" stroke="#333"/>`;
+      for(let k=0;k<=max;k+=2){const y=base-k*(base-20)/max;s+=`<line x1="${pad-4}" y1="${y}" x2="${pad}" y2="${y}" stroke="#333"/><text x="${pad-8}" y="${y+4}" font-size="11" text-anchor="end">${k}</text>`}
+      vals.forEach((v,i)=>{const x=pad+20+i*(bw+gap),h=H[i]*(base-20)/max;s+=`<rect x="${x}" y="${base-h}" width="${bw}" height="${h}" fill="${COLS[i]}" rx="3"/><text x="${x+bw/2}" y="${base+16}" font-size="13" text-anchor="middle">${v}</text><text x="${x+bw/2}" y="${base-h-5}" font-size="13" font-weight="700" text-anchor="middle">${H[i]}</text>`});
+      s+=`<text x="${W-20}" y="${Hh-2}" font-size="11" text-anchor="end">Alter</text><text x="${pad+4}" y="12" font-size="11">abs. Häufigkeit</text>`;}
+    $('#barChart').innerHTML=s+'</svg>'}
+  $('#btnBarToggle').onclick=()=>{horiz=!horiz;bar()}; bar();
+  // Kreis
+  (function(){const R=95,cx=130,cy=115;let a0=-90,s=`<svg viewBox="0 0 260 235" role="img" aria-label="Kreisdiagramm der relativen Häufigkeiten">`;
+    vals.forEach((v,i)=>{const ang=H[i]/20*360,a1=a0+ang,r=Math.PI/180,x0=cx+R*Math.cos(a0*r),y0=cy+R*Math.sin(a0*r),x1=cx+R*Math.cos(a1*r),y1=cy+R*Math.sin(a1*r);
+      s+=`<path d="M${cx},${cy} L${x0},${y0} A${R},${R} 0 ${ang>180?1:0} 1 ${x1},${y1} Z" fill="${COLS[i]}" fill-opacity=".85" stroke="#fff" stroke-width="2"/>`;
+      const am=(a0+ang/2)*r;s+=`<text x="${cx+R*.6*Math.cos(am)}" y="${cy+R*.6*Math.sin(am)}" font-size="13" text-anchor="middle" fill="#fff" font-weight="700">${v} J.</text><text x="${cx+R*.6*Math.cos(am)}" y="${cy+R*.6*Math.sin(am)+15}" font-size="12" text-anchor="middle" fill="#fff">${H[i]*5} %</text>`;a0=a1});
+    $('#pieChart').innerHTML=s+'</svg>'})();
+
+  // Kennzahlen-Rechner
+  function kz(){const raw=$('#kzIn').value.split(/[;\s]+/).map(x=>x.trim()).filter(Boolean).map(x=>parseFloat(x.replace(',','.')));
+    const out=$('#kzOut');out.style.display='block';
+    if(!raw.length||raw.some(isNaN)){out.innerHTML='Bitte nur Zahlen eingeben, getrennt durch Semikolon (z. B. 3; 5,5; 7).';return}
+    const d=raw.slice().sort((a,b)=>a-b),n=d.length,sum=d.reduce((a,b)=>a+b,0),mean=sum/n;
+    const cnt={};d.forEach(x=>cnt[x]=(cnt[x]||0)+1);const mx=Math.max(...Object.values(cnt));const modes=Object.keys(cnt).filter(k=>cnt[k]===mx).map(Number);
+    let med,medTxt,pos;
+    if(n%2){pos=[(n+1)/2];med=d[pos[0]-1];medTxt=`n = ${n} ist ungerade → (n+1)/2 = ${(n+1)/2}. Wert: x<sub>med</sub> = ${de(med)}`}
+    else{pos=[n/2,n/2+1];med=(d[n/2-1]+d[n/2])/2;medTxt=`n = ${n} ist gerade → ${n/2}. und ${n/2+1}. Wert: x<sub>med</sub> = (${de(d[n/2-1])} + ${de(d[n/2])}) : 2 = ${de(med,3)}`}
+    out.innerHTML=`<div class="row"><b>Rangliste:</b> ${d.map((x,i)=>pos.includes(i+1)?`<mark>${de(x)}</mark>`:de(x)).join('; ')}</div>
+     <div class="row"><b>arithmetisches Mittel:</b> x̄ = ${de(sum,3)} : ${n} ${isExact(mean)?'=':'≈'} <b>${de(mean)}</b></div>
+     <div class="row"><b>Modalwert:</b> ${mx===1?'Jeder Wert kommt nur einmal vor → kein eindeutiger Modalwert.':`x<sub>mod</sub> = <b>${modes.map(x=>de(x)).join(' und ')}</b> (${mx}-mal)`}</div>
+     <div class="row"><b>Median:</b> ${medTxt}</div>
+     <div class="row"><b>Spannweite:</b> R = ${de(d[n-1])} − ${de(d[0])} = <b>${de(d[n-1]-d[0])}</b></div>
+     ${Math.abs(mean-med)>(d[n-1]-d[0])*0.2?'<div class="row" style="color:#bf360c">Achtung: Mittelwert und Median liegen weit auseinander – vermutlich gibt es einen Ausreißer. Der Median ist dann aussagekräftiger.</div>':''}`}
+  $('#kzGo').onclick=kz; $$('[data-kz]').forEach(b=>b.onclick=()=>{$('#kzIn').value=b.dataset.kz;$('#kzOut').style.display='none'});
+})();
+
+// ================= WÜRFEL =================
+const PIPS={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+function dieHTML(n,sm){let s=`<div class="die${sm?' sm':''}" role="img" aria-label="Würfel ${n}">`;for(let i=0;i<9;i++)s+=`<i style="${PIPS[n].includes(i)?'visibility:visible':''}"></i>`;return s+'</div>'}
+(function(){
+  let pred=null;const pc=$('#predict');
+  for(let k=1;k<=6;k++){const b=el('button',{class:'chip'},'Ich tippe auf '+k);b.onclick=()=>{$$('#predict .chip').forEach(x=>x.classList.remove('on'));b.classList.add('on');pred=k};pc.appendChild(b)}
+  $('#bigDie').innerHTML=dieHTML(1);const hist=[];
+  $('#btnRoll').onclick=()=>{const r=1+Math.floor(Math.random()*6);$('#bigDie').innerHTML=dieHTML(r);$('#bigDie .die').classList.add('rolling');
+    hist.push(r);$('#rollHist').innerHTML=hist.map(x=>`<span class="h">${x}</span>`).join('');
+    $('#rollMsg').innerHTML=pred?(pred===r?'Treffer! Aber war das Können – oder Zufall?':`Leider nicht – es fiel eine ${r}. Vorhersagen klappt nicht zuverlässig.`):`Es fiel eine ${r}.`};
+  // Omega-Baukasten
+  const cand=shuffle(['1','2','3','4','5','6','0','7','12']);let inBox=[];
+  function draw(){$('#omegaPool').innerHTML='';cand.forEach(c=>{const b=el('button',{class:'chip'+(inBox.includes(c)?' on':'')},c);b.onclick=()=>{inBox=inBox.includes(c)?inBox.filter(x=>x!==c):[...inBox,c];draw()};$('#omegaPool').appendChild(b)});
+    const s=inBox.slice().sort((a,b)=>a-b);$('#omegaBox').innerHTML='<span class="lbl">Ω</span>'+s.map(x=>/^[1-6]$/.test(x)?dieHTML(+x,1):`<span class="chip" style="align-self:center">${x}</span>`).join('');
+    $('#omegaSet').innerHTML='Ω = '+setStr(s)}
+  $('#btnOmegaCheck').onclick=()=>{const s=new Set(inBox),need=['1','2','3','4','5','6'];const miss=need.filter(x=>!s.has(x)),extra=[...s].filter(x=>!need.includes(x));
+    if(!miss.length&&!extra.length)showFb($('#omegaFb'),'ok','Richtig! Ω = {1; 2; 3; 4; 5; 6}. Der Ergebnisraum hat 6 Elemente: <b>|Ω| = 6</b>.');
+    else showFb($('#omegaFb'),'bad',(extra.length?`${extra.join(', ')} kann bei einem normalen Würfel nicht fallen. `:'')+(miss.length?`Es fehlen noch ${miss.length} Ergebnis(se).`:''))};
+  $('#btnOmegaReset').onclick=()=>{inBox=[];draw();$('#omegaFb').className='fb'};draw();
+})();
+
+// ================= ÜBUNGS-ENGINE =================
+let solved=store.get('solved',{});
+function parseVal(str,kind){
+  let s=String(str).trim().replace(/\s/g,'');const hasPct=s.includes('%');s=s.replace('%','').replace(/[a-zA-Z°€]/g,'');
+  let v;if(s.includes('/')){const [a,b]=s.split('/').map(x=>parseFloat(x.replace(',','.')));v=a/b}else v=parseFloat(s.replace(/\./g,'').replace(',','.'));
+  if(/^\d+\.\d+$/.test(s))v=parseFloat(s); // Punkt als Dezimaltrenner zulassen
+  if(isNaN(v)||!isFinite(v))return null;
+  let note='';
+  if(kind==='p'){if(hasPct)v=v/100;else if(v>1&&v<=100){v=v/100;note='Tipp: Schreibe bei Prozentangaben das %-Zeichen dazu.'}}
+  return {v,note}}
+function parseSet(str){let s=String(str).trim();if(/^(∅|\{\s*\}|leer|leere menge)$/i.test(s))return [];
+  s=s.replace(/^[A-Za-zΩ₀-₉0-9]*\s*=\s*/,'').replace(/[{}]/g,'');return s.split(/[;,]+/).map(x=>x.trim().toLowerCase()).filter(Boolean)}
+function renderEx(ex,container){
+  const lvName={e:'Einstieg',s:'Standard',f:'Fehlvorstellung',t:'Transfer / AP'}[ex.lv],topName={stat:'Statistik',ein:'einstufig',mehr:'mehrstufig'}[ex.top];
+  const d=el('div',{class:'ex'+(solved[ex.id]?' solved':''),id:'ex_'+ex.id});
+  d.innerHTML=`<div class="exhead"><span class="nr">${ex.id}</span><span class="lv ${ex.lv}">${lvName}</span>${topName?`<span class="meta">${topName}</span>`:''}<span class="st">gelöst ✓</span></div><div class="exbody"><div class="q">${ex.q}</div><div class="body"></div><div class="fb"></div>
+   <div class="help">${(ex.h||[]).map((h,i)=>`<button class="small btn-tip hb" data-i="${i}" ${i>0?'disabled':''}>Tipp ${i+1}</button>`).join('')}<button class="small btn-sol sb">Lösung anzeigen</button></div>
+   ${(ex.h||[]).map((h,i)=>`<div class="hint" data-i="${i}"><b>Tipp ${i+1}:</b> ${h}</div>`).join('')}<div class="sol"><b>Lösung:</b> ${ex.sol}</div></div>`;
+  const body=$('.body',d),fb=$('.fb',d);
+  const ok=(msg)=>{showFb(fb,'ok',msg);d.classList.add('solved');solved[ex.id]=1;store.set('solved',solved);updProg()};
+  if(ex.type==='mc'){const o=el('div',{class:'opts'});(ex.shuffle===false?ex.opts:shuffle(ex.opts)).forEach(op=>{const b=el('button',{class:'opt'},op.t);b.onclick=()=>{
+      $$('.opt',o).forEach(x=>x.classList.remove('bad'));if(op.ok){b.classList.add('ok');ok(op.fb||'Richtig!')}else{b.classList.add('bad');showFb(fb,'bad',op.fb||'Leider falsch.')}};o.appendChild(b)});body.appendChild(o)}
+  else{const a=el('div',{class:'ans'});const inp=el('input',{class:'txt',placeholder:ex.type==='set'?'{ …; … }':(ex.kind==='p'?'z. B. 3/8 oder 37,5 %':'Zahl'),'aria-label':'Antwort'});
+    const btn=el('button',{class:'primary'},'Prüfen');a.appendChild(inp);if(ex.unit&&ex.type!=='set')a.appendChild(el('span',{},ex.unit));a.appendChild(btn);body.appendChild(a);
+    const check=()=>{if(!inp.value.trim()){showFb(fb,'info','Gib zuerst eine Antwort ein.');return}
+      if(ex.type==='set'){const u=parseSet(inp.value),norm=x=>(ex.alias&&ex.alias[x])||x;const un=u.map(norm);const sets=[ex.ans,...(ex.ansAlt||[])].map(s=>s.map(x=>x.toLowerCase()));
+        if(new Set(un).size!==un.length){showFb(fb,'bad','In einer Menge wird jedes Element nur <b>einmal</b> aufgeschrieben.');return}
+        for(const r of (ex.rules||[]))if(un.includes(r.has)){showFb(fb,'bad',r.fb);return}
+        const target=sets.map(s=>s.map(norm));
+        if(target.some(t=>t.length===un.length&&t.every(x=>un.includes(x)))){ok('Richtig! '+(un.length?`Die Menge hat ${un.length} Element${un.length>1?'e':''}.`:'Das ist die leere Menge ∅.'));return}
+        const t=target[0],miss=t.filter(x=>!un.includes(x)).length,extra=un.filter(x=>!t.includes(x)).length;
+        showFb(fb,'bad',(extra?`${extra} Element(e) gehören nicht dazu. `:'')+(miss?`Es fehlen ${miss} Element(e).`:'')+(!/[{}]/.test(inp.value)&&un.length?' Denke an die Mengenklammern { }.':''));return}
+      const p=parseVal(inp.value,ex.kind);if(!p){showFb(fb,'bad','Diese Eingabe kann ich nicht lesen. Beispiele: 3/8 · 0,375 · 37,5 %');return}
+      const target=ex.kind==='p'?ex.ans[0]/ex.ans[1]:ex.ans;const tol=ex.kind==='p'?0.00006:(ex.tol||0.006);
+      if(Math.abs(p.v-target)<=tol){ok('Richtig!'+(ex.kind==='p'?` P = ${frac(ex.ans[0],ex.ans[1])} ${pctEq(target)}`:'')+(p.note?' '+p.note:''));return}
+      if(ex.kind==='p'&&Math.abs(p.v-target)<=0.0011){ok('Fast genau – richtig gerechnet! Runde Prozentwerte auf zwei Nachkommastellen: '+pct(target)+'.');return}
+      for(const w of (ex.wrong||[]))if(Math.abs(p.v-w.v)<=(ex.kind==='p'?0.0006:0.006)){showFb(fb,'bad',w.fb);return}
+      showFb(fb,'bad','Leider nicht richtig. Nutze einen Hinweis.'+(p.note?' '+p.note:''))};
+    btn.onclick=check;inp.onkeydown=e=>{if(e.key==='Enter')check()}}
+  $$('.hb',d).forEach(b=>b.onclick=()=>{const i=+b.dataset.i;$(`.hint[data-i="${i}"]`,d).style.display='block';const nx=$(`.hb[data-i="${i+1}"]`,d);if(nx)nx.disabled=false});
+  $('.sb',d).onclick=function(){const s=$('.sol',d);const vis=s.style.display==='block';s.style.display=vis?'none':'block';this.textContent=vis?'Lösung anzeigen':'Lösung ausblenden'};
+  container.appendChild(d);return d}
+
+// eingebettete Aufgaben in den Abschnitten
+const INLINE={
+ omegaTasks:[
+  {id:'Ω1',lv:'e',type:'set',q:'Werfen einer Münze (K = Kopf, Z = Zahl)',ans:['k','z'],alias:{kopf:'k',zahl:'z',wappen:'k',w:'k'},h:['Zwei mögliche Ausgänge.'],sol:'Ω = {K; Z}, |Ω| = 2'},
+  {id:'Ω2',lv:'s',type:'set',q:'Ziehen eines Buchstabens aus den Buchstabenkärtchen L, O, T, T, O',ans:['l','o','t'],h:['Welche verschiedenen Buchstaben kann man ziehen?','Jedes Element nur einmal!'],sol:'Ω = {L; O; T}, |Ω| = 3 (doppelte Buchstaben werden nur einmal notiert)'},
+  {id:'Ω3',lv:'s',type:'num',kind:'n',q:'Glücksrad mit den Zahlen 1 bis 8: Bestimme die Mächtigkeit |Ω|.',ans:8,h:['Wie viele Elemente hat Ω = {1; 2; …; 8}?'],sol:'|Ω| = 8'}],
+ lapTasks:[
+  {id:'L1',lv:'e',type:'mc',shuffle:false,q:'Werfen einer Laplace-Münze',opts:[{t:'Laplace-Experiment',ok:1,fb:'Ja: Kopf und Zahl sind gleich wahrscheinlich, je 1/2.'},{t:'kein Laplace-Experiment',fb:'Bei einer idealen Münze sind Kopf und Zahl gleich wahrscheinlich.'}],h:[],sol:'Laplace, P(K) = P(Z) = 1/2'},
+  {id:'L2',lv:'e',type:'mc',shuffle:false,q:'Werfen einer Reißzwecke („Spitze oben“ oder „Seitenlage“)',opts:[{t:'Laplace-Experiment',fb:'Die beiden Lagen sind nicht gleich wahrscheinlich – die Form ist unsymmetrisch.'},{t:'kein Laplace-Experiment',ok:1,fb:'Richtig. Die Wahrscheinlichkeit kann man nur durch viele Versuche schätzen.'}],h:[],sol:'kein Laplace-Experiment'},
+  {id:'L3',lv:'s',type:'mc',shuffle:false,q:'Glücksrad mit einem roten Feld (Hälfte des Rads) und je einem blauen und gelben Feld (je ein Viertel). Ω = {rot; blau; gelb}',opts:[{t:'Laplace-Experiment',fb:'Rot ist doppelt so groß wie Blau – also wahrscheinlicher.'},{t:'kein Laplace-Experiment',ok:1,fb:'Richtig: P(rot) = 1/2, P(blau) = P(gelb) = 1/4.'}],h:[],sol:'kein Laplace-Experiment'},
+  {id:'L4',lv:'s',type:'mc',shuffle:false,q:'Urne mit 3 roten und 3 blauen Kugeln, Ω = {rot; blau}',opts:[{t:'Laplace-Experiment',ok:1,fb:'Ja: Gleich viele Kugeln je Farbe → P(rot) = P(blau) = 3/6 = 1/2.'},{t:'kein Laplace-Experiment',fb:'Zähle nach: Beide Farben haben gleich viele Kugeln.'}],h:[],sol:'Laplace, je 1/2'}],
+ begTasks:[
+  {id:'B1',lv:'s',type:'mc',shuffle:false,q:'„Die Wahrscheinlichkeit, mit einem Laplace-Würfel eine 6 zu werfen, ist 1/6.“',opts:[{t:'Laplace',ok:1,fb:'Richtig: theoretisch berechnet, alle Ergebnisse gleich wahrscheinlich.'},{t:'statistisch',fb:'Hier wurde nichts ausprobiert, sondern gerechnet.'},{t:'subjektiv',fb:'Das ist keine persönliche Einschätzung.'}],h:[],sol:'Laplace-Wahrscheinlichkeit'},
+  {id:'B2',lv:'s',type:'mc',shuffle:false,q:'„Bei 500 Würfen fiel der Legostein 140-mal auf die Seite. Also P(Seite) ≈ 28 %.“',opts:[{t:'Laplace',fb:'Beim Legostein sind die Lagen nicht gleich wahrscheinlich.'},{t:'statistisch',ok:1,fb:'Richtig: geschätzt aus der relativen Häufigkeit 140/500.'},{t:'subjektiv',fb:'Es gibt eine Versuchsreihe.'}],h:[],sol:'statistische Wahrscheinlichkeit'},
+  {id:'B3',lv:'s',type:'mc',shuffle:false,q:'„Ich glaube, die Wahrscheinlichkeit, dass ich morgen die Ex schreibe, liegt bei 80 %.“',opts:[{t:'Laplace',fb:'Hier gibt es keine gleich wahrscheinlichen Ergebnisse.'},{t:'statistisch',fb:'Es gibt keine Versuchsreihe.'},{t:'subjektiv',ok:1,fb:'Richtig: persönliche Einschätzung.'}],h:[],sol:'subjektive Wahrscheinlichkeit'}],
+ evTasks:[
+  {id:'W1',lv:'e',type:'set',q:'E₂: „Der Spieler würfelt höchstens eine Vier.“ Gib E₂ an.',ans:['1','2','3','4'],rules:[{has:'5',fb:'„Höchstens vier“ heißt: 4 oder weniger.'}],h:['höchstens 4 = 4 oder kleiner'],sol:'E₂ = {1; 2; 3; 4}'},
+  {id:'W2',lv:'e',type:'num',kind:'p',q:'Berechne P(E₂) für „höchstens eine Vier“ (zwölfseitiger Würfel).',ans:[1,3],wrong:[{v:4/6,fb:'Der Würfel hat 12 Seiten: |Ω| = 12.'}],h:['P(E₂) = |E₂| : |Ω| = 4 : 12'],sol:'P(E₂) = 4/12 = 1/3 ≈ 33,33 %'},
+  {id:'W3',lv:'s',type:'set',q:'Gib das Gegenereignis E̅₂ zu „höchstens eine Vier“ als Menge an.',ans:['5','6','7','8','9','10','11','12'],rules:[{has:'4',fb:'Die 4 gehört zu E₂ – nicht zum Gegenereignis.'}],h:['Alle Zahlen von 1 bis 12, die nicht in E₂ sind.'],sol:'E̅₂ = {5; 6; 7; 8; 9; 10; 11; 12}: „mindestens eine Fünf“, P = 1 − 1/3 = 2/3 ≈ 66,67 %'},
+  {id:'W4',lv:'s',type:'set',q:'E₄: „Der Spieler würfelt eine 15.“ Gib E₄ an.',ans:[],h:['Gibt es auf dem Würfel eine 15?'],sol:'E₄ = { } = ∅ (unmögliches Ereignis), P(E₄) = 0 %'},
+  {id:'W5',lv:'s',type:'num',kind:'p',q:'E₅: „Die Zahl ist durch 3 teilbar.“ Berechne P(E₅).',ans:[1,3],wrong:[{v:3/12,fb:'Du hast eine Zahl vergessen: 3, 6, 9 und 12.'}],h:['E₅ = {3; 6; 9; 12}'],sol:'P(E₅) = 4/12 = 1/3 ≈ 33,33 %'}]
+};
+Object.keys(INLINE).forEach(k=>{const c=document.getElementById(k);INLINE[k].forEach(ex=>renderEx(ex,c))});
+
+// ================= 3 SIMULATION & REISSZWECKE =================
+(function(){
+  let cnt=[0,0,0,0,0,0];
+  function draw(){const n=cnt.reduce((a,b)=>a+b,0);$('#simN').textContent=n.toLocaleString('de-DE');
+    const W=520,Hh=250,base=210,pad=46,max=n?Math.max(.35,...cnt.map(c=>c/n)):.35,ym=Math.ceil(max*10)/10;
+    let s=`<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="relative Häufigkeiten der Augenzahlen"><line x1="${pad}" y1="10" x2="${pad}" y2="${base}" stroke="#333"/><line x1="${pad}" y1="${base}" x2="${W-10}" y2="${base}" stroke="#333"/>`;
+    for(let k=0;k<=ym*10+1e-9;k++){const y=base-(k/10)/ym*(base-15);s+=`<line x1="${pad-4}" y1="${y}" x2="${W-10}" y2="${y}" stroke="#eceff1"/><text x="${pad-8}" y="${y+4}" font-size="11" text-anchor="end">${k*10} %</text>`}
+    cnt.forEach((c,i)=>{const h=n?c/n:0,x=pad+20+i*75,bh=h/ym*(base-15);s+=`<rect x="${x}" y="${base-bh}" width="44" height="${bh}" fill="#26a69a" rx="3"/><text x="${x+22}" y="${base+16}" font-size="13" text-anchor="middle">${i+1}</text>${n?`<text x="${x+22}" y="${base-bh-5}" font-size="11" text-anchor="middle">${de(h*100,1)} %</text>`:''}`});
+    const yt=base-(1/6)/ym*(base-15);s+=`<line x1="${pad}" y1="${yt}" x2="${W-10}" y2="${yt}" stroke="#4527a0" stroke-width="2.5" stroke-dasharray="8 5"/><text x="${W-12}" y="${yt-6}" font-size="12" fill="#4527a0" text-anchor="end">theoretisch 1/6 ≈ 16,67 %</text>`;
+    s+=`<text x="${W-10}" y="${Hh-4}" font-size="11" text-anchor="end">Augenzahl</text>`;$('#simChart').innerHTML=s+'</svg>'}
+  $$('[data-sim]').forEach(b=>b.onclick=()=>{for(let i=0;i<+b.dataset.sim;i++)cnt[Math.floor(Math.random()*6)]++;draw()});
+  $('#simReset').onclick=()=>{cnt=[0,0,0,0,0,0];draw()};draw();
+  const tb=$('#rzTab tbody');for(let g=1;g<=6;g++)tb.insertAdjacentHTML('beforeend',`<tr><td class="l">Gruppe ${g}</td><td><input class="cell" inputmode="numeric" data-g="${g}" data-k="a"></td><td><input class="cell" inputmode="numeric" data-g="${g}" data-k="b"></td><td id="rzN${g}">–</td><td id="rzH${g}">–</td></tr>`);
+  function rz(){let A=0,B=0;for(let g=1;g<=6;g++){const a=parseInt($(`[data-g="${g}"][data-k="a"]`).value)||0,b=parseInt($(`[data-g="${g}"][data-k="b"]`).value)||0;A+=a;B+=b;$('#rzN'+g).textContent=a+b||'–';$('#rzH'+g).textContent=a+b?pct(a/(a+b)):'–'}
+    $('#rzA').textContent=A;$('#rzB').textContent=B;$('#rzN').textContent=A+B;$('#rzH').textContent=A+B?pct(A/(A+B)):'–'}
+  tb.addEventListener('input',rz);
+})();
+
+// ================= 4 EREIGNIS-LABOR =================
+(function(){
+  const PRE=[['E₁: „Ich werfe eine 8.“',[]],['E₂: „Ich werfe eine Zahl, die größer als 2 ist.“',[3,4,5,6]],['E₃: „Ich werfe eine Zahl zwischen 0 und 7.“',[1,2,3,4,5,6]],['„Ich werfe eine gerade Zahl.“',[2,4,6]],['„Ich werfe eine Primzahl.“',[2,3,5]],['„Ich werfe höchstens eine 4.“',[1,2,3,4]]];
+  let E=[3,4,5,6],name=PRE[1][0];
+  PRE.forEach(([n,s])=>{const b=el('button',{class:'chip'},n);b.onclick=()=>{E=s.slice();name=n;draw()};$('#evPresets').appendChild(b)});
+  $('#evComp').onchange=draw;
+  function draw(){const comp=$('#evComp').checked,box=$('#evBox');box.innerHTML='<span class="lbl">Ω = {1; 2; 3; 4; 5; 6}</span>';
+    for(let k=1;k<=6;k++){const b=el('button',{class:'diebtn'+(E.includes(k)?' sel':(comp?' comp':'')),'aria-pressed':E.includes(k),title:'Ergebnis '+k},dieHTML(k));
+      b.onclick=()=>{E=E.includes(k)?E.filter(x=>x!==k):[...E,k].sort();name='eigenes Ereignis';draw()};box.appendChild(b)}
+    const P=new Fr(E.length,6),C=[1,2,3,4,5,6].filter(x=>!E.includes(x));
+    const typ=E.length===0?'<b style="color:#c62828">unmögliches Ereignis</b> (leere Menge ∅)':E.length===6?'<b style="color:#2e7d32">sicheres Ereignis</b> (E = Ω)':'<b>mögliches Ereignis</b>';
+    let s=`<div class="row"><b>${name}</b> → ${typ}</div><div class="row set">E = ${E.length?setStr(E):'{ } = ∅'} &nbsp;&nbsp; |E| = ${E.length}</div>
+      <div class="row math">P(E) = ${frac('|E|','|Ω|')} = ${frac(E.length,6)}${P.d!==6&&E.length?' = '+P.html():''} ${pctEq(P.val())}</div>`;
+    if(comp)s+=`<hr style="border:0;border-top:1px dashed #ffb74d"><div class="row set" style="color:#0277bd">E̅ = ${C.length?setStr(C):'{ } = ∅'} &nbsp; |E̅| = ${C.length} &nbsp; P(E̅) = ${frac(C.length,6)} ${pctEq(C.length/6)}</div>
+      <div class="row math">E ∪ E̅ = ${setStr([1,2,3,4,5,6])} = Ω ✓ &nbsp;&nbsp; E ∩ E̅ = ∅ ✓ &nbsp;&nbsp; P(E) + P(E̅) = ${frac(E.length,6)} + ${frac(C.length,6)} = 1 = 100 % ✓</div>`;
+    $('#evOut').innerHTML=s;const mk=$('#evMk');mk.style.left=`calc(${P.val()*100}% - 2px)`;mk.querySelector('span').textContent=pct(P.val())}
+  draw();
+})();
+
+// ================= BAUMDIAGRAMM-KOMPONENTE =================
+function Tree(box,calcBox,presetBox,cfg){
+  const self={sel:new Set(),evName:''};
+  function build(path){if(path.length===cfg.stages)return [];return cfg.branches(path).filter(b=>b.p.n>0).map(b=>({...b,path:[...path,b.k],kids:build([...path,b.k])}))}
+  self.leaves=()=>{const out=[];(function rec(nodes,probs){nodes.forEach(n=>{const pr=[...probs,n.p];if(n.kids.length)rec(n.kids,pr);else out.push({key:n.path.join(''),path:n.path,probs:pr})})})(self.root,[]);return out};
+  function fracSvg(x,y,f,col){if(f.d===1)return `<text x="${x}" y="${y+4}" font-size="13" text-anchor="middle" fill="${col}">${f.n}</text>`;
+    return `<text x="${x}" y="${y-3}" font-size="12.5" text-anchor="middle" fill="${col}" font-weight="600">${f.n}</text><line x1="${x-9}" y1="${y+1}" x2="${x+9}" y2="${y+1}" stroke="${col}" stroke-width="1.2"/><text x="${x}" y="${y+14}" font-size="12.5" text-anchor="middle" fill="${col}" font-weight="600">${f.d}</text>`}
+  self.draw=function(){
+    self.root=build([]);const leaves=self.leaves();const L=leaves.length,rowH=cfg.rowH||44,colW=cfg.colW||150,x0=46,Hh=L*rowH+30,leafX=x0+cfg.stages*colW+30,W=leafX+190;
+    let svg=`<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Baumdiagramm">`;let li=0;
+    const selPaths=[...self.sel];
+    function lay(nodes,depth){return nodes.map(n=>{let y;if(n.kids.length){const ch=lay(n.kids,depth+1);y=(ch[0].y+ch[ch.length-1].y)/2;n._ch=ch}else{y=20+li*rowH+rowH/2;li++}n.y=y;n.x=x0+(depth+1)*colW;return n})}
+    const top=lay(self.root,0),rootY=(top[0].y+top[top.length-1].y)/2;
+    const onSel=p=>selPaths.some(k=>k.startsWith(p.join('')));
+    function drawN(nodes,px,py){nodes.forEach(n=>{const s=onSel(n.path);
+      svg+=`<line class="edge${s?' sel':''}" x1="${px+18}" y1="${py}" x2="${n.x-18}" y2="${n.y}"/>`;
+      if(cfg.showP()){const dir=n.y<py?-1:(n.y>py?1:0),mx=px+18+(n.x-18-px-18)*.5,my=py+(n.y-py)*.5+dir*15;svg+=`<rect x="${mx-12}" y="${my-15}" width="24" height="31" fill="#fff" opacity=".9" rx="3"/>`+fracSvg(mx,my,n.p,s?'#ad1457':'#37474f')}
+      svg+=`<g class="node"><rect x="${n.x-17}" y="${n.y-12}" width="34" height="24" rx="5" style="${s?'stroke:#ad1457;stroke-width:2':''}"/><text x="${n.x}" y="${n.y+5}" font-size="14" text-anchor="middle" font-weight="700">${n.k}</text></g>`;
+      if(n.kids.length)drawN(n.kids,n.x,n.y)})}
+    svg+=`<g class="node"><rect x="${x0-40}" y="${rootY-12}" width="44" height="24" rx="5" fill="#eceff1"/><text x="${x0-18}" y="${rootY+5}" font-size="12" text-anchor="middle">Start</text></g>`;
+    drawN(top,x0-14,rootY);
+    for(let s=1;s<=cfg.stages;s++)svg+=`<text x="${x0+s*colW}" y="${Hh-4}" font-size="11" fill="#ad1457" text-anchor="middle">${cfg.stageName?cfg.stageName(s):s+'. Stufe'}</text>`;
+    // Blätter
+    li=0;(function rec(nodes){nodes.forEach(n=>{if(n.kids.length)rec(n.kids);else{const key=n.path.join(''),lf=leaves.find(l=>l.key===key),P=lf.probs.reduce((a,b)=>a.mul(b),ONE),s=self.sel.has(key);
+      svg+=`<g class="leaf${s?' sel':''}" data-k="${key}" tabindex="0" role="button" aria-pressed="${s}"><rect x="${leafX}" y="${n.y-13}" width="${cfg.showP()?170:70}" height="26" rx="6"/><text x="${leafX+8}" y="${n.y+5}" font-size="14" font-weight="700" fill="#ad1457">${key}</text>${cfg.showP()?`<text x="${leafX+64}" y="${n.y+5}" font-size="13">P = ${P.txt()}</text>`:''}</g>`;
+      svg+=`<line x1="${n.x+17}" y1="${n.y}" x2="${leafX-2}" y2="${n.y}" stroke="#cfd8dc" stroke-dasharray="3 3"/>`}})})(top);
+    box.innerHTML=svg+'</svg>';
+    $$('.leaf',box).forEach(g=>{const t=()=>{const k=g.dataset.k;self.sel.has(k)?self.sel.delete(k):self.sel.add(k);self.evName='';self.draw()};g.onclick=t;g.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();t()}}});
+    self.calc()};
+  self.calc=function(){const leaves=self.leaves(),sel=leaves.filter(l=>self.sel.has(l.key));
+    const omega=`<div class="row note">Ω = {${leaves.map(l=>l.key).join('; ')}} &nbsp; |Ω| = ${cfg.countTxt?cfg.countTxt(leaves.length):leaves.length}</div>`;
+    if(!sel.length){calcBox.innerHTML=omega+'<div class="row">Tippe ein Ergebnis (rechts) an oder wähle ein Ereignis.</div>';return}
+    const pp=sel.map(l=>({k:l.key,f:l.probs,P:l.probs.reduce((a,b)=>a.mul(b),ONE)}));let sum=pp.reduce((a,b)=>a.add(b.P),ZERO);
+    let s=omega;if(self.evName)s+=`<div class="row"><b>${self.evName}</b></div>`;
+    s+=`<div class="row set">${sel.length>1||self.evName?'E = ':'Ergebnis: '}{${sel.map(l=>l.key).join('; ')}}${sel.length>1?' &nbsp; |E| = '+sel.length:''}</div>`;
+    s+=`<div class="row"><span class="tagline theo">1. Pfadregel</span> multiplizieren entlang des Pfades:</div>`;
+    pp.forEach(p=>{const r=p.f.reduce((a,f)=>({n:a.n*f.n,d:a.d*f.d}),{n:1,d:1});s+=`<div class="row math">P(${p.k}) = ${p.f.map(f=>f.html()).join(' · ')} = ${r.d!==p.P.d&&p.f.length>1?frac(r.n,r.d)+' = ':''}${p.P.html()}</div>`});
+    if(pp.length>1)s+=`<div class="row"><span class="tagline theo">2. Pfadregel</span> Pfadwahrscheinlichkeiten addieren:</div><div class="row math">P(E) = ${pp.map(p=>p.P.html()).join(' + ')} = ${sum.html()} ${pctEq(sum.val())}</div>`;
+    else s+=`<div class="row math">P(${pp[0].k}) ${pctEq(sum.val())}</div>`;
+    const rest=leaves.filter(l=>!self.sel.has(l.key));
+    if(rest.length&&rest.length<sel.length){const cs=rest.map(l=>l.probs.reduce((a,b)=>a.mul(b),ONE)).reduce((a,b)=>a.add(b),ZERO);
+      s+=`<div class="row" style="margin-top:.4em"><b>Schneller mit dem Gegenereignis:</b> E̅ = {${rest.map(l=>l.key).join('; ')}}</div><div class="row math">P(E) = 1 − P(E̅) = 1 − ${cs.html()} = ${ONE.sub(cs).html()} ${pctEq(ONE.sub(cs).val())}</div>`}
+    calcBox.innerHTML=s;self.lastP=sum};
+  self.setPresets=function(list){presetBox.innerHTML='';list.forEach(([n,pred])=>{const b=el('button',{class:'chip'},n);b.onclick=()=>{self.sel=new Set(self.leaves().filter(l=>pred(l.path)).map(l=>l.key));self.evName=n;self.draw()};presetBox.appendChild(b)});
+    const c=el('button',{class:'chip'},'Auswahl löschen');c.onclick=()=>{self.sel.clear();self.evName='';self.draw()};presetBox.appendChild(c)};
+  return self}
+
+// Münze
+(function(){const half=new Fr(1,2);let stages=3;
+  const T=Tree($('#coinTree'),$('#coinCalc'),$('#coinPresets'),{get stages(){return stages},branches:()=>[{k:'K',p:half},{k:'Z',p:half}],showP:()=>$('#coinProbs').checked,stageName:s=>s+'. Wurf',colW:140,
+    countTxt:n=>Array(stages).fill(2).join(' · ')+' = '+n});
+  const cnt=(p,c)=>p.filter(x=>x===c).length;
+  function presets(){const L=[[`P(${'ZKK'.slice(0,stages)}) – ein Ergebnis`,p=>p.join('')==='ZKK'.slice(0,stages)]];
+    if(stages>=2)L.push(['E: „genau einmal Zahl“',p=>cnt(p,'Z')===1],['E: „mindestens einmal Zahl“',p=>cnt(p,'Z')>=1],['E: „immer das Gleiche“',p=>new Set(p).size===1]);
+    if(stages===3)L.push(['E: „mindestens zweimal Kopf“',p=>cnt(p,'K')>=2]);T.setPresets(L)}
+  $$('[data-coin]').forEach(b=>b.onclick=()=>{stages=+b.dataset.coin;$$('[data-coin]').forEach(x=>x.className='btn small'+(x===b?'':' sec'));T.sel.clear();T.evName='';presets();T.draw()});
+  $('#coinProbs').onchange=()=>T.draw();presets();T.draw();
+})();
+// Max
+(function(){const F=(a,b)=>new Fr(a,b);
+  const T=Tree($('#maxTree'),$('#maxCalc'),$('#maxPresets'),{stages:3,colW:140,rowH:48,branches:p=>p.length===0?[{k:'G',p:F(2,4)},{k:'R',p:F(1,4)},{k:'S',p:F(1,4)}]:p.length===1?[{k:'B',p:F(1,3)},{k:'S',p:F(2,3)}]:[{k:'W',p:F(1,2)},{k:'S',p:F(1,2)}],
+    showP:()=>true,stageName:s=>['Pullover','Hose','Schuhe'][s-1],countTxt:n=>'3 · 2 · 2 = '+n});
+  T.setPresets([['E₁: „weiße Schuhe“',p=>p[2]==='W'],['E₂: „roter Pullover und schwarze Schuhe“',p=>p[0]==='R'&&p[2]==='S'],['E₃: „nicht die Farbe Schwarz“',p=>!p.includes('S')],
+    ['E₄: „kein schwarzer Pullover, aber schwarze Schuhe“',p=>p[0]!=='S'&&p[2]==='S'],['E₅: „höchstens zwei Farben“',p=>new Set(p).size<=2],['E₆: „Grau, aber nicht Weiß“',p=>p[0]==='G'&&p[2]!=='W']]);T.draw();
+})();
+// Urne
+(function(){let mit=true;const sB=$('#uB'),sG=$('#uG'),sN=$('#uN');
+  for(let i=1;i<=9;i++){sB.add(new Option(i,i,false,i===6));sG.add(new Option(i,i,false,i===4))}
+  const cfg={get stages(){return +sN.value},colW:150,showP:()=>true,stageName:s=>s+'. Zug',
+    branches:p=>{const B=+sB.value,G=+sG.value;if(mit)return [{k:'B',p:new Fr(B,B+G)},{k:'G',p:new Fr(G,B+G)}];
+      const b=B-p.filter(x=>x==='B').length,g=G-p.filter(x=>x==='G').length,t=b+g;return [{k:'B',p:t?new Fr(b,t):ZERO},{k:'G',p:t?new Fr(g,t):ZERO}]},
+    countTxt:n=>n};
+  const T=Tree($('#urnTree'),$('#urnCalc'),$('#urnPresets'),cfg);const c=(p,x)=>p.filter(y=>y===x).length;
+  T.setPresets([['E₁: „mindestens zwei grüne Kugeln“',p=>c(p,'G')>=2],['E₂: „höchstens zwei blaue Kugeln“',p=>c(p,'B')<=2],['„genau eine grüne Kugel“',p=>c(p,'G')===1],['„alle Kugeln gleichfarbig“',p=>new Set(p).size===1]]);
+  // Fraktionen ungekürzt wie im Unterricht: Fr kürzt – für Urne Anzeige ungekürzt
+  const origBranches=cfg.branches;cfg.branches=p=>origBranches(p).map(b=>({...b,p:raw(b.p,p)}));
+  function raw(f,p){const B=+sB.value,G=+sG.value,t=mit?B+G:B+G-p.length;if(!f.n)return f;const o=Object.create(Fr.prototype);o.n=Math.round(f.val()*t);o.d=t;return o}
+  function setMode(m){mit=m;$('#uMit').className='btn'+(m?'':' sec');$('#uOhne').className='btn'+(!m?'':' sec');$('#uMit').setAttribute('aria-pressed',m);$('#uOhne').setAttribute('aria-pressed',!m);T.sel.clear();T.evName='';T.draw();$('#urnSimOut').textContent=''}
+  $('#uMit').onclick=()=>setMode(true);$('#uOhne').onclick=()=>setMode(false);[sB,sG,sN].forEach(s=>s.onchange=()=>{T.sel.clear();T.evName='';T.draw();$('#urnSimOut').textContent=''});
+  T.draw();
+  $('#urnSim').onclick=()=>{if(!T.sel.size){$('#urnSimOut').innerHTML='Markiere zuerst ein Ereignis im Baum (z. B. E₁).';return}
+    const B=+sB.value,G=+sG.value,N=+sN.value;let hit=0;
+    for(let r=0;r<1000;r++){let b=B,g=G,s='';for(let z=0;z<N;z++){const pick=Math.random()*(b+g)<b?'B':'G';s+=pick;if(!mit){pick==='B'?b--:g--}}if(T.sel.has(s))hit++}
+    $('#urnSimOut').innerHTML=`<span class="tagline obs">beobachtet</span> ${hit} von 1000 = ${pct(hit/1000)} &nbsp; <span class="tagline theo">theoretisch</span> P(E) ${pctEq(T.lastP.val())}`};
+})();
+
+// ================= TRAINING =================
+const exFilter={top:'all',lv:'all'};
+function renderFilters(){const f=$('#exFilters');f.innerHTML='<b>Thema:</b>';
+  [['all','alle'],['stat','Statistik'],['ein','einstufig'],['mehr','mehrstufig']].forEach(([k,n])=>{const b=el('button',{class:'chip'+(exFilter.top===k?' on':'')},n);b.onclick=()=>{exFilter.top=k;renderFilters();renderExList()};f.appendChild(b)});
+  f.appendChild(el('b',{style:'margin-left:10px'},'Niveau:'));
+  [['all','alle'],['e','Einstieg'],['s','Standard'],['f','Fehlvorstellung'],['t','Transfer / AP']].forEach(([k,n])=>{const b=el('button',{class:'chip'+(exFilter.lv===k?' on':'')},n);b.onclick=()=>{exFilter.lv=k;renderFilters();renderExList()};f.appendChild(b)})}
+function renderExList(){const c=$('#exList');c.innerHTML='';let k=0;EX.filter(e=>(exFilter.top==='all'||e.top===exFilter.top)&&(exFilter.lv==='all'||e.lv===exFilter.lv)).forEach(e=>renderEx(e,c));updProg()}
+function updProg(){const n=EX.filter(e=>solved[e.id]).length;$('#exProg').style.width=(n/EX.length*100)+'%';$('#exProgT').textContent=`${n} von ${EX.length} Trainingsaufgaben gelöst`}
+renderFilters();renderExList();
+
+// ================= ÜBERSICHT =================
+let ovData=store.get('ov',{}),unlockAll=store.get('unlockAll',false);
+const SECNAME={s1:'Kapitel 1',s2:'Kapitel 2',s3:'Kapitel 3',s4:'Kapitel 4',s5:'Kapitel 5',s6:'Kapitel 6'};
+function miniTree(){let s='<svg class="minitree" viewBox="0 0 300 120" aria-label="dreistufiges Baumdiagramm Münze">';const lv=[[60],[30,90],[15,45,75,105],[7,22,37,52,67,82,97,112]];
+  for(let d=0;d<3;d++)lv[d+1].forEach((y,i)=>{const py=lv[d][Math.floor(i/2)],x1=d*80+20,x2=(d+1)*80+20;s+=`<line x1="${x1+8}" y1="${py}" x2="${x2-8}" y2="${y}" stroke="#ad1457" stroke-width="1"/>`;
+    s+=`<text class="bl-hide" x="${(x1+x2)/2}" y="${(py+y)/2-2}" font-size="7" fill="#ad1457" text-anchor="middle">½</text><text class="bl-hide" x="${x2}" y="${y+3}" font-size="8.5" font-weight="700" text-anchor="middle">${i%2?'Z':'K'}</text>`});
+  s+='<text x="12" y="63" font-size="8">Start</text>';
+  const keys=['KKK','KKZ','KZK','KZZ','ZKK','ZKZ','ZZK','ZZZ'];lv[3].forEach((y,i)=>s+=`<text class="bl-hide" x="268" y="${y+3}" font-size="7.5" fill="${keys[i]==='ZKK'?'#ad1457':'#37474f'}" font-weight="${keys[i]==='ZKK'?700:400}">${keys[i]}</text>`);
+  s+='<text x="100" y="119" font-size="7" fill="#ad1457">1. Wurf</text><text x="180" y="119" font-size="7" fill="#ad1457">2. Wurf</text><text x="250" y="119" font-size="7" fill="#ad1457">3. Wurf</text>';return s+'</svg>'}
+function cardHTML(c){let h=`<div class="ovc ${c.cls}" data-unlock="${c.unlock}" data-lock="wird in ${SECNAME[c.unlock]} ergänzt"><h4>${c.title}</h4>`;
+  c.fields.forEach((f,i)=>{const id=c.id+'_'+i;h+=`<div class="ovf" data-id="${id}"><span class="k">${f.k}<button class="qh noprint" title="Hilfe" aria-label="Hilfe zu ${f.k}">?</button></span><div class="v${f.l2?' l2':''}"><textarea rows="1" data-id="${id}" aria-label="${f.k}">${(ovData[id]||'').replace(/</g,'&lt;')}</textarea><div class="own"></div><div class="mu">${f.mu}</div><div class="hi">Hilfe: ${f.hi}</div></div></div>`});
+  if(c.tree)h+=miniTree();if(c.extra)h+=c.extra;return h+'</div>'}
+function buildOv(){const o=$('#ov');
+  let h=`<div class="ov-title"><span>Daten und Zufall</span></div><div class="ov-arrows"><span>↙</span><span>↘</span></div><div class="ov-branches">`;
+  h+=`<div class="ov-branch stat"><div class="bh">STATISTIK</div>${cardHTML(OV.stat[0])}<span class="rel">↓ <b>Rangliste zählen → Häufigkeiten</b></span>${cardHTML(OV.stat[1])}<span class="rel">↓ <b>Kennzahlen beschreiben die Verteilung</b></span>${cardHTML(OV.stat[2])}</div>`;
+  h+=`<div class="ov-branch ws"><div class="bh">WAHRSCHEINLICHKEITSRECHNUNG</div><div class="ov-sub"><div class="ein"><div class="sh">einstufige Zufallsexperimente</div>${cardHTML(OV.ein[0])}<span class="rel">↓ <b>Ergebnisse gleich wahrscheinlich?</b></span>${cardHTML(OV.ein[1])}<span class="rel">↓ <b>Ereignis = Teilmenge von Ω</b></span>${cardHTML(OV.ein[2])}</div>`;
+  h+=`<div class="mehr"><div class="sh">mehrstufige Zufallsexperimente <span style="font-style:normal">← mehrere nacheinander</span></div>${cardHTML(OV.mehr[0])}<span class="rel">↓ <b>Pfad = Ergebnis · mehrere Pfade = Ereignis</b></span>${cardHTML(OV.mehr[1])}<span class="rel">↓ <b>Ändern sich die Äste von Stufe zu Stufe?</b></span>${cardHTML(OV.mehr[2])}</div></div></div></div>`;
+  o.innerHTML=h;
+  $$('#ov textarea').forEach(t=>{syncOwn(t);t.addEventListener('input',()=>{ovData[t.dataset.id]=t.value;store.set('ov',ovData);syncOwn(t);autosize(t)})});
+  $$('#ov .qh').forEach(b=>b.onclick=()=>b.closest('.ovf').classList.toggle('showhint'));updateLocks()}
+function syncOwn(t){t.parentNode.querySelector('.own').textContent=t.value}
+function autosize(t){t.style.height='auto';t.style.height=Math.max(t.scrollHeight,22)+'px'}
+function updateLocks(){$$('#ov .ovc').forEach(c=>c.classList.toggle('locked',!unlockAll&&!visited.includes(c.dataset.unlock)))}
+buildOv();
+$('#ovMu').onclick=function(){const on=$('#ov').classList.toggle('showmu');this.setAttribute('aria-pressed',on);this.textContent=on?'Musterübersicht ausblenden':'Musterübersicht einblenden'};
+$('#ovHints').onclick=function(){const on=this.getAttribute('aria-pressed')!=='true';this.setAttribute('aria-pressed',on);$$('#ov .ovf').forEach(f=>f.classList.toggle('showhint',on));this.textContent=on?'Hilfen ausblenden':'alle Hilfen einblenden'};
+$('#ovUnlock').onclick=()=>{unlockAll=true;store.set('unlockAll',true);updateLocks()};
+$('#ovClear').onclick=()=>{if(confirm('Alle eigenen Einträge in der Übersicht löschen?')){ovData={};store.set('ov',ovData);buildOv()}};
+function doPrint(mode){document.body.classList.add('pr-'+mode);if(location.hash!=='#uebersicht')location.hash='#uebersicht';setTimeout(()=>{window.print()},150)}
+window.addEventListener('afterprint',()=>document.body.classList.remove('pr-blank','pr-own','pr-mu'));
+$('#prBlank').onclick=()=>doPrint('blank');$('#prOwn').onclick=()=>doPrint('own');$('#prMu').onclick=()=>doPrint('mu');
+
+// ================= LEHRKRAFT =================
+$('#mapTab tbody').innerHTML=MAP.map(r=>`<tr>${r.map((c,i)=>`<td class="l">${i===0?'<b>'+c+'</b>':c}</td>`).join('')}</tr>`).join('');
+
+route();
+
+</script>
+</body>
+</html>
