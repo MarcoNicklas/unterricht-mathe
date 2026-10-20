@@ -279,7 +279,7 @@ details.teacher summary{cursor:pointer;font-weight:600}
   <button id="btnBeamer" title="Größere Schrift für den Beamer" aria-pressed="false">A+</button>
   <button id="btnTheme" title="Hell/Dunkel umschalten">◐</button>
 </div>
-<nav class="tabs" aria-label="Bereiche"><a href="#start" data-v="start">Kapitel</a><a href="#training" data-v="training">Training</a><a href="#uebersicht" data-v="uebersicht">Meine Übersicht</a><a href="#lehrkraft" data-v="lehrkraft">Für Lehrkräfte</a></nav>
+<nav class="tabs" aria-label="Bereiche"><a href="#start" data-v="start">Kapitel</a><a href="#training" data-v="training">Training</a><a href="#uebersicht" data-v="uebersicht">Meine Übersicht</a></nav>
 </header>
 
 <main>
@@ -610,65 +610,6 @@ details.teacher summary{cursor:pointer;font-weight:600}
   </div>
   <div id="exList"></div>
 </section>
-<section class="view" id="lehrkraft">
-<div class="panel">
-    <h3 style="margin-top:0">Empfohlener Unterrichtsaufbau (ca. 14 Unterrichtsstunden)</h3>
-    <div class="tablewrap"><table class="t">
-      <thead><tr><th>Std.</th><th class="l">Kapitel</th><th class="l">Schwerpunkt / Sozialform</th><th class="l">Material</th></tr></thead>
-      <tbody>
-      <tr><td>1–2</td><td class="l"><b>1 Statistik</b> (Wiederholung)</td><td class="l">Einstieg Altersumfrage in der eigenen Klasse (Urliste an der Tafel) → Rangliste, Häufigkeiten, Diagramme, Kennzahlen; Partnerarbeit am AB</td><td class="l">Kapitel 1, AB 01 (Teil Statistik)</td></tr>
-      <tr><td>3–4</td><td class="l"><b>2 Zufallsexperiment &amp; Ω</b> und <b>3 Wahrscheinlichkeit</b></td><td class="l">Würfeln im Plenum, Ω gemeinsam aufbauen; Reißzwecken-Versuch in Gruppen (statistische WS), Simulation am Beamer; Abgrenzung der WS-Begriffe</td><td class="l">Kapitel 2–3, AB 01b (Aufgaben 1–3), Reißzwecken/Legosteine</td></tr>
-      <tr><td>5–6</td><td class="l"><b>4 Ereignisse</b></td><td class="l">Ereignis-Labor (Lehrkraft-Demo, dann Einzelarbeit), Gegenereignis; Übung zwölfseitiger Würfel und Urne</td><td class="l">Kapitel 4, AB 01 (Teil einstufig), AB 01b (Aufgaben 4–6)</td></tr>
-      <tr><td>7–8</td><td class="l"><b>5 Baumdiagramm</b>, Zählprinzip, 1. Pfadregel</td><td class="l">Münze 3× gemeinsam; Max-Situation selbstständig in Partnerarbeit mit dem interaktiven Baum als Kontrolle</td><td class="l">Kapitel 5, AB 02 (Baum, Kombinationsmöglichkeiten, Pfadwahrscheinlichkeiten)</td></tr>
-      <tr><td>9–10</td><td class="l"><b>5 2. Pfadregel</b>, Gegenereignis bei „mindestens“</td><td class="l">E₁–E₆ von Max, Training</td><td class="l">AB 02 (Ereignisse), Lehrbuch laut AB</td></tr>
-      <tr><td>11–12</td><td class="l"><b>6 Mit / ohne Zurücklegen</b></td><td class="l">Problemstellung Urne, Vergleich der Bäume am Beamer, Simulation</td><td class="l">Kapitel 6, AB 03</td></tr>
-      <tr><td>13–14</td><td class="l"><b>Sicherung &amp; Prüfungstraining</b></td><td class="l">Übersicht fertigstellen und mit Muster vergleichen; AP-Aufgaben in Stationen; Training nach Niveau</td><td class="l">Meine Übersicht (Druck), 04 AP-Aufgaben, Training</td></tr>
-      </tbody>
-    </table></div>
-    <p class="note">Begründung der Reihenfolge: Statistik zuerst, weil die relative Häufigkeit die Brücke zur statistischen Wahrscheinlichkeit bildet. Einstufige Begriffe (Ω, Ereignis, Gegenereignis) werden am Würfel vollständig aufgebaut, bevor das Baumdiagramm sie auf mehrere Stufen überträgt: Ein Pfad ist ein Ergebnis, ein Ereignis ist eine Menge von Pfaden. Mit/ohne Zurücklegen kommt zuletzt, weil es die Pfadregeln voraussetzt.</p>
-  </div>
-
-  <div class="panel">
-    <h3 style="margin-top:0">Zuordnung: Themen der Zusammenfassung → Material → Lehrplan → Seite</h3>
-    <div class="tablewrap"><table class="t" id="mapTab">
-      <thead><tr><th class="l">Thema / Begriff (Zusammenfassungs-PDF)</th><th class="l">vorhandenes Material</th><th class="l">Lehrplanbezug</th><th class="l">Umsetzung auf dieser Seite</th></tr></thead>
-      <tbody></tbody>
-    </table></div>
-    <p class="note">LP 10 = Lehrplanauszug „Kompetenzerwartungen/Inhalte“ (Entwurf, Jgst. 10); LP M11 = LehrplanPLUS Wirtschaftsschule M 11 (zweistufig), Lernbereich 5 „Daten und Zufall“; GW = Grundwissen/Abschlussprüfung.</p>
-  </div>
-
-  <div class="panel">
-    <h3 style="margin-top:0">Lehrplanbezug</h3>
-    <ul>
-      <li><b>Lehrplanauszug Jahrgangsstufe 10 (vorliegender Entwurf)</b>: Kompetenzerwartungen „erfassen den möglichen Ausgang eines Zufallsexperiments als Ergebnis …“, „benutzen den Begriff der Wahrscheinlichkeit nach Laplace und grenzen ihn von anderen Wahrscheinlichkeitsbegriffen ab“, „betrachten geeignete reale Problemsituationen als ein- und mehrstufige Zufallsexperimente“, „berechnen die Wahrscheinlichkeiten einzelner Ereignisse in einem mehrstufigen Zufallsexperiment und interpretieren diese“. Inhalte: Zufallsexperiment; Ereignis, Gegenereignis, Ergebnis; Ergebnisraum; Mengenschreibweise; Mächtigkeit; Wahrscheinlichkeit, Laplace-Wahrscheinlichkeit; ein- und mehrstufiges Baumdiagramm; Pfadregeln. <i>Dieser Text war online nicht auffindbar und konnte nur am vorliegenden Auszug geprüft werden.</i></li>
-      <li><a href="https://www.lehrplanplus.bayern.de/fachlehrplan/wirtschaftsschule/10/mathematik/vierstufig" target="_blank" rel="noopener">LehrplanPLUS Wirtschaftsschule, Mathematik 10 (vierstufig), Lernbereich 5 „Zusammengesetzte Zufallsexperimente“</a> – auf der Seite als „gültig bis Schuljahr 2025/26“ gekennzeichnet; inhaltlich identisch zu den mehrstufigen Kompetenzerwartungen oben (Baumdiagramm, Pfadregeln, interpretieren).</li>
-      <li><a href="https://www.lehrplanplus.bayern.de/fachlehrplan/wirtschaftsschule/11/mathematik" target="_blank" rel="noopener">LehrplanPLUS Wirtschaftsschule, Mathematik 11 (zweistufig), Lernbereich 5 „Daten und Zufall“</a> (gültig ab 2026/27): Modalwert, Median, arithmetisches Mittel, Spannweite, mehrstufiges Baumdiagramm, Pfadregeln.</li>
-      <li>Statistik (Datenerhebung, Häufigkeiten, Diagramme, Kennzahlen) ist in der Jgst. 10 Wiederholung bzw. Grundwissen, wird aber in jeder Abschlussprüfung (Aufgabenteil B, Aufgabe 4) geprüft und ist deshalb vollständig enthalten.</li>
-      <li><b>Notwendig</b>: alle Inhalte der Kapitel 1–6. <b>Optional/Vertiefung</b>: Simulationen, Augensumme zweier Würfel, „mindestens“-Aufgaben mit mehr als drei Stufen, Ereignisraum-Hinweis.</li>
-    </ul>
-  </div>
-
-  <div class="panel">
-    <h3 style="margin-top:0">Hinweise zu den vorhandenen Materialien</h3>
-    <ul>
-      <li><b>Zusammenfassung (PDF):</b> „E ∩ E̅ = Ω“ ist fachlich falsch; richtig ist E ∪ E̅ = Ω (und E ∩ E̅ = ∅). Auf dieser Seite und in der Musterübersicht korrigiert, im Unterricht ansprechen.</li>
-      <li><b>AB 03 LÖSUNG:</b> Der Situationstext nannte 6 blaue, 5 grüne und 4 weiße Kugeln und E₁ „… aber keine weiße Kugel“, gerechnet wurde aber mit 6 blauen und 4 grünen Kugeln; außerdem 352/1000 = 35,2 % (nicht 35,23 %). Korrigierte Fassung liegt bei.</li>
-      <li><b>AB 03 (Schülerfassung):</b> Randnotiz „26 passende Ergebnisse“ zu E₂ stammt aus der Drei-Farben-Version; richtig sind 7 von 8 Ergebnissen. Korrigiert.</li>
-      <li><b>AB 01 LÖSUNG:</b> Tippfehler 38,98 % → 38,89 %; Laplace-Begründung „gleich häufig“ → „gleich wahrscheinlich“; „ein sichere“ → „ein sicheres“. Korrigiert.</li>
-    </ul>
-  </div>
-
-  <div class="panel">
-    <h3 style="margin-top:0">Nutzung im Unterricht</h3>
-    <ul>
-      <li><b>Beamer:</b> Oben rechts „A+“ für größere Schrift, „◐“ für hell/dunkel, „Merkzettel“ für alle Formeln. Die Labore (Würfel, Ereignisse, Bäume, Simulation) eignen sich als Demonstration im Unterrichtsgespräch: Erst Vermutungen sammeln, dann klicken.</li>
-      <li><b>Tablet/PC der Lernenden:</b> Kapitel der Reihe nach bearbeiten – jedes Kapitel wird Schritt für Schritt angezeigt („alle Schritte zeigen“ blendet alles ein). Beobachtungen erst nach eigenem Nachdenken aufdecken lassen.</li>
-      <li><b>Übersicht:</b> Am Ende jeder Stunde 5 Minuten Sicherung in „Meine Übersicht“ (digital oder auf der gedruckten ausfüllbaren Vorlage). Musterlösung zum Vergleich ausgeben oder einblenden.</li>
-      <li><b>Differenzierung:</b> Training nach Niveau filtern (Einstieg – Standard – Fehlvorstellung – Transfer). Schwächere nutzen Hinweis 1 und 2 und die Labore als Kontrolle; Schnellere bearbeiten Transfer- und AP-Aufgaben.</li>
-      <li><b>Offline/GitHub:</b> Die Datei funktioniert ohne Internet und ohne Installation; sie kann unverändert über GitHub Pages bereitgestellt werden.</li>
-    </ul>
-  </div>
-</section>
 </main>
 
 <div class="modal" id="merkModal"><div class="box">
@@ -997,7 +938,7 @@ const CH=[
  {id:'k4',cls:'ev',tag:'Kapitel 4 · einstufig',title:'Ereignisse und Gegenereignis',desc:'Teilmenge, P(E) = |E| : |Ω|, unmöglich, sicher, Gegenereignis',img:'ereignis',ov:'s4',goals:['Ereignisse in Worten und als Menge angeben','P(E) = |E| : |Ω| berechnen','unmögliche, sichere Ereignisse und Gegenereignisse bestimmen']},
  {id:'k5',cls:'mehr',tag:'Kapitel 5 · mehrstufig',title:'Baumdiagramm und Pfadregeln',desc:'Stufe, Pfad, Zählprinzip, 1. und 2. Pfadregel',img:'baum',ov:'s5',goals:['mehrstufige Zufallsexperimente im Baum darstellen','die Mächtigkeit mit dem Zählprinzip bestimmen','mit den Pfadregeln rechnen und Ergebnisse deuten']},
  {id:'k6',cls:'mehr',tag:'Kapitel 6 · mehrstufig',title:'Mit und ohne Zurücklegen',desc:'Urne, sich ändernde Wahrscheinlichkeiten, Gegenereignis',img:'urne',ov:'s6',goals:['erkennen, ob sich die Wahrscheinlichkeiten ändern','passende Baumdiagramme erstellen','geschickt mit dem Gegenereignis rechnen']}];
-const VIEWS=['start','training','uebersicht','lehrkraft',...CH.map(c=>c.id)];
+const VIEWS=['start','training','uebersicht',...CH.map(c=>c.id)];
 let visited=store.get('visited2',[]); let seen=store.get('seen',{});
 injectImages();
 // Kapitel aufbauen
@@ -1378,7 +1319,7 @@ window.addEventListener('afterprint',()=>document.body.classList.remove('pr-blan
 $('#prBlank').onclick=()=>doPrint('blank');$('#prOwn').onclick=()=>doPrint('own');$('#prMu').onclick=()=>doPrint('mu');
 
 // ================= LEHRKRAFT =================
-$('#mapTab tbody').innerHTML=MAP.map(r=>`<tr>${r.map((c,i)=>`<td class="l">${i===0?'<b>'+c+'</b>':c}</td>`).join('')}</tr>`).join('');
+
 
 route();
 
