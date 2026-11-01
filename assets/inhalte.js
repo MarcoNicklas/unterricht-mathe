@@ -17,7 +17,7 @@ const KLASSEN = {
 
   "10": {
     titel: "Jahrgangsstufe 10",
-    untertitel: "Funktionen · Daten und Zufall · Vorbereitung auf die Abschlussprüfung",
+    untertitel: "Funktionen · Raum und Form · Daten und Zufall · Vorbereitung auf die Abschlussprüfung",
     lernbereiche: [
       {
         id: "lin",
@@ -62,6 +62,20 @@ const KLASSEN = {
           { id: "pruef-funk",    titel: "Prüfungsaufgaben zu Parabeln und Geraden", link: "quadratische_funktionen.html#s5",           art: "Prüfung" , ap: true },
           { id: "pruef-ap2025",  titel: "AP 2025: Torbogen mit Skywalk",            link: "funktionaler-zusammenhang.html#ap2025-torbogen", art: "Abschlussprüfung" , ap: true },
           { id: "pruef-ap2024",  titel: "AP 2024: Minigolf mit Fangnetz",           link: "funktionaler-zusammenhang.html#ap2024-minigolf", art: "Abschlussprüfung" , ap: true }
+        ]
+      },
+      {
+        id: "ruf",
+        titel: "Raum und Form",
+        beschreibung: "Zylinder, quadratische Pyramide und Kreiskegel – Netz, Oberfläche und Volumen",
+        typ: "Lern-App",
+        link: "raum_und_form.html#start",
+        themen: [
+          { id: "ruf-zyl",   titel: "Zylinder: Netz, Mantel, Oberfläche und Volumen",                      link: "raum_und_form.html#s1", art: "Kapitel 1" },
+          { id: "ruf-pyr",   titel: "Quadratische Pyramide: Seitenhöhe, Seitenkante, Oberfläche, Volumen", link: "raum_und_form.html#s2", art: "Kapitel 2" },
+          { id: "ruf-kegel", titel: "Kreiskegel: Mantellinie, Netz, Oberfläche und Volumen",               link: "raum_und_form.html#s3", art: "Kapitel 3" },
+          { id: "ruf-ueber", titel: "Überblick: alle Formeln, Einheiten umrechnen, gemischtes Training",   link: "raum_und_form.html#s4", art: "Kapitel 4" },
+          { id: "ruf-pruef", titel: "Prüfungsaufgaben: Getränkedose, Pavillondach, Salzlager, Silo",       link: "raum_und_form.html#s5", art: "Prüfung" , ap: true }
         ]
       },
       {

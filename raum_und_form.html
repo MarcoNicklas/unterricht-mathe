@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raum und Form – Lern-App</title>
+<style>
+:root{--bg:#f5f6fa;--card:#fff;--ink:#1d2433;--muted:#5b6475;--line:#dfe3ec;--blue:#2457d6;--blue-s:#e8eefc;
+--green:#12805c;--green-s:#e3f5ee;--orange:#d9620b;--orange-s:#fdf0e5;--red:#c62f3b;--red-s:#fbe9eb;--purple:#7a3fc4}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;font-size:17px;line-height:1.5}
+header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:10px 20px;gap:12px}
+header h1{font-size:20px;margin:0}
+header .score{font-size:15px;color:var(--muted);white-space:nowrap}
+header .score b{color:var(--green)}
+.wrap{display:grid;grid-template-columns:270px 1fr;min-height:calc(100vh - 52px)}
+nav{background:#fff;border-right:1px solid var(--line);padding:16px 10px;position:sticky;top:52px;height:calc(100vh - 52px);overflow:auto}
+nav button{display:flex;gap:10px;align-items:center;width:100%;text-align:left;border:0;background:none;padding:10px 12px;border-radius:10px;font:inherit;font-size:16px;color:var(--ink);cursor:pointer}
+nav button .n{flex:0 0 28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--blue-s);color:var(--blue);font-weight:700;font-size:14px}
+nav button.on{background:var(--blue-s);font-weight:600}
+nav button.on .n{background:var(--blue);color:#fff}
+nav .pz .n{background:var(--orange-s);color:var(--orange)}
+nav .pz.on{background:var(--orange-s)} nav .pz.on .n{background:var(--orange);color:#fff}
+main{padding:26px clamp(16px,4vw,48px) 80px;max-width:1150px;width:100%}
+section{display:none} section.on{display:block}
+h2{font-size:30px;margin:0 0 4px} h3{font-size:21px;margin:28px 0 10px}
+.lead{color:var(--muted);margin:0 0 18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin:14px 0;box-shadow:0 1px 4px rgba(20,30,60,.04)}
+.merke{border-left:6px solid var(--blue);background:var(--blue-s)}
+.merke>.t{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--blue)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.f{font-family:"Cambria Math","Times New Roman",serif;font-size:1.15em;white-space:nowrap}
+.big{font-family:"Cambria Math","Times New Roman",serif;font-size:26px;text-align:center;margin:8px 0}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.15;margin:0 2px}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 3px}
+.blue{color:var(--blue)} .green{color:var(--green)} .orange{color:var(--orange)} .red{color:var(--red)} .purple{color:var(--purple)}
+svg.plot{width:100%;height:auto;display:block;background:#fff;border:1px solid var(--line);border-radius:12px}
+.ctrl{display:grid;grid-template-columns:44px 1fr 56px;gap:4px 10px;align-items:center;margin:6px 0}
+.ctrl label{font-weight:700;font-family:"Cambria Math",serif;font-size:19px}
+.ctrl input{width:100%;accent-color:var(--blue)}
+.ctrl output{font-family:ui-monospace,monospace;text-align:right}
+.live{background:#f8f9fc;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-top:10px}
+.live p{margin:3px 0}
+table.calc{border-collapse:collapse;font-family:"Cambria Math","Times New Roman",serif;font-size:18px}
+table.calc td{padding:2px 10px 2px 0;vertical-align:top}
+table.calc td.op{color:var(--muted);font-family:inherit;font-size:15px;padding-left:16px}
+.steps .st{display:none} .steps .st.show{display:block;animation:fd .25s}
+.st{background:var(--green-s);border-left:4px solid var(--green);border-radius:8px;padding:8px 12px;margin:8px 0}
+.st .why{color:var(--muted);font-size:15px;display:block}
+@keyframes fd{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+button.b{font:inherit;font-size:15px;border:1px solid var(--line);background:#fff;color:var(--ink);padding:7px 14px;border-radius:9px;cursor:pointer}
+button.b:hover{border-color:var(--blue);color:var(--blue)}
+button.b.p{background:var(--blue);border-color:var(--blue);color:#fff}
+button.b.g{background:var(--green);border-color:var(--green);color:#fff}
+button.b.o{background:var(--orange-s);border-color:#f3c9a5;color:var(--orange)}
+button.b:disabled{opacity:.45;cursor:default}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.tabs button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+/* Aufgaben */
+.ex{border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0;background:#fff}
+.ex .q{margin-bottom:10px}
+.ex .q b.nr{display:inline-block;min-width:30px;color:var(--orange)}
+.fields{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.fld{display:flex;align-items:center;gap:6px}
+.fld span{font-family:"Cambria Math","Times New Roman",serif;font-size:18px}
+.fld input,.fld select{font:inherit;font-size:16px;width:92px;padding:6px 8px;border:1.5px solid var(--line);border-radius:8px;background:#fff}
+.fld select{width:auto}
+.fld .ok{border-color:var(--green);background:var(--green-s)} .fld .no{border-color:var(--red);background:var(--red-s)}
+.fb{margin-top:10px;font-weight:600}
+.fb.ok{color:var(--green)} .fb.no{color:var(--red)}
+.hint{background:var(--orange-s);border-left:4px solid var(--orange);border-radius:8px;padding:8px 12px;margin:8px 0}
+.sol{display:none}.sol.show{display:block}
+.note{font-size:14px;color:var(--muted)}
+.sa{border:2px solid #f3c9a5;border-radius:16px;padding:20px 22px;margin:22px 0;background:#fff}
+.sa h3{margin-top:0;color:var(--orange)}
+.sa .pts{float:right;font-size:14px;color:var(--muted);font-weight:400}
+.sa .ex{background:#fffdfb}
+.case h4{margin:6px 0 2px} .case p{margin:4px 0;font-size:15px}
+.badge{display:inline-block;font-size:13px;font-weight:700;padding:2px 10px;border-radius:99px;background:var(--green-s);color:var(--green)}
+.badge.w{background:var(--orange-s);color:var(--orange)} .badge.r{background:var(--red-s);color:var(--red)}
+.start-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.start-grid .card{cursor:pointer;margin:0;transition:transform .15s,box-shadow .15s}
+.start-grid .card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(20,30,60,.08)}
+.start-grid .card h4{margin:6px 0}
+.start-grid .card p{margin:0;color:var(--muted);font-size:15px}
+.navbtm{display:flex;justify-content:space-between;margin-top:30px}
+@media(max-width:860px){.wrap{grid-template-columns:1fr}nav{position:static;height:auto;display:flex;overflow-x:auto;gap:4px;padding:8px;border-right:0;border-bottom:1px solid var(--line)}
+nav button{width:auto;white-space:nowrap;padding:8px 10px}nav button .lbl{display:none}nav button.on .lbl{display:inline}
+.grid2,.grid3{grid-template-columns:1fr}header h1{font-size:17px}}
+</style>
+<style>/* Logo + Link zurück zur Lernseite, fest in der Kopfzeile */.home-logo{display:inline-flex;align-items:center;gap:8px;flex:0 0 auto;color:inherit;text-decoration:none;font:inherit;font-size:14px;font-weight:600;line-height:1.2;white-space:nowrap;margin-right:12px;padding-right:12px;border-right:1px solid color-mix(in srgb,currentColor 22%,transparent)}.home-logo img{height:32px;width:auto;display:block;background:#fff;border-radius:6px;padding:2px 4px}.home-logo:hover span{text-decoration:underline}@media(max-width:640px){.home-logo img{height:24px}.home-logo span{display:none}}</style>
+</head>
+<body>
+<header><div style="display:flex;align-items:center;gap:6px"><a class="home-logo" href="index.html" title="Zur Startseite der Lernseite"><img src="assets/schullogo.png" alt="Schullogo – zur Startseite"><span>⌂ Lernseite</span></a><h1>🧊 Raum &amp; Form</h1></div><div class="score">Gelöst: <b id="sc">0</b> Aufgaben</div></header>
+<div class="wrap">
+<nav id="nav">
+  <button data-s="start"><span class="n">⌂</span><span class="lbl">Start</span></button>
+  <button data-s="s1"><span class="n">1</span><span class="lbl">Zylinder</span></button>
+  <button data-s="s2"><span class="n">2</span><span class="lbl">Quadratische Pyramide</span></button>
+  <button data-s="s3"><span class="n">3</span><span class="lbl">Kreiskegel</span></button>
+  <button data-s="s4"><span class="n">4</span><span class="lbl">Überblick &amp; Einheiten</span></button>
+  <button data-s="s5" class="pz"><span class="n">★</span><span class="lbl">Prüfungsaufgaben</span></button>
+</nav>
+<main>
+
+<!-- START -->
+<section id="start">
+  <h2>Raum und Form</h2>
+  <p class="lead">Mathematik · Wirtschaftsschule · Jahrgangsstufe 10 · Zylinder, Pyramide und Kegel</p>
+  <div class="card merke"><div class="t">So arbeitest du mit der App</div>
+    <p style="margin:.4em 0 0">Arbeite die Kapitel der Reihe nach durch. In jedem Kapitel siehst du den Körper und sein Netz, kannst die Maße mit Schiebereglern verändern und rechnest dann Übungsaufgaben. Gib deine Ergebnisse ein und klicke auf <b>Prüfen</b>. Wenn du nicht weiterkommst: erst <b>Hinweis</b>, dann <b>Lösung</b>.<br>Runde auf <b>zwei Nachkommastellen</b>. Kleine Abweichungen durch Runden (z. B. mit π ≈ 3,14) werden als richtig gewertet.</p>
+  </div>
+  <div class="start-grid">
+    <div class="card" data-go="s1"><span class="badge">Kapitel 1</span><h4>Zylinder</h4><p>Netz, Mantel, Oberfläche und Volumen</p></div>
+    <div class="card" data-go="s2"><span class="badge">Kapitel 2</span><h4>Quadratische Pyramide</h4><p>Grundkante, Höhe, Seitenhöhe, Seitenkante – Oberfläche und Volumen</p></div>
+    <div class="card" data-go="s3"><span class="badge">Kapitel 3</span><h4>Kreiskegel</h4><p>Radius, Höhe, Mantellinie – Oberfläche und Volumen</p></div>
+    <div class="card" data-go="s4"><span class="badge">Kapitel 4</span><h4>Überblick &amp; Einheiten</h4><p>Alle Formeln auf einen Blick, Liter und m³, gemischtes Training</p></div>
+    <div class="card" data-go="s5"><span class="badge w">Prüfung</span><h4>Prüfungsaufgaben</h4><p>Getränkedose, Pavillondach, Salzlager und Silo mit gestuften Hinweisen</p></div>
+  </div>
+</section>
+
+<!-- 1 ZYLINDER -->
+<section id="s1">
+  <h2>1 · Der Zylinder</h2>
+  <p class="lead">Dosen, Rohre, Tanks: Ein Zylinder hat zwei gleich große Kreise als Grund- und Deckfläche.</p>
+  <div class="grid2">
+    <div>
+      <div class="card merke"><div class="t">Merke – Formeln am Zylinder</div>
+        <p>Grundfläche (Kreis): <span class="f">G = π · r²</span></p>
+        <p>Mantelfläche (Rechteck): <span class="f">M = 2 · π · r · h</span></p>
+        <p>Oberfläche: <span class="f">O = 2 · G + M = 2πr² + 2πrh</span></p>
+        <p style="margin-bottom:0">Volumen: <span class="f">V = G · h = π · r² · h</span></p>
+      </div>
+      <div class="card">
+        <p style="margin-top:0"><b>Das Netz verstehen</b></p>
+        <ul style="margin:0;padding-left:20px">
+          <li>Schneidet man den Mantel auf, entsteht ein <b>Rechteck</b>.</li>
+          <li>Seine Breite ist der <b>Kreisumfang</b> <span class="f">u = 2πr</span>, seine Höhe ist <span class="f">h</span>.</li>
+          <li>Dazu kommen <b>zwei Kreise</b> (Boden und Deckel).</li>
+          <li><b>Achtung:</b> Ist der Durchmesser d gegeben, gilt <span class="f">r = d : 2</span>.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <p style="margin-top:0"><b>Ausprobieren</b> – verändere Radius und Höhe:</p>
+      <div class="tabs"><button class="b on" data-tab="v1k">Körper</button><button class="b" data-tab="v1n">Netz</button></div>
+      <div id="v1k"></div><div id="v1n" style="display:none"></div>
+      <div class="ctrl"><label class="red">r</label><input type="range" id="e1r" min="1" max="6" step="0.5" value="3"><output id="o1r"></output></div>
+      <div class="ctrl"><label class="purple">h</label><input type="range" id="e1h" min="1" max="10" step="0.5" value="5"><output id="o1h"></output></div>
+      <div class="live" id="l1"></div>
+    </div>
+  </div>
+  <div class="card"><p style="margin-top:0"><b>Beispiel:</b> Eine Konservendose hat den Durchmesser <b>d = 10 cm</b> und die Höhe <b>h = 12 cm</b>.</p>
+    <div class="steps" id="bsp1">
+      <div class="st">r = 10 cm : 2 = 5 cm<span class="why">Durchmesser halbieren</span></div>
+      <div class="st">G = π · 5² ≈ 78,54 cm²<span class="why">Kreisfläche</span></div>
+      <div class="st">M = 2 · π · 5 · 12 ≈ 376,99 cm²<span class="why">Rechteck: Umfang mal Höhe</span></div>
+      <div class="st">O = 2 · 78,54 + 376,99 ≈ <b>534,07 cm²</b><span class="why">zwei Kreise plus Mantel</span></div>
+      <div class="st">V = 78,54 · 12 ≈ <b>942,48 cm³</b> ≈ 0,94 Liter<span class="why">1 000 cm³ = 1 Liter</span></div>
+    </div>
+    <div class="btns"><button class="b g" data-step="bsp1">Nächster Schritt</button><button class="b" data-all="bsp1">Alle</button></div>
+  </div>
+  <h3>Übungen</h3>
+  <div id="x1"></div>
+  <h3>Training mit Zufallsaufgaben</h3>
+  <div id="r1"></div>
+  <div class="navbtm"><button class="b" data-go="start">← Start</button><button class="b p" data-go="s2">Weiter: Pyramide →</button></div>
+</section>
+
+<!-- 2 PYRAMIDE -->
+<section id="s2">
+  <h2>2 · Die gerade quadratische Pyramide</h2>
+  <p class="lead">Die Grundfläche ist ein Quadrat, die Spitze liegt genau über dessen Mitte. Die vier Seitenflächen sind gleichschenklige Dreiecke.</p>
+  <div class="grid2">
+    <div>
+      <div class="card merke"><div class="t">Merke – Bezeichnungen und Formeln</div>
+        <p><span class="f">a</span> Grundkante · <span class="f purple">h</span> Höhe der Pyramide · <span class="f green">h<sub>s</sub></span> Höhe der Seitenfläche · <span class="f orange">s</span> Seitenkante</p>
+        <p>Grundfläche: <span class="f">G = a²</span></p>
+        <p>Mantelfläche (4 Dreiecke): <span class="f">M = 4 · ½ · a · h<sub>s</sub> = 2 · a · h<sub>s</sub></span></p>
+        <p>Oberfläche: <span class="f">O = a² + 2 · a · h<sub>s</sub></span></p>
+        <p style="margin-bottom:0">Volumen: <span class="f">V = ⅓ · a² · h</span></p>
+      </div>
+      <div class="card">
+        <p style="margin-top:0"><b>Fehlende Längen mit Pythagoras</b></p>
+        <ul style="margin:0;padding-left:20px">
+          <li><span class="f">h<sub>s</sub>² = h² + (a/2)²</span> &nbsp;<span class="note">(Dreieck aus h, halber Grundkante und h<sub>s</sub>)</span></li>
+          <li><span class="f">s² = h<sub>s</sub>² + (a/2)²</span> &nbsp;<span class="note">(halbe Seitenfläche)</span></li>
+          <li><b>Achtung:</b> Für die <b>Fläche</b> brauchst du h<sub>s</sub>, für das <b>Volumen</b> brauchst du h!</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <p style="margin-top:0"><b>Ausprobieren</b> – verändere Grundkante und Höhe:</p>
+      <div class="tabs"><button class="b on" data-tab="v2k">Körper</button><button class="b" data-tab="v2n">Netz</button></div>
+      <div id="v2k"></div><div id="v2n" style="display:none"></div>
+      <div class="ctrl"><label>a</label><input type="range" id="e2a" min="2" max="10" step="0.5" value="6"><output id="o2a"></output></div>
+      <div class="ctrl"><label class="purple">h</label><input type="range" id="e2h" min="1" max="10" step="0.5" value="4"><output id="o2h"></output></div>
+      <div class="live" id="l2"></div>
+    </div>
+  </div>
+  <div class="card"><p style="margin-top:0"><b>Beispiel:</b> Eine quadratische Pyramide hat die Grundkante <b>a = 6 cm</b> und die Höhe <b>h = 4 cm</b>.</p>
+    <div class="steps" id="bsp2">
+      <div class="st">h<sub>s</sub>² = 4² + 3² = 16 + 9 = 25 → h<sub>s</sub> = 5 cm<span class="why">Pythagoras mit der halben Grundkante a/2 = 3 cm</span></div>
+      <div class="st">M = 2 · 6 · 5 = 60 cm²<span class="why">vier Dreiecke</span></div>
+      <div class="st">O = 6² + 60 = <b>96 cm²</b><span class="why">Grundfläche plus Mantel</span></div>
+      <div class="st">V = ⅓ · 6² · 4 = <b>48 cm³</b><span class="why">Für das Volumen die Körperhöhe h verwenden!</span></div>
+    </div>
+    <div class="btns"><button class="b g" data-step="bsp2">Nächster Schritt</button><button class="b" data-all="bsp2">Alle</button></div>
+  </div>
+  <h3>Übungen</h3>
+  <div id="x2"></div>
+  <h3>Training mit Zufallsaufgaben</h3>
+  <div id="r2"></div>
+  <div class="navbtm"><button class="b" data-go="s1">← Zylinder</button><button class="b p" data-go="s3">Weiter: Kegel →</button></div>
+</section>
+
+<!-- 3 KEGEL -->
+<section id="s3">
+  <h2>3 · Der gerade Kreiskegel</h2>
+  <p class="lead">Eiswaffel, Partyhut, Sandhaufen: Ein Kegel hat einen Kreis als Grundfläche und eine Spitze genau über dem Mittelpunkt.</p>
+  <div class="grid2">
+    <div>
+      <div class="card merke"><div class="t">Merke – Bezeichnungen und Formeln</div>
+        <p><span class="f red">r</span> Radius · <span class="f purple">h</span> Höhe · <span class="f green">s</span> Mantellinie (von der Spitze zum Rand)</p>
+        <p>Grundfläche: <span class="f">G = π · r²</span></p>
+        <p>Mantelfläche: <span class="f">M = π · r · s</span></p>
+        <p>Oberfläche: <span class="f">O = πr² + πrs</span></p>
+        <p style="margin-bottom:0">Volumen: <span class="f">V = ⅓ · π · r² · h</span></p>
+      </div>
+      <div class="card">
+        <p style="margin-top:0"><b>Pythagoras und Netz</b></p>
+        <ul style="margin:0;padding-left:20px">
+          <li><span class="f">s² = r² + h²</span> &nbsp;<span class="note">(r, h und s bilden ein rechtwinkliges Dreieck)</span></li>
+          <li>Der Mantel ist im Netz ein <b>Kreisausschnitt</b> mit Radius s.</li>
+          <li>Sein Mittelpunktswinkel: <span class="f">α = 360° · r : s</span></li>
+          <li><b>Achtung:</b> Fläche mit s, Volumen mit h!</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <p style="margin-top:0"><b>Ausprobieren</b> – verändere Radius und Höhe:</p>
+      <div class="tabs"><button class="b on" data-tab="v3k">Körper</button><button class="b" data-tab="v3n">Netz</button></div>
+      <div id="v3k"></div><div id="v3n" style="display:none"></div>
+      <div class="ctrl"><label class="red">r</label><input type="range" id="e3r" min="1" max="6" step="0.5" value="3"><output id="o3r"></output></div>
+      <div class="ctrl"><label class="purple">h</label><input type="range" id="e3h" min="1" max="10" step="0.5" value="4"><output id="o3h"></output></div>
+      <div class="live" id="l3"></div>
+    </div>
+  </div>
+  <div class="card"><p style="margin-top:0"><b>Beispiel:</b> Ein Kegel hat den Radius <b>r = 3 cm</b> und die Höhe <b>h = 4 cm</b>.</p>
+    <div class="steps" id="bsp3">
+      <div class="st">s² = 3² + 4² = 25 → s = 5 cm<span class="why">Pythagoras</span></div>
+      <div class="st">M = π · 3 · 5 ≈ 47,12 cm²<span class="why">Mantel mit der Mantellinie s</span></div>
+      <div class="st">O = π · 3² + 47,12 ≈ 28,27 + 47,12 = <b>75,40 cm²</b></div>
+      <div class="st">V = ⅓ · π · 3² · 4 ≈ <b>37,70 cm³</b><span class="why">Volumen mit der Höhe h</span></div>
+    </div>
+    <div class="btns"><button class="b g" data-step="bsp3">Nächster Schritt</button><button class="b" data-all="bsp3">Alle</button></div>
+  </div>
+  <div class="card"><p style="margin:0"><b>Gut zu wissen:</b> Ein Kegel (oder eine Pyramide) hat genau <b>ein Drittel</b> des Volumens eines Zylinders (oder Prismas) mit gleicher Grundfläche und gleicher Höhe. Daher kommt das <span class="f">⅓</span> in der Formel.</p></div>
+  <h3>Übungen</h3>
+  <div id="x3"></div>
+  <h3>Training mit Zufallsaufgaben</h3>
+  <div id="r3"></div>
+  <div class="navbtm"><button class="b" data-go="s2">← Pyramide</button><button class="b p" data-go="s4">Weiter: Überblick →</button></div>
+</section>
+
+<!-- 4 ÜBERBLICK -->
+<section id="s4">
+  <h2>4 · Überblick &amp; Einheiten</h2>
+  <p class="lead">Alle Formeln auf einen Blick – und wie du zwischen cm³, Litern und m³ umrechnest.</p>
+  <div class="grid3">
+    <div class="card"><h4 style="margin:0 0 6px">Zylinder</h4><div id="m4a"></div>
+      <p><span class="f">M = 2πrh</span><br><span class="f">O = 2πr² + 2πrh</span><br><span class="f">V = πr²h</span></p></div>
+    <div class="card"><h4 style="margin:0 0 6px">Quadratische Pyramide</h4><div id="m4b"></div>
+      <p><span class="f">M = 2·a·h<sub>s</sub></span><br><span class="f">O = a² + 2·a·h<sub>s</sub></span><br><span class="f">V = ⅓·a²·h</span></p></div>
+    <div class="card"><h4 style="margin:0 0 6px">Kreiskegel</h4><div id="m4c"></div>
+      <p><span class="f">M = πrs</span><br><span class="f">O = πr² + πrs</span><br><span class="f">V = ⅓·πr²h</span></p></div>
+  </div>
+  <div class="card merke"><div class="t">Merke – Einheiten umrechnen</div>
+    <p><span class="f">1 cm³ = 1 ml</span> &nbsp;·&nbsp; <span class="f">1 dm³ = 1 l</span> &nbsp;·&nbsp; <span class="f">1 m³ = 1 000 l</span></p>
+    <p><span class="f">1 m³ = 1 000 dm³ = 1 000 000 cm³</span> &nbsp;<span class="note">(Umrechnungszahl 1 000)</span></p>
+    <p style="margin-bottom:0"><span class="f">1 m² = 100 dm² = 10 000 cm²</span> &nbsp;<span class="note">(Umrechnungszahl 100)</span></p>
+  </div>
+  <h3>Übungen: Einheiten</h3>
+  <div id="x4"></div>
+  <h3>Gemischtes Training</h3>
+  <p class="note">Ein zufälliger Körper – erkenne ihn und wähle die richtige Formel.</p>
+  <div id="r4"></div>
+  <div class="navbtm"><button class="b" data-go="s3">← Kegel</button><button class="b p" data-go="s5">Weiter: Prüfungsaufgaben →</button></div>
+</section>
+
+<!-- 5 PRÜFUNG -->
+<section id="s5">
+  <h2>★ Prüfungsaufgaben</h2>
+  <p class="lead">Realitätsnahe Anwendungsaufgaben zu Zylinder, Pyramide und Kegel. Nutze die Hinweise stufenweise – erst selbst probieren!</p>
+  <div class="card merke"><div class="t">Tipps für die Prüfung</div>
+    <ul style="margin:.4em 0 0;padding-left:20px">
+      <li>Mach eine Skizze und trage alle gegebenen Maße ein. Welcher Körper ist es?</li>
+      <li>Fläche oder Volumen? „Blech, Stoff, Plane, Farbe“ → <b>Fläche</b>. „Füllen, fassen, Inhalt“ → <b>Volumen</b>.</li>
+      <li>Fehlt eine Länge (h, h<sub>s</sub>, s)? → <b>Pythagoras</b>.</li>
+      <li>Einheiten beachten und Antwortsatz schreiben!</li>
+    </ul>
+  </div>
+  <div id="x5"></div>
+  <div class="navbtm"><button class="b" data-go="s4">← Überblick</button><button class="b" data-go="start">Zur Startseite</button></div>
+</section>
+
+</main>
+</div>
+
+<script>
+/* ===== Hilfsfunktionen ===== */
+const $=id=>document.getElementById(id);
+const fmt=(n,d=2)=>{if(Math.abs(n)<1e-9)n=0;return (Math.round(n*10**d)/10**d).toString().replace('.',',').replace('-','−')};
+function poly(a,b,c,v='x'){let s='';[[a,v+'²'],[b,v],[c,'']].forEach(([k,t])=>{if(Math.abs(k)<1e-9)return;const ab=Math.abs(k),num=(ab===1&&t)?'':fmt(ab);
+ s+= s?(k<0?' − ':' + ')+num+t : (k<0?'−':'')+num+t});return s||'0'}
+function lin(m,t){return poly(0,m,t)}
+function vform(a,xs,ys){const A=a===1?'':a===-1?'−':fmt(a)+' · ';const X=Math.abs(xs)<1e-9?'x²':`(x ${xs>0?'−':'+'} ${fmt(Math.abs(xs))})²`;
+ const Y=Math.abs(ys)<1e-9?'':` ${ys>0?'+':'−'} ${fmt(Math.abs(ys))}`;return A+X+Y}
+const P=(x,y)=>`(${fmt(x)} | ${fmt(y)})`;
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const par=n=>n<0?`(${fmt(n)})`:fmt(n);
+
+/* ===== Aufgaben-Engine ===== */
+let solved=0;
+function num(v){v=v.trim().replace(/\s/g,'').replace(',','.').replace(/[−–]/g,'-');if(v==='')return null;if(/^-?\d+(\.\d+)?\/\d+(\.\d+)?$/.test(v)){const[a,b]=v.split('/');return +a/+b}const n=Number(v);return isNaN(n)?NaN:n}
+function renderEx(ex,host,nr){
+ const el=document.createElement('div');el.className='ex';
+ const fl=ex.fields.map((f,i)=>f.opts?`<label class="fld"><span>${f.l}</span><select data-i="${i}"><option value="">– wählen –</option>${f.opts.map(o=>`<option>${o}</option>`).join('')}</select></label>`
+   :`<label class="fld"><span>${f.l}</span><input data-i="${i}" inputmode="decimal" autocomplete="off">${f.u?`<span style="font-family:inherit;font-size:15px">${f.u}</span>`:''}</label>`).join('');
+ el.innerHTML=`<div class="q">${nr?`<b class="nr">${nr}</b>`:''}${ex.q}</div><div class="fields">${fl}</div>
+ <div class="btns"><button class="b p ck">Prüfen</button>${ex.hints&&ex.hints.length?'<button class="b o hn">Hinweis</button>':''}<button class="b sl">Lösung zeigen</button></div>
+ <div class="fb"></div><div class="hs"></div><div class="sol">${ex.sol.map(s=>`<div class="st">${s}</div>`).join('')}</div>`;
+ host.appendChild(el);
+ const inp=[...el.querySelectorAll('[data-i]')];let hi=0,counted=false;
+ el.querySelector('.ck').onclick=()=>{
+  const groups={};let ok=0;
+  ex.fields.forEach((f,i)=>{const e=inp[i];let good;
+   if(f.opts)good=e.value===f.a;
+   else if(f.g){(groups[f.g]=groups[f.g]||[]).push(i);return}
+   else{const v=num(e.value);good=f.a===null?v===null:(v!==null&&Math.abs(v-f.a)<=(f.tol??0.011))}
+   e.className=good?'ok':'no';if(good)ok++});
+  Object.values(groups).forEach(ix=>{const ans=ix.map(i=>ex.fields[i].a),used=[];
+   ix.forEach(i=>{const v=num(inp[i].value);let hit=-1;
+    ans.forEach((a,j)=>{if(hit>=0||used[j])return;if(a===null?v===null:(v!==null&&Math.abs(v-a)<=(ex.fields[i].tol??0.011)))hit=j});
+    if(hit>=0){used[hit]=1;ok++;inp[i].className='ok'}else inp[i].className='no'})});
+  const fb=el.querySelector('.fb');
+  if(ok===ex.fields.length){fb.className='fb ok';fb.textContent='✓ Richtig – super!';if(!counted){counted=true;solved++;$('sc').textContent=solved}}
+  else{fb.className='fb no';fb.textContent=`Noch nicht ganz: ${ok} von ${ex.fields.length} richtig. ${ex.hints&&hi<ex.hints.length?'Tipp: Nutze einen Hinweis.':''}`}};
+ const hb=el.querySelector('.hn');
+ if(hb)hb.onclick=()=>{const h=document.createElement('div');h.className='hint';h.innerHTML=`<b>Hinweis ${hi+1}:</b> ${ex.hints[hi]}`;el.querySelector('.hs').appendChild(h);hi++;
+  if(hi>=ex.hints.length){hb.disabled=true;hb.textContent='Keine weiteren Hinweise'}else hb.textContent=`Hinweis ${hi+1}`};
+ el.querySelector('.sl').onclick=e=>{const s=el.querySelector('.sol');s.classList.toggle('show');e.target.textContent=s.classList.contains('show')?'Lösung ausblenden':'Lösung zeigen'};
+ return el}
+function renderList(hostId,list,pre){const h=$(hostId);list.forEach((ex,i)=>renderEx(ex,h,(pre||'')+String.fromCharCode(97+i)+')'))}
+function randomBox(hostId,gen,title){const h=$(hostId);h.innerHTML=`<div class="card"><div class="btns" style="margin:0 0 4px"><button class="b g">🎲 Neue Zufallsaufgabe</button><span class="note" style="align-self:center">${title}</span></div><div class="rb"></div></div>`;
+ const box=h.querySelector('.rb');const go=()=>{box.innerHTML='';renderEx(gen(),box)};h.querySelector('button').onclick=go;go()}
+
+/* ===== Navigation ===== */
+function show(id){document.querySelectorAll('main section').forEach(s=>s.classList.toggle('on',s.id===id));
+ document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.s===id));window.scrollTo(0,0);history.replaceState(null,'','#'+id)}
+document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>show(b.dataset.s));
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
+document.querySelectorAll('[data-step]').forEach(b=>b.onclick=()=>{const s=$(b.dataset.step).querySelector('.st:not(.show)');if(s)s.classList.add('show')});
+document.querySelectorAll('[data-all]').forEach(b=>b.onclick=()=>$(b.dataset.all).querySelectorAll('.st').forEach(s=>s.classList.add('show')));
+document.querySelectorAll('.tabs').forEach(t=>t.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{t.querySelectorAll('[data-tab]').forEach(x=>{x.classList.toggle('on',x===b);$(x.dataset.tab).style.display=x===b?'':'none'})}));
+
+const B='#2457d6',G='#12805c',O='#d9620b',R='#c62f3b',V='#7a3fc4',INK='#1d2433',FILL='#e8eefc',FILL2='#d5e0f8',FILLG='#e3f5ee';
+const PI=Math.PI;
+
+/* ===== Körper zeichnen ===== */
+// Einheiten-Koordinaten (y nach oben) passend in die Zeichenfläche einpassen
+function fit(P,W,H,pad=30){let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
+ P.forEach(([x,y])=>{x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)});
+ const k=Math.min((W-2*pad)/((x1-x0)||1),(H-2*pad)/((y1-y0)||1)),ox=(W-(x1-x0)*k)/2,oy=(H-(y1-y0)*k)/2;
+ return (x,y)=>[ox+(x-x0)*k,H-oy-(y-y0)*k]}
+const pts=(T,P)=>P.map(p=>T(...p).map(v=>v.toFixed(1)).join(',')).join(' ');
+const pl=(T,P,c=INK,o={})=>`<polyline points="${pts(T,P)}" fill="none" stroke="${c}" stroke-width="${o.w||2}" ${o.dash?'stroke-dasharray="6 5"':''} stroke-linejoin="round" stroke-linecap="round"/>`;
+const pg=(T,P,fill,c='none')=>`<polygon points="${pts(T,P)}" fill="${fill}" stroke="${c}" stroke-width="2" stroke-linejoin="round"/>`;
+const tx=(T,x,y,s,c=INK,o={})=>{const[a,b]=T(x,y);return `<text x="${(a+(o.dx||0)).toFixed(1)}" y="${(b+(o.dy||0)).toFixed(1)}" fill="${c}" font-weight="700" text-anchor="${o.an||'middle'}" paint-order="stroke" stroke="#fff" stroke-width="4">${s}</text>`};
+const svg=(W,H,s)=>`<svg class="plot" viewBox="0 0 ${W} ${H}" font-family="Segoe UI,Arial" font-size="15">${s}</svg>`;
+const ell=(cx,cy,rx,ry,a0,a1,n=64)=>Array.from({length:n+1},(_,i)=>{const t=a0+(a1-a0)*i/n;return [cx+rx*Math.cos(t),cy+ry*Math.sin(t)]});
+
+function drawCyl(r,h,L={},W=340,H=280){const q=0.3*r,T=fit([[-r,-q],[r,h+q],[-r-0.6*r,0],[r+0.9*r,0]],W,H);
+ let s=pg(T,[...ell(0,0,r,q,PI,2*PI),...ell(0,h,r,q,2*PI,PI)],FILL);
+ s+=pg(T,ell(0,h,r,q,0,2*PI),FILL2,INK);
+ s+=pl(T,ell(0,0,r,q,0,PI),INK,{dash:1})+pl(T,ell(0,0,r,q,PI,2*PI))+pl(T,[[-r,0],[-r,h]])+pl(T,[[r,0],[r,h]]);
+ s+=pl(T,[[0,0],[0,h]],V,{dash:1})+pl(T,[[0,0],[r,0]],R,{w:2.5});
+ s+=tx(T,r/2,0,L.r||'r',R,{dy:-8})+tx(T,0,h/2,L.h||'h',V,{dx:8,an:'start'});
+ return svg(W,H,s)}
+function drawCone(r,h,L={},W=340,H=280){const q=0.3*r,T=fit([[-r,-q],[r,h],[-r-0.6*r,0],[r+0.9*r,0]],W,H);
+ let s=pg(T,[...ell(0,0,r,q,PI,2*PI),[0,h]],FILL);
+ s+=pl(T,ell(0,0,r,q,0,PI),INK,{dash:1})+pl(T,ell(0,0,r,q,PI,2*PI))+pl(T,[[-r,0],[0,h],[r,0]]);
+ s+=pl(T,[[0,0],[0,h]],V,{dash:1})+pl(T,[[0,0],[r,0]],R,{w:2.5})+pl(T,[[0,h],[r,0]],G,{w:3});
+ s+=tx(T,r/2,0,L.r||'r',R,{dy:-8})+tx(T,0,h/2,L.h||'h',V,{dx:-8,an:'end'})+tx(T,r/2,h/2,L.s||'s',G,{dx:10,an:'start'});
+ return svg(W,H,s)}
+function drawPyr(a,h,L={},W=340,H=280){const p=(x,y,z)=>[x+0.45*z,y+0.32*z],m=a/2;
+ const FL=p(-m,0,-m),FR=p(m,0,-m),BR=p(m,0,m),BL=p(-m,0,m),S=p(0,h,0),M=p(0,0,0),Mf=p(0,0,-m);
+ const T=fit([FL,FR,BR,BL,S],W,H);
+ let s=pg(T,[FR,BR,S],FILL2)+pg(T,[FL,FR,S],FILL);
+ s+=pl(T,[BL,FL],INK,{dash:1})+pl(T,[BL,BR],INK,{dash:1})+pl(T,[BL,S],INK,{dash:1});
+ s+=pl(T,[FL,FR,BR])+pl(T,[FL,S,FR])+pl(T,[S,BR],O,{w:3});
+ s+=pl(T,[S,M],V,{dash:1})+pl(T,[M,Mf],INK,{dash:1,w:1.5})+pl(T,[S,Mf],G,{w:3});
+ s+=tx(T,(FL[0]+FR[0])/2,FL[1],L.a||'a',INK,{dy:20})+tx(T,M[0]+(S[0]-M[0])*0.35,M[1]+(S[1]-M[1])*0.35,L.h||'h',V,{dx:8,an:'start'})
+  +tx(T,Mf[0]+(S[0]-Mf[0])*0.55,Mf[1]+(S[1]-Mf[1])*0.55,L.hs||'h<tspan font-size="11" dy="4">s</tspan>',G,{dx:-8,an:'end'})
+  +tx(T,(S[0]+BR[0])/2,(S[1]+BR[1])/2,L.s||'s',O,{dx:10,an:'start'});
+ return svg(W,H,s)}
+function netCyl(r,h,W=340,H=300){const u=2*PI*r,T=fit([[0,-2*r],[u,h+2*r]],W,H,24);
+ let s=pg(T,[[0,0],[u,0],[u,h],[0,h]],FILL,INK)+pg(T,ell(u/2,h+r,r,r,0,2*PI),FILL2,INK)+pg(T,ell(u/2,-r,r,r,0,2*PI),FILL2,INK);
+ s+=tx(T,u/2,h/2,'Mantel',B,{dy:5})+tx(T,u/2,h+r,'G',INK,{dy:5})+tx(T,u/2,-r,'G',INK,{dy:5});
+ s+=tx(T,u*0.18,0,'2πr = '+fmt(u),R,{dy:18})+tx(T,0,h/2,'h',V,{dx:-6,an:'end'});
+ return svg(W,H,s)}
+function netPyr(a,hs,W=340,H=300){const m=a/2,e=m+hs,T=fit([[-e,-e],[e,e]],W,H,20);
+ const tri=[[[-m,-m],[m,-m],[0,-e]],[[m,-m],[m,m],[e,0]],[[m,m],[-m,m],[0,e]],[[-m,m],[-m,-m],[-e,0]]];
+ let s=tri.map(t=>pg(T,t,FILL,INK)).join('')+pg(T,[[-m,-m],[m,-m],[m,m],[-m,m]],FILLG,INK);
+ s+=pl(T,[[0,-m],[0,-e]],G,{w:2.5,dash:1})+tx(T,0,-m-hs/2,'h<tspan font-size="11" dy="4">s</tspan>',G,{dx:8,an:'start'});
+ s+=tx(T,0,0,'G = a²',G,{dy:5})+tx(T,0,m,'a',INK,{dy:-6});
+ return svg(W,H,s)}
+function netCone(r,s,W=340,H=300){const al=2*PI*r/s,a0=-PI/2-al/2,a1=-PI/2+al/2,arc=ell(0,0,s,s,a0,a1,90),circ=ell(0,-s-r,r,r,0,2*PI);
+ const T=fit([[0,0],...arc,...circ],W,H,22);
+ let o=pg(T,[[0,0],...arc],FILL,INK)+pg(T,circ,FILL2,INK);
+ o+=tx(T,0,-s*0.55,'Mantel',B,{dy:5})+tx(T,0,-s-r,'G',INK,{dy:5});
+ const e=arc[0];o+=tx(T,e[0]/2,e[1]/2,'s',G,{dx:-10,an:'end'})+tx(T,0,-s*0.25,'α = '+fmt(360*r/s,1)+'°',O,{dy:5})+pl(T,ell(0,0,s*0.12,s*0.12,a0,a1,30),O);
+ return svg(W,H,o)}
+function drawSilo(r,hz,hk,W=300,H=300){const q=0.3*r,T=fit([[-r,-hk],[r,hz+q],[-1.6*r,0],[1.9*r,0]],W,H);
+ let s=pg(T,[[-r,0],[0,-hk],[r,0],...ell(0,hz,r,q,2*PI,PI)],FILL)+pg(T,ell(0,hz,r,q,0,2*PI),FILL2,INK);
+ s+=pl(T,ell(0,0,r,q,0,PI),INK,{dash:1})+pl(T,ell(0,0,r,q,PI,2*PI))+pl(T,[[-r,hz],[-r,0],[0,-hk],[r,0],[r,hz]]);
+ s+=pl(T,[[0,0],[r,0]],R,{w:2.5})+tx(T,r/2,0,'r = 2 m',R,{dy:-14});
+ s+=pl(T,[[r*1.3,0],[r*1.3,hz]],V)+tx(T,r*1.3,hz/2,'6 m',V,{dx:6,an:'start'});
+ s+=pl(T,[[r*1.3,0],[r*1.3,-hk]],O)+tx(T,r*1.3,-hk/2,'1,5 m',O,{dx:6,an:'start'});
+ return svg(W,H,s)}
+
+/* ===== Aufgaben-Helfer ===== */
+// Feld mit Toleranz 0,5 %: Rundungen und π ≈ 3,14 werden akzeptiert
+const F=(l,a,u)=>({l,a,u,tol:Math.max(0.011,Math.abs(a)*0.005)});
+const c2=n=>fmt(n,2);
+
+/* ===== Kapitel 1: Zylinder ===== */
+function upd1(){const r=+$('e1r').value,h=+$('e1h').value;$('o1r').textContent=fmt(r);$('o1h').textContent=fmt(h);
+ $('v1k').innerHTML=drawCyl(r,h);$('v1n').innerHTML=netCyl(r,h);
+ const g=PI*r*r,m=2*PI*r*h;
+ $('l1').innerHTML=`<p><b>G</b> = π · ${fmt(r)}² ≈ ${c2(g)} &nbsp; <b>M</b> = 2 · π · ${fmt(r)} · ${fmt(h)} ≈ ${c2(m)}</p>
+ <p><b>O</b> = 2 · ${c2(g)} + ${c2(m)} ≈ <b>${c2(2*g+m)}</b> &nbsp; <b>V</b> = ${c2(g)} · ${fmt(h)} ≈ <b>${c2(g*h)}</b></p><p class="note">Maße in cm → Flächen in cm², Volumen in cm³</p>`}
+['e1r','e1h'].forEach(i=>$(i).oninput=upd1);upd1();
+
+renderList('x1',[
+ {q:'Ein Zylinder hat den Radius <b>r = 4 cm</b> und die Höhe <b>h = 10 cm</b>. Berechne Grundfläche, Mantelfläche, Oberfläche und Volumen.',
+  fields:[F('G =',50.27,'cm²'),F('M =',251.33,'cm²'),F('O =',351.86,'cm²'),F('V =',502.65,'cm³')],
+  hints:['G = π · r² und M = 2 · π · r · h','O = 2 · G + M, &nbsp; V = G · h'],
+  sol:['G = π · 4² ≈ 50,27 cm²','M = 2 · π · 4 · 10 ≈ 251,33 cm²','O = 2 · 50,27 + 251,33 ≈ <b>351,86 cm²</b>','V = 50,27 · 10 ≈ <b>502,65 cm³</b>']},
+ {q:'Ein Rohrstück hat den <b>Durchmesser d = 12 cm</b> und ist <b>5 cm</b> hoch. Berechne Mantelfläche, Oberfläche und Volumen des (geschlossenen) Zylinders.',
+  fields:[F('M =',188.50,'cm²'),F('O =',414.69,'cm²'),F('V =',565.49,'cm³')],
+  hints:['Achtung, Durchmesser! r = 12 cm : 2 = 6 cm'],
+  sol:['r = 6 cm','M = 2 · π · 6 · 5 ≈ 188,50 cm²','O = 2 · π · 6² + 188,50 ≈ 226,19 + 188,50 = <b>414,69 cm²</b>','V = π · 6² · 5 ≈ <b>565,49 cm³</b>']},
+ {q:'Ein zylinderförmiger Messbecher mit dem Radius <b>r = 5 cm</b> soll genau <b>1 Liter</b> fassen. Wie hoch muss er mindestens sein?',
+  fields:[F('h =',12.73,'cm')],
+  hints:['1 Liter = 1 dm³ = 1 000 cm³','V = π · r² · h nach h umstellen: h = V : (π · r²)'],
+  sol:['1 000 = π · 5² · h','h = 1 000 : (π · 25) ≈ <b>12,73 cm</b>']},
+ {q:'Im Netz eines Zylinders ist der Mantel ein Rechteck mit <b>31,42 cm</b> Breite und <b>8 cm</b> Höhe. Bestimme den Radius und das Volumen des Zylinders.',
+  fields:[F('r =',5,'cm'),F('V =',628.32,'cm³')],
+  hints:['Die Breite des Rechtecks ist der Kreisumfang: 2 · π · r = 31,42','r = 31,42 : (2 · π)'],
+  sol:['2 · π · r = 31,42 → r = 31,42 : 6,283 ≈ <b>5 cm</b>','V = π · 5² · 8 ≈ <b>628,32 cm³</b>']}
+]);
+function genCyl(){const r=rnd(2,9),h=rnd(3,15),d=pick([0,1]),g=PI*r*r,m=2*PI*r*h;
+ return {q:`Ein Zylinder hat ${d?`den Durchmesser <b>d = ${2*r} cm</b>`:`den Radius <b>r = ${r} cm</b>`} und die Höhe <b>h = ${h} cm</b>. Berechne Mantelfläche, Oberfläche und Volumen.`,
+  fields:[F('M =',m,'cm²'),F('O =',2*g+m,'cm²'),F('V =',g*h,'cm³')],
+  hints:[d?`Zuerst den Radius: r = ${2*r} : 2 = ${r} cm`:'M = 2 · π · r · h','O = 2 · π · r² + M, &nbsp; V = π · r² · h'],
+  sol:[`M = 2 · π · ${r} · ${h} ≈ ${c2(m)} cm²`,`O = 2 · π · ${r}² + ${c2(m)} ≈ <b>${c2(2*g+m)} cm²</b>`,`V = π · ${r}² · ${h} ≈ <b>${c2(g*h)} cm³</b>`]}}
+randomBox('r1',genCyl,'Mantel, Oberfläche und Volumen eines Zylinders');
+
+/* ===== Kapitel 2: Pyramide ===== */
+function upd2(){const a=+$('e2a').value,h=+$('e2h').value;$('o2a').textContent=fmt(a);$('o2h').textContent=fmt(h);
+ const hs=Math.hypot(h,a/2),s=Math.hypot(hs,a/2),m=2*a*hs;
+ $('v2k').innerHTML=drawPyr(a,h);$('v2n').innerHTML=netPyr(a,hs);
+ $('l2').innerHTML=`<p><span class="green"><b>h<sub>s</sub></b> = √(${fmt(h)}² + ${fmt(a/2)}²) ≈ ${c2(hs)}</span> &nbsp; <span class="orange"><b>s</b> = √(${c2(hs)}² + ${fmt(a/2)}²) ≈ ${c2(s)}</span></p>
+ <p><b>M</b> = 2 · ${fmt(a)} · ${c2(hs)} ≈ ${c2(m)} &nbsp; <b>O</b> = ${fmt(a)}² + ${c2(m)} ≈ <b>${c2(a*a+m)}</b></p><p><b>V</b> = ⅓ · ${fmt(a)}² · ${fmt(h)} ≈ <b>${c2(a*a*h/3)}</b></p>`}
+['e2a','e2h'].forEach(i=>$(i).oninput=upd2);upd2();
+
+renderList('x2',[
+ {q:'Eine quadratische Pyramide hat die Grundkante <b>a = 10 cm</b> und die Höhe <b>h = 12 cm</b>. Berechne h<sub>s</sub>, die Oberfläche und das Volumen.',
+  fields:[F('h<sub>s</sub> =',13,'cm'),F('O =',360,'cm²'),F('V =',400,'cm³')],
+  hints:['h<sub>s</sub>² = h² + (a/2)² = 12² + 5²','O = a² + 2 · a · h<sub>s</sub>, &nbsp; V = ⅓ · a² · h'],
+  sol:['h<sub>s</sub> = √(144 + 25) = √169 = <b>13 cm</b>','O = 10² + 2 · 10 · 13 = 100 + 260 = <b>360 cm²</b>','V = ⅓ · 10² · 12 = <b>400 cm³</b>']},
+ {q:'Von einer quadratischen Pyramide kennt man <b>a = 8 cm</b> und die Höhe der Seitenfläche <b>h<sub>s</sub> = 5 cm</b>. Berechne die Körperhöhe h, die Oberfläche und das Volumen.',
+  fields:[F('h =',3,'cm'),F('O =',144,'cm²'),F('V =',64,'cm³')],
+  hints:['Pythagoras umgestellt: h² = h<sub>s</sub>² − (a/2)² = 5² − 4²','Für O brauchst du h<sub>s</sub>, für V brauchst du h.'],
+  sol:['h = √(25 − 16) = √9 = <b>3 cm</b>','O = 8² + 2 · 8 · 5 = 64 + 80 = <b>144 cm²</b>','V = ⅓ · 8² · 3 = <b>64 cm³</b>']},
+ {q:'Eine quadratische Pyramide hat <b>a = 4 cm</b> und die Seitenkante <b>s = 6 cm</b>. Berechne h<sub>s</sub>, h, die Mantelfläche und das Volumen.',
+  fields:[F('h<sub>s</sub> =',5.66,'cm'),F('h =',5.29,'cm'),F('M =',45.25,'cm²'),F('V =',28.22,'cm³')],
+  hints:['Halbe Seitenfläche: s² = h<sub>s</sub>² + (a/2)² → h<sub>s</sub>² = 6² − 2²','Dann h² = h<sub>s</sub>² − (a/2)² = 32 − 4'],
+  sol:['h<sub>s</sub> = √(36 − 4) = √32 ≈ <b>5,66 cm</b>','h = √(32 − 4) = √28 ≈ <b>5,29 cm</b>','M = 2 · 4 · 5,66 ≈ <b>45,25 cm²</b>','V = ⅓ · 4² · 5,29 ≈ <b>28,22 cm³</b>']},
+ {q:'Welche Länge brauchst du jeweils? Ordne zu.',
+  fields:[{l:'für das Volumen:',opts:['h','hs','s'],a:'h'},{l:'für die Mantelfläche:',opts:['h','hs','s'],a:'hs'}],
+  hints:['Das Volumen hängt von der Höhe des ganzen Körpers ab. Die Fläche eines Dreiecks hängt von seiner eigenen Höhe ab.'],
+  sol:['Volumen: V = ⅓ · a² · <b>h</b>','Mantel: vier Dreiecke mit der Höhe <b>h<sub>s</sub></b>']}
+]);
+function genPyr(){const a=pick([2,4,6,8,10,12]),h=rnd(2,12),hs=Math.hypot(h,a/2);
+ return {q:`Eine quadratische Pyramide hat <b>a = ${a} cm</b> und <b>h = ${h} cm</b>. Berechne h<sub>s</sub>, die Oberfläche und das Volumen.`,
+  fields:[F('h<sub>s</sub> =',hs,'cm'),F('O =',a*a+2*a*hs,'cm²'),F('V =',a*a*h/3,'cm³')],
+  hints:[`h<sub>s</sub>² = ${h}² + ${a/2}²`,'O = a² + 2 · a · h<sub>s</sub>, &nbsp; V = ⅓ · a² · h'],
+  sol:[`h<sub>s</sub> = √(${h*h} + ${a*a/4}) ≈ ${c2(hs)} cm`,`O = ${a}² + 2 · ${a} · ${c2(hs)} ≈ <b>${c2(a*a+2*a*hs)} cm²</b>`,`V = ⅓ · ${a}² · ${h} ≈ <b>${c2(a*a*h/3)} cm³</b>`]}}
+randomBox('r2',genPyr,'Quadratische Pyramide');
+
+/* ===== Kapitel 3: Kegel ===== */
+function upd3(){const r=+$('e3r').value,h=+$('e3h').value;$('o3r').textContent=fmt(r);$('o3h').textContent=fmt(h);
+ const s=Math.hypot(r,h),m=PI*r*s,g=PI*r*r;
+ $('v3k').innerHTML=drawCone(r,h);$('v3n').innerHTML=netCone(r,s);
+ $('l3').innerHTML=`<p><span class="green"><b>s</b> = √(${fmt(r)}² + ${fmt(h)}²) ≈ ${c2(s)}</span> &nbsp; <span class="orange">α = 360° · ${fmt(r)} : ${c2(s)} ≈ ${fmt(360*r/s,1)}°</span></p>
+ <p><b>M</b> = π · ${fmt(r)} · ${c2(s)} ≈ ${c2(m)} &nbsp; <b>O</b> = π · ${fmt(r)}² + ${c2(m)} ≈ <b>${c2(g+m)}</b></p><p><b>V</b> = ⅓ · π · ${fmt(r)}² · ${fmt(h)} ≈ <b>${c2(g*h/3)}</b></p>`}
+['e3r','e3h'].forEach(i=>$(i).oninput=upd3);upd3();
+
+renderList('x3',[
+ {q:'Ein Kegel hat den Radius <b>r = 6 cm</b> und die Mantellinie <b>s = 10 cm</b>. Berechne die Höhe, die Oberfläche, das Volumen und den Mittelpunktswinkel α des Mantels im Netz.',
+  fields:[F('h =',8,'cm'),F('O =',301.59,'cm²'),F('V =',301.59,'cm³'),F('α =',216,'°')],
+  hints:['h² = s² − r² = 10² − 6²','O = π · r² + π · r · s, &nbsp; V = ⅓ · π · r² · h, &nbsp; α = 360° · r : s'],
+  sol:['h = √(100 − 36) = √64 = <b>8 cm</b>','O = π · 36 + π · 60 = π · 96 ≈ <b>301,59 cm²</b>','V = ⅓ · π · 36 · 8 ≈ <b>301,59 cm³</b> <span class="note">(gleiche Zahl – Zufall!)</span>','α = 360° · 6 : 10 = <b>216°</b>']},
+ {q:'Ein kegelförmiger Partyhut hat den <b>Durchmesser d = 10 cm</b> und die <b>Höhe h = 12 cm</b>. Wie viel Karton braucht man für den Hut (nur Mantel)? Wie groß ist sein Volumen?',
+  fields:[F('s =',13,'cm'),F('M =',204.20,'cm²'),F('V =',314.16,'cm³')],
+  hints:['r = 5 cm. Mantellinie: s² = r² + h² = 5² + 12²','Ein Hut hat keinen Boden – nur die Mantelfläche M = π · r · s.'],
+  sol:['s = √(25 + 144) = <b>13 cm</b>','M = π · 5 · 13 ≈ <b>204,20 cm²</b>','V = ⅓ · π · 5² · 12 ≈ <b>314,16 cm³</b>']},
+ {q:'Eine Eiswaffel (Kegel) hat oben den Radius <b>r = 2,5 cm</b> und die Mantellinie <b>s = 12 cm</b>. Wie viel Waffelteig-Fläche braucht man? Wie viel Eis passt hinein (bis zum Rand)?',
+  fields:[F('M =',94.25,'cm²'),F('h =',11.74,'cm'),F('V =',76.82,'cm³')],
+  hints:['M = π · r · s','h² = s² − r² = 144 − 6,25'],
+  sol:['M = π · 2,5 · 12 ≈ <b>94,25 cm²</b>','h = √137,75 ≈ <b>11,74 cm</b>','V = ⅓ · π · 2,5² · 11,74 ≈ <b>76,82 cm³</b> ≈ 77 ml']}
+]);
+function genCone(){const r=rnd(2,8),h=rnd(3,12),s=Math.hypot(r,h);
+ return {q:`Ein Kegel hat den Radius <b>r = ${r} cm</b> und die Höhe <b>h = ${h} cm</b>. Berechne die Mantellinie s, die Oberfläche und das Volumen.`,
+  fields:[F('s =',s,'cm'),F('O =',PI*r*r+PI*r*s,'cm²'),F('V =',PI*r*r*h/3,'cm³')],
+  hints:[`s² = ${r}² + ${h}²`,'O = π · r² + π · r · s, &nbsp; V = ⅓ · π · r² · h'],
+  sol:[`s = √(${r*r} + ${h*h}) ≈ ${c2(s)} cm`,`O = π · ${r}² + π · ${r} · ${c2(s)} ≈ <b>${c2(PI*r*r+PI*r*s)} cm²</b>`,`V = ⅓ · π · ${r}² · ${h} ≈ <b>${c2(PI*r*r*h/3)} cm³</b>`]}}
+randomBox('r3',genCone,'Gerader Kreiskegel');
+
+/* ===== Kapitel 4: Überblick ===== */
+$('m4a').innerHTML=drawCyl(2,3,{},220,160);$('m4b').innerHTML=drawPyr(4,3.5,{},220,160);$('m4c').innerHTML=drawCone(2,3.5,{},220,160);
+renderList('x4',[
+ {q:'Rechne um.',fields:[F('2,5 dm³ =',2.5,'l'),F('750 cm³ =',0.75,'l'),F('3 m³ =',3000,'l'),F('1 500 l =',1.5,'m³')],
+  hints:['1 dm³ = 1 l, &nbsp; 1 000 cm³ = 1 l, &nbsp; 1 m³ = 1 000 l'],
+  sol:['2,5 dm³ = <b>2,5 l</b>','750 cm³ = 750 ml = <b>0,75 l</b>','3 m³ = <b>3 000 l</b>','1 500 l = <b>1,5 m³</b>']},
+ {q:'Rechne um.',fields:[F('4 m² =',40000,'cm²'),F('2 500 cm² =',0.25,'m²'),F('0,2 m³ =',200,'dm³')],
+  hints:['Flächen: Umrechnungszahl 100 pro Stufe (m² → dm² → cm²).','Volumen: Umrechnungszahl 1 000 pro Stufe.'],
+  sol:['4 m² = 400 dm² = <b>40 000 cm²</b>','2 500 cm² = 25 dm² = <b>0,25 m²</b>','0,2 m³ = <b>200 dm³</b>']}
+]);
+function genMix(){return pick([genCyl,genPyr,genCone])()}
+randomBox('r4',genMix,'Zylinder, Pyramide oder Kegel');
+
+/* ===== Prüfungsaufgaben ===== */
+const SA=[
+ {t:'Aufgabe 1: Die Getränkedose',pts:'ca. 8 Punkte',
+  intro:'Eine zylinderförmige Getränkedose hat den Durchmesser <b>6,6 cm</b> und die Höhe <b>11,5 cm</b>.',
+  fig:()=>drawCyl(3.3,11.5,{r:'r = 3,3 cm',h:'11,5 cm'},300,300),
+  parts:[
+   {q:'Berechne das Volumen der Dose. Passen 330 ml Getränk hinein?',fields:[F('V =',393.44,'cm³'),{l:'Passt es?',opts:['ja','nein'],a:'ja'}],
+    hints:['r = 6,6 cm : 2 = 3,3 cm','V = π · r² · h. 1 cm³ = 1 ml.'],
+    sol:['V = π · 3,3² · 11,5 ≈ <b>393,44 cm³</b> ≈ 393 ml','393 ml &gt; 330 ml → <b>Ja</b>, das Getränk passt hinein.']},
+   {q:'Wie viel Blech braucht man für eine Dose? Für Falze und Verschnitt kommen <b>10 %</b> dazu.',fields:[F('O =',306.87,'cm²'),F('Blech =',337.56,'cm²')],
+    hints:['Die Dose ist geschlossen: O = 2 · π · r² + 2 · π · r · h','10 % mehr bedeutet: O · 1,1'],
+    sol:['O = 2 · π · 3,3² + 2 · π · 3,3 · 11,5 ≈ 68,42 + 238,45 = <b>306,87 cm²</b>','Blech = 306,87 · 1,1 ≈ <b>337,56 cm²</b>']},
+   {q:'Eine größere Dose mit gleichem Durchmesser soll <b>0,5 Liter</b> fassen. Wie hoch muss sie sein?',fields:[F('h =',14.61,'cm')],
+    hints:['0,5 l = 500 cm³','h = V : (π · r²)'],sol:['500 = π · 3,3² · h','h = 500 : 34,21 ≈ <b>14,61 cm</b>']}]},
+ {t:'Aufgabe 2: Das Pavillondach',pts:'ca. 9 Punkte',
+  intro:'Ein Gartenpavillon hat ein Dach in Form einer geraden quadratischen Pyramide. Die Grundkante ist <b>5 m</b> lang, die Dachspitze liegt <b>2 m</b> über der Grundfläche.',
+  fig:()=>drawPyr(5,2,{a:'a = 5 m',h:'2 m'},320,240),
+  parts:[
+   {q:'Berechne die Höhe einer dreieckigen Dachfläche h<sub>s</sub>.',fields:[F('h<sub>s</sub> =',3.20,'m')],
+    hints:['Rechtwinkliges Dreieck aus h = 2 m, halber Grundkante 2,5 m und h<sub>s</sub>.'],sol:['h<sub>s</sub>² = 2² + 2,5² = 10,25','h<sub>s</sub> = √10,25 ≈ <b>3,20 m</b>']},
+   {q:'Das Dach (vier Dreiecke) wird mit Schindeln gedeckt. <b>1 m²</b> kostet <b>38 €</b>. Berechne die Dachfläche und die Kosten.',fields:[F('M =',32.02,'m²'),F('Kosten =',1216.59,'€')],
+    hints:['Dachfläche = Mantelfläche M = 2 · a · h<sub>s</sub>','Kosten = M · 38 €'],
+    sol:['M = 2 · 5 · 3,20 ≈ <b>32,02 m²</b>','Kosten = 32,02 · 38 € ≈ <b>1 216,59 €</b>']},
+   {q:'Wie groß ist der Luftraum unter dem Dach (Volumen der Pyramide)?',fields:[F('V =',16.67,'m³')],
+    hints:['V = ⅓ · a² · h – hier mit der Körperhöhe h = 2 m!'],sol:['V = ⅓ · 5² · 2 ≈ <b>16,67 m³</b>']}]},
+ {t:'Aufgabe 3: Das Streusalzlager',pts:'ca. 10 Punkte',
+  intro:'Im Bauhof der Stadt liegt Streusalz in Form eines Kegels. Der Haufen hat am Boden einen <b>Durchmesser von 8 m</b> und ist <b>3 m</b> hoch. 1 m³ Streusalz wiegt <b>1,2 t</b>.',
+  fig:()=>drawCone(4,3,{r:'r = 4 m',h:'3 m'},320,220),
+  parts:[
+   {q:'Berechne das Volumen und die Masse des Salzhaufens.',fields:[F('V =',50.27,'m³'),F('Masse =',60.32,'t')],
+    hints:['r = 4 m, &nbsp; V = ⅓ · π · r² · h','Masse = V · 1,2 t'],
+    sol:['V = ⅓ · π · 4² · 3 ≈ <b>50,27 m³</b>','Masse = 50,27 · 1,2 ≈ <b>60,32 t</b>']},
+   {q:'Der Haufen wird mit einer Plane abgedeckt (nur Mantel). Wie groß muss die Plane mindestens sein?',fields:[F('s =',5,'m'),F('M =',62.83,'m²')],
+    hints:['Zuerst die Mantellinie: s² = r² + h² = 4² + 3²','M = π · r · s'],
+    sol:['s = √(16 + 9) = <b>5 m</b>','M = π · 4 · 5 ≈ <b>62,83 m²</b>']},
+   {q:'Ein Lkw kann höchstens <b>12 t</b> laden. Wie viele Fahrten braucht man, um das ganze Salz abzutransportieren?',fields:[{l:'Fahrten =',a:6,tol:0}],
+    hints:['60,32 t : 12 t ≈ 5,03','Ein Rest bleibt übrig – dafür braucht man noch eine Fahrt.'],
+    sol:['60,32 : 12 ≈ 5,03','Fünf Fahrten reichen nicht → <b>6 Fahrten</b>']}]},
+ {t:'Aufgabe 4: Das Futtersilo',pts:'ca. 10 Punkte',
+  intro:'Ein Futtersilo besteht aus einem Zylinder (<b>r = 2 m</b>, <b>h = 6 m</b>) mit einem kegelförmigen Auslauf darunter (Höhe <b>1,5 m</b>, gleicher Radius).',
+  fig:()=>drawSilo(2,6,1.5),
+  parts:[
+   {q:'Berechne das Gesamtvolumen des Silos.',fields:[F('V<sub>Zyl</sub> =',75.40,'m³'),F('V<sub>Kegel</sub> =',6.28,'m³'),F('V<sub>ges</sub> =',81.68,'m³')],
+    hints:['Zusammengesetzter Körper: Volumen einzeln berechnen und addieren.','V<sub>Zyl</sub> = π · 2² · 6, &nbsp; V<sub>Kegel</sub> = ⅓ · π · 2² · 1,5'],
+    sol:['V<sub>Zyl</sub> = π · 4 · 6 ≈ 75,40 m³','V<sub>Kegel</sub> = ⅓ · π · 4 · 1,5 ≈ 6,28 m³','V<sub>ges</sub> ≈ <b>81,68 m³</b>']},
+   {q:'Das Silo ist zu <b>80 %</b> gefüllt. Wie viel m³ Futter sind darin?',fields:[F('Futter =',65.35,'m³')],
+    hints:['80 % = 0,8'],sol:['0,8 · 81,68 ≈ <b>65,35 m³</b>']},
+   {q:'Die Außenwand (Zylindermantel und Kegelmantel, ohne Deckel) wird gestrichen. Berechne die Fläche.',fields:[F('s =',2.5,'m'),F('Fläche =',91.11,'m²')],
+    hints:['Kegel: s² = 2² + 1,5²','Fläche = 2 · π · r · h + π · r · s'],
+    sol:['s = √(4 + 2,25) = <b>2,5 m</b>','M<sub>Zyl</sub> = 2 · π · 2 · 6 ≈ 75,40 m², &nbsp; M<sub>Kegel</sub> = π · 2 · 2,5 ≈ 15,71 m²','Fläche ≈ <b>91,11 m²</b>']}]}
+];
+SA.forEach(sa=>{const box=document.createElement('div');box.className='sa';
+ box.innerHTML=`<h3>${sa.t}<span class="pts">${sa.pts}</span></h3><p>${sa.intro}</p><div style="max-width:360px">${sa.fig()}</div><div class="parts"></div>`;
+ $('x5').appendChild(box);sa.parts.forEach((p,i)=>renderEx(p,box.querySelector('.parts'),String.fromCharCode(97+i)+')'))});
+
+show((location.hash.slice(1)&&$(location.hash.slice(1)))?location.hash.slice(1):'start');
+</script>
+</body>
+</html>
