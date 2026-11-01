@@ -58,6 +58,7 @@ const KLASSEN = {
         typ: "Training",
         link: "funktionaler-zusammenhang.html",
         themen: [
+          { id: "pruef-strat",   titel: "Was ist zu tun? Anwendungsaufgaben richtig anpacken", link: "funktionaler-zusammenhang.html#strategie",  art: "Strategie" , ap: true },
           { id: "pruef-funk",    titel: "Prüfungsaufgaben zu Parabeln und Geraden", link: "quadratische_funktionen.html#s5",           art: "Prüfung" , ap: true },
           { id: "pruef-ap2025",  titel: "AP 2025: Torbogen mit Skywalk",            link: "funktionaler-zusammenhang.html#ap2025-torbogen", art: "Abschlussprüfung" , ap: true },
           { id: "pruef-ap2024",  titel: "AP 2024: Minigolf mit Fangnetz",           link: "funktionaler-zusammenhang.html#ap2024-minigolf", art: "Abschlussprüfung" , ap: true }
