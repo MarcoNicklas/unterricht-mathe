@@ -5,6 +5,7 @@
 
    - Jedes Thema braucht eine eindeutige id (z. B. "lin-steigung").
    - link: Pfad zur Lernseite, relativ zum Hauptordner.
+   - ap: true markiert Themen für die Seite „Abschlussprüfung“.
    - Ein Lernpaket listet nur die ids der Themen, die drankommen.
    ===================================================================== */
 
@@ -33,7 +34,7 @@ const KLASSEN = {
           { id: "lin-schnitt",  titel: "Lage zweier Geraden & Schnittpunkt",                    link: "lineare_funktionen.html#9",  art: "Erklärung" },
           { id: "lin-alltag",   titel: "Lineare Funktionen im Alltag",                          link: "lineare_funktionen.html#10", art: "Erklärung" },
           { id: "lin-ueben",    titel: "Übungen: m, t, Steigung, Nullstellen, Schnittpunkt",    link: "lineare_funktionen.html#11", art: "Übungen" },
-          { id: "lin-sach",     titel: "Sachaufgaben: Kfz-Werkstatt & Tankinhalt",              link: "lineare_funktionen.html#18", art: "Sachaufgaben" },
+          { id: "lin-sach",     titel: "Sachaufgaben: Kfz-Werkstatt & Tankinhalt",              link: "lineare_funktionen.html#18", art: "Sachaufgaben" , ap: true },
           { id: "lin-kurz",     titel: "Das Wichtigste auf einen Blick",                        link: "lineare_funktionen.html#20", art: "Zusammenfassung" }
         ]
       },
@@ -57,9 +58,9 @@ const KLASSEN = {
         typ: "Training",
         link: "funktionaler-zusammenhang.html",
         themen: [
-          { id: "pruef-funk",    titel: "Prüfungsaufgaben zu Parabeln und Geraden", link: "quadratische_funktionen.html#s5",           art: "Prüfung" },
-          { id: "pruef-ap2025",  titel: "AP 2025: Torbogen mit Skywalk",            link: "funktionaler-zusammenhang.html#ap2025-torbogen", art: "Abschlussprüfung" },
-          { id: "pruef-ap2024",  titel: "AP 2024: Minigolf mit Fangnetz",           link: "funktionaler-zusammenhang.html#ap2024-minigolf", art: "Abschlussprüfung" }
+          { id: "pruef-funk",    titel: "Prüfungsaufgaben zu Parabeln und Geraden", link: "quadratische_funktionen.html#s5",           art: "Prüfung" , ap: true },
+          { id: "pruef-ap2025",  titel: "AP 2025: Torbogen mit Skywalk",            link: "funktionaler-zusammenhang.html#ap2025-torbogen", art: "Abschlussprüfung" , ap: true },
+          { id: "pruef-ap2024",  titel: "AP 2024: Minigolf mit Fangnetz",           link: "funktionaler-zusammenhang.html#ap2024-minigolf", art: "Abschlussprüfung" , ap: true }
         ]
       },
       {
@@ -75,7 +76,7 @@ const KLASSEN = {
           { id: "dz-ereig",  titel: "Ereignisse und Gegenereignis",                                      link: "daten-und-zufall.html#k4", art: "Kapitel 4" },
           { id: "dz-baum",   titel: "Baumdiagramm und Pfadregeln",                                       link: "daten-und-zufall.html#k5", art: "Kapitel 5" },
           { id: "dz-urne",   titel: "Mit und ohne Zurücklegen",                                          link: "daten-und-zufall.html#k6", art: "Kapitel 6" },
-          { id: "dz-train",  titel: "Training und Übersicht",                                            link: "daten-und-zufall.html#training", art: "Training" }
+          { id: "dz-train",  titel: "Training und Übersicht",                                            link: "daten-und-zufall.html#training", art: "Training" , ap: true }
         ]
       }
     ]

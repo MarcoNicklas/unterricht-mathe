@@ -74,7 +74,36 @@ input.chk{width:20px;height:20px;accent-color:var(--green);flex:0 0 auto;cursor:
 .btn{display:inline-block;font:inherit;font-size:15px;font-weight:700;border:0;background:var(--navy);color:#fff;padding:12px 20px;border-radius:13px;text-decoration:none;cursor:pointer}
 .btn.ghost{background:#fff;color:var(--navy);border:1px solid #cdd7e3}
 .note{font-size:14px;color:var(--muted)}
-footer{max-width:1080px;margin:0 auto;padding:20px 16px 40px;font-size:12px;color:#7a8898}
+footer{max-width:1080px;margin:0 auto;padding:20px 16px 40px;font-size:12px;color:#7a8898;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 20px}
+footer a{color:#7a8898}
+footer a:hover{color:var(--navy)}
+
+/* Startseite: drei Lernwege – Farben wie die Balken im Schullogo */
+.wege{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.weg{display:flex;flex-direction:column;gap:6px;background:var(--card);border:1px solid #fff;border-top:5px solid var(--navy);border-radius:22px;padding:20px 22px;text-decoration:none;color:var(--ink);box-shadow:var(--shadow-s);transition:box-shadow .2s,transform .2s}
+.weg:hover{box-shadow:var(--shadow);transform:translateY(-3px)}
+.weg b{font-size:20px;letter-spacing:-.03em}
+.weg .d{font-size:15px;color:var(--muted)}
+.weg.w2{border-top-color:var(--yellow)} .weg.w2 .eyebrow{color:#7a6200}
+.weg.w3{border-top-color:var(--red)} .weg.w3 .eyebrow{color:var(--red)}
+section[id]{scroll-margin-top:80px}
+
+/* Baukasten für Lehrkräfte */
+.baukasten{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px;align-items:start}
+.ergebnis{position:sticky;top:90px}
+.form label{display:block;font-size:13px;font-weight:600;margin:16px 0 6px}
+.form label:first-child{margin-top:0}
+.form input,.form select,.form textarea,#b-link{width:100%;font:inherit;font-size:15px;border:1px solid #cdd7e3;background:#f8fafc;border-radius:13px;padding:11px 13px;color:var(--ink)}
+.form textarea{resize:vertical}
+.form input:focus,.form select:focus,.form textarea:focus{outline:3px solid var(--ring);border-color:transparent}
+.themen label{flex:1;cursor:pointer}
+.btn.klein{padding:6px 12px;font-size:13px}
+.merke-t{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--navy);margin-bottom:10px}
+#b-link{font-size:13px;color:var(--muted)}
+.knoepfe{display:flex;gap:8px;margin:10px 0 14px;flex-wrap:wrap}
+.qr{display:flex;justify-content:center;padding:12px;background:#fff;border-radius:13px;border:1px solid var(--line)}
+.qr img,.qr canvas{max-width:100%;height:auto}
+@media (max-width:860px){.baukasten{grid-template-columns:1fr}.ergebnis{position:static}}
 
 @media (max-width:640px){
   header{padding:8px 16px}

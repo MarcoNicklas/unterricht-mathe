@@ -6,7 +6,7 @@
 <title>Mathe Wirtschaftsschule – Lernseite</title>
 <meta name="theme-color" content="#123b73">
 <link rel="icon" href="assets/schullogo.png">
-<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/style.css?v=2">
 </head>
 <body>
 <header><a class="logo" href="index.html"><img src="assets/schullogo.png" width="462" height="110" alt="Staatliches Berufliches Schulzentrum Altmühlfranken"><span>Mathe · Wirtschaftsschule</span></a></header>
@@ -17,21 +17,33 @@
     <p>Alle Lerninhalte von der 6. bis zur 11. Klasse – zur Vorbereitung auf Schulaufgaben und die Abschlussprüfung.</p>
   </section>
 
-  <div class="card merke">
-    <div class="t">So arbeitest du mit der Lernseite</div>
-    <p>Wähle deine Jahrgangsstufe und arbeite die Lerninhalte der Reihe nach durch. In jedem Kapitel gibt es eine
-    Erklärung, ein durchgerechnetes Beispiel, ein interaktives Schaubild und Übungsaufgaben. Gib deine Ergebnisse ein
-    und klicke auf <b>Prüfen</b>. Wenn du nicht weiterkommst: erst <b>Hinweis</b>, dann <b>Lösung</b>.</p>
-    <p>Vor einer Schulaufgabe bekommst du von deiner Lehrkraft ein <b>Lernpaket</b> mit genau den Themen, die drankommen.
-    Hake erledigte Themen ab – dein Fortschritt wird nur auf deinem Gerät gespeichert.</p>
+  <h2>Was möchtest du tun?</h2>
+  <div class="wege">
+    <a class="weg w1" href="#lernen"><span class="eyebrow">Lernen</span><b>Thema lernen</b>
+      <span class="d">Ein Thema Schritt für Schritt erarbeiten – mit Erklärung, Beispiel und Übungen.</span></a>
+    <a class="weg w2" href="#schulaufgabe"><span class="eyebrow">Schulaufgabe</span><b>Schulaufgabe vorbereiten</b>
+      <span class="d">Ein Lernpaket mit genau den Themen, die drankommen – und einer Checkliste.</span></a>
+    <a class="weg w3" href="pruefung.html"><span class="eyebrow">Abschlussprüfung</span><b>Für die Prüfung trainieren</b>
+      <span class="d">Echte Abschlussprüfungen und Sachaufgaben im Prüfungsstil mit gestuften Tipps.</span></a>
   </div>
 
-  <h2>Jahrgangsstufen</h2>
-  <div class="tiles" id="klassen"></div>
+  <section id="lernen">
+    <h2>Thema lernen</h2>
+    <p class="lead">Wähle deine Jahrgangsstufe. In jedem Kapitel gibt es eine Erklärung, ein durchgerechnetes Beispiel und
+    Übungen: Ergebnis eingeben, <b>Prüfen</b> klicken – wenn du nicht weiterkommst, erst <b>Hinweis</b>, dann <b>Lösung</b>.</p>
+    <div class="tiles" id="klassen"></div>
+  </section>
+
+  <section id="schulaufgabe">
+    <h2>Schulaufgabe vorbereiten</h2>
+    <p class="lead">Vor einer Schulaufgabe bekommst du von deiner Lehrkraft einen Link oder QR-Code zu deinem Lernpaket.
+    Hake erledigte Themen ab – dein Fortschritt wird nur auf deinem Gerät gespeichert.</p>
+    <div id="pakete"></div>
+  </section>
 </main>
-<footer>Lernseite für den Mathematikunterricht an der Wirtschaftsschule</footer>
-<script src="assets/inhalte.js"></script>
-<script src="assets/app.js"></script>
+<footer><span>Lernseite für den Mathematikunterricht an der Wirtschaftsschule</span><a href="lehrkraefte.html">Für Lehrkräfte: Lernpaket erstellen</a></footer>
+<script src="assets/inhalte.js?v=2"></script>
+<script src="assets/app.js?v=2"></script>
 <script>startseite()</script>
 </body>
 </html>

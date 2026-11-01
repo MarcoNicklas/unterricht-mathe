@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Für Lehrkräfte – Lernpaket erstellen</title>
+<meta name="theme-color" content="#123b73">
+<link rel="icon" href="assets/schullogo.png">
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/style.css?v=2">
+</head>
+<body>
+<header><a class="logo" href="index.html"><img src="assets/schullogo.png" width="462" height="110" alt="Staatliches Berufliches Schulzentrum Altmühlfranken"><span>Mathe · Wirtschaftsschule</span></a><nav><a href="index.html">Alle Klassen</a></nav></header>
+<main id="bk">
+  <div class="crumbs"><a href="index.html">Start</a> › Für Lehrkräfte</div>
+  <div class="eyebrow">Für Lehrkräfte</div>
+  <h1>Lernpaket erstellen</h1>
+  <p class="lead">Themen anhaken, Titel und Termin eintragen – fertig. Den Link oder QR-Code bekommen die Schülerinnen und
+  Schüler, z.&nbsp;B. nach einer Stunde, vor einer Schulaufgabe oder zur Wiederholung. Nichts wird gespeichert oder hochgeladen:
+  das ganze Paket steckt im Link.</p>
+
+  <div class="baukasten">
+    <div>
+      <div class="card form">
+        <label for="b-klasse">Jahrgangsstufe</label>
+        <select id="b-klasse"></select>
+        <label for="b-titel">Titel</label>
+        <input id="b-titel" placeholder="z. B. V10 · Schulaufgabe Funktionen oder Wiederholung Steigung">
+        <label for="b-datum">Termin der Schulaufgabe <span class="note">(optional)</span></label>
+        <input id="b-datum" type="date">
+        <label for="b-hinweis">Hinweis für die Klasse <span class="note">(optional)</span></label>
+        <input id="b-hinweis" placeholder="z. B. Taschenrechner und Merkhilfe erlaubt">
+        <label for="b-check">Checkliste „Das musst du können“ <span class="note">(optional, eine Zeile pro Punkt)</span></label>
+        <textarea id="b-check" rows="4" placeholder="Ich kann die Steigung aus zwei Punkten berechnen."></textarea>
+        <p class="note">Bitte keine Namen von Schülerinnen und Schülern eintragen – für einzelne Schüler lieber einen Code verwenden.</p>
+      </div>
+      <h2>Themen auswählen <span class="note" id="b-anzahl"></span></h2>
+      <div id="b-themen"></div>
+    </div>
+
+    <aside class="ergebnis">
+      <div class="card">
+        <div class="merke-t">Link für die Klasse</div>
+        <p class="note" id="b-leer">Wähle mindestens ein Thema aus.</p>
+        <div id="b-ergebnis" hidden>
+          <input id="b-link" readonly aria-label="Link zum Lernpaket">
+          <div class="knoepfe">
+            <button type="button" class="btn" id="b-kopieren">Link kopieren</button>
+            <a class="btn ghost" id="b-oeffnen" target="_blank" rel="noopener">Vorschau</a>
+          </div>
+          <div id="b-qr" class="qr" aria-label="QR-Code zum Lernpaket"></div>
+          <p class="note">QR-Code zum Beispiel am Beamer zeigen oder aufs Arbeitsblatt drucken.</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+</main>
+<footer><span>Lernseite für den Mathematikunterricht an der Wirtschaftsschule</span><a href="index.html">Zur Startseite</a></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="assets/inhalte.js?v=2"></script>
+<script src="assets/app.js?v=2"></script>
+<script>baukasten()</script>
+</body>
+</html>
