@@ -1,48 +1,62 @@
-/* Gemeinsames Design – Farben wie in den Lern-Apps (quadratische_funktionen.html) */
-:root{--bg:#f5f6fa;--card:#fff;--ink:#1d2433;--muted:#5b6475;--line:#dfe3ec;--blue:#2457d6;--blue-s:#e8eefc;
---green:#12805c;--green-s:#e3f5ee;--orange:#d9620b;--orange-s:#fdf0e5;--red:#c62f3b;--red-s:#fbe9eb;--purple:#7a3fc4}
+/* Gemeinsames Design – angelehnt an den Schulwegweiser (wirtschaftsschule-3d) */
+:root{--bg:#f2f5f9;--card:#ffffffed;--ink:#172d48;--muted:#64738a;--line:#e1e8f0;--navy:#163f78;--navy-s:#e7eef8;
+--green:#347056;--green-s:#e4f0e8;--yellow:#f2c500;--yellow-s:#fdf6d8;--red:#c62f3b;--ring:#bbd6fa;
+--shadow:0 24px 80px #163f7817;--shadow-s:0 6px 24px #163f780f}
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;font-size:17px;line-height:1.5}
-a{color:var(--blue)}
-header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:10px 20px;gap:12px}
-header .logo{font-weight:700;font-size:19px;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:8px}
-header .logo::before{content:"";width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,var(--blue),var(--purple))}
-header nav a{color:var(--muted);text-decoration:none;font-size:15px;margin-left:16px}
-header nav a:hover{color:var(--blue)}
-main{padding:28px 16px 80px;max-width:1080px;margin:0 auto}
-.crumbs{font-size:14px;color:var(--muted);margin-bottom:6px}
-.crumbs a{color:var(--muted)}
-h1{font-size:32px;margin:0 0 4px;line-height:1.2}
-h2{font-size:22px;margin:32px 0 10px}
-.lead{color:var(--muted);margin:0 0 20px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin:14px 0;box-shadow:0 1px 4px rgba(20,30,60,.04)}
-.merke{border-left:6px solid var(--blue);background:var(--blue-s)}
-.merke .t{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);margin-bottom:4px}
-.merke p{margin:4px 0}
+html,body{margin:0;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;font-size:17px;line-height:1.55}
+body{min-height:100svh;background:radial-gradient(ellipse at 15% 0%,#ccdfef,transparent 55%),radial-gradient(ellipse at 90% 100%,#deedc7,transparent 55%),var(--bg);background-attachment:fixed}
+a{color:var(--navy)}
+:focus-visible{outline:3px solid var(--ring);outline-offset:2px;border-radius:6px}
 
-/* Kacheln (Klassen, Lernbereiche) */
-.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
-.tile{display:block;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;text-decoration:none;color:var(--ink);transition:border-color .15s,transform .15s}
-a.tile:hover{border-color:var(--blue);transform:translateY(-2px)}
-.tile .tag{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--green-s);color:var(--green);margin-bottom:8px}
-.tile .tag.o{background:var(--orange-s);color:var(--orange)}
-.tile .tag.m{background:#eef0f4;color:var(--muted)}
-.tile b{display:block;font-size:18px;margin-bottom:2px}
+header{position:sticky;top:0;z-index:5;background:#ffffffd9;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid #fff;box-shadow:0 1px 0 var(--line);display:flex;align-items:center;justify-content:space-between;padding:10px 24px;gap:12px}
+header .logo{display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--ink)}
+header .logo img{height:46px;width:auto;display:block}
+header .logo span{font-weight:700;font-size:15px;color:var(--navy);padding-left:14px;border-left:1px solid var(--line);letter-spacing:-.01em}
+header nav a{color:var(--muted);text-decoration:none;font-size:15px;font-weight:600;margin-left:18px}
+header nav a:hover{color:var(--navy)}
+
+main{padding:36px 16px 80px;max-width:1080px;margin:0 auto}
+.eyebrow{font-size:11px;letter-spacing:.16em;color:var(--green);font-weight:700;text-transform:uppercase}
+.crumbs{font-size:14px;color:var(--muted);margin-bottom:8px}
+.crumbs a{color:var(--muted)}
+h1{font-size:40px;line-height:1.05;letter-spacing:-.045em;margin:12px 0 10px}
+h2{font-size:24px;letter-spacing:-.03em;margin:40px 0 14px}
+.lead{color:var(--muted);margin:0 0 24px;max-width:62ch}
+.card{background:var(--card);border:1px solid #fff;border-radius:22px;padding:22px 26px;margin:16px 0;box-shadow:var(--shadow-s)}
+.merke{border-left:6px solid var(--navy)}
+.merke .t{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--navy);margin-bottom:6px}
+.merke p{margin:6px 0}
+
+/* Startseite: Kopfbereich */
+.hero{background:var(--card);border:1px solid #fff;border-radius:28px;padding:40px;box-shadow:var(--shadow);margin-bottom:8px}
+.hero h1{font-size:48px;margin:14px 0 12px}
+.hero p{color:var(--muted);margin:0;max-width:60ch}
+
+/* Kacheln (Klassen, Lernpakete) */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.tile{display:block;background:var(--card);border:1px solid #fff;border-radius:22px;padding:20px 22px;text-decoration:none;color:var(--ink);box-shadow:var(--shadow-s);transition:box-shadow .2s,transform .2s}
+a.tile:hover{box-shadow:var(--shadow);transform:translateY(-3px)}
+.tile .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:999px;background:var(--green-s);color:var(--green);margin-bottom:10px}
+.tile .tag.o{background:var(--yellow-s);color:#7a6200}
+.tile .tag.m{background:#eef1f5;color:var(--muted)}
+.tile b{display:block;font-size:19px;letter-spacing:-.02em;margin-bottom:2px}
 .tile span.d{font-size:14px;color:var(--muted)}
-.tile.off{opacity:.55}
-.tile .big{font-size:40px;font-weight:800;line-height:1;color:var(--blue);margin-bottom:6px}
+.tile.off{opacity:.55;box-shadow:none}
+.tile .big{font-size:44px;font-weight:800;line-height:1;letter-spacing:-.05em;color:var(--navy);margin-bottom:8px}
 
 /* Lernbereich mit Themenliste */
-.lb{background:#fff;border:1px solid var(--line);border-radius:14px;margin:16px 0;overflow:hidden}
-.lb-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line)}
-.lb-head h3{margin:0;font-size:20px}
+.lb{background:var(--card);border:1px solid #fff;border-radius:22px;margin:18px 0;overflow:hidden;box-shadow:var(--shadow-s)}
+.lb-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:20px 24px;border-bottom:1px solid var(--line)}
+.lb-head h3{margin:2px 0 0;font-size:21px;letter-spacing:-.03em}
+.lb-head h3 a{color:var(--ink);text-decoration:none}
+.lb-head h3 a:hover{color:var(--navy);text-decoration:underline}
 .lb-head p{margin:2px 0 0;font-size:15px;color:var(--muted)}
-.lb-head .typ{font-size:12px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.05em}
-.themen{list-style:none;margin:0;padding:6px 0}
-.themen li{display:flex;align-items:center;gap:12px;padding:8px 20px}
-.themen li:hover{background:#f8f9fc}
+.lb-head .typ{font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.16em}
+.themen{list-style:none;margin:0;padding:8px 0}
+.themen li{display:flex;align-items:center;gap:12px;padding:9px 24px}
+.themen li:hover{background:#f6f9fc}
 .themen a{flex:1;text-decoration:none;color:var(--ink)}
-.themen a:hover{color:var(--blue);text-decoration:underline}
+.themen a:hover{color:var(--navy);text-decoration:underline}
 .themen .art{font-size:12px;color:var(--muted);white-space:nowrap}
 .themen li.done a{color:var(--muted);text-decoration:line-through}
 input.chk{width:20px;height:20px;accent-color:var(--green);flex:0 0 auto;cursor:pointer}
@@ -53,22 +67,24 @@ input.chk{width:20px;height:20px;accent-color:var(--green);flex:0 0 auto;cursor:
 .bar i{display:block;height:100%;background:var(--green);border-radius:99px;transition:width .3s}
 
 /* Lernpaket */
-.paket-head{border:2px solid #f3c9a5;background:#fff;border-radius:16px;padding:20px 22px;margin:10px 0 18px}
-.paket-head .count{display:inline-block;background:var(--orange-s);color:var(--orange);font-weight:700;border-radius:10px;padding:4px 12px;margin-top:8px}
-.check li{display:flex;gap:12px;align-items:flex-start;padding:6px 0}
+.paket-head{background:var(--card);border:1px solid #fff;border-left:6px solid var(--yellow);border-radius:22px;padding:22px 26px;margin:12px 0 20px;box-shadow:var(--shadow-s)}
+.paket-head .count{display:inline-block;background:var(--navy);color:#fff;font-weight:700;border-radius:13px;padding:5px 14px;margin-top:10px}
+.check li{display:flex;gap:12px;align-items:flex-start;padding:7px 0}
 .check{list-style:none;padding:0;margin:0}
-.btn{display:inline-block;font:inherit;font-size:15px;border:1px solid var(--blue);background:var(--blue);color:#fff;padding:8px 16px;border-radius:9px;text-decoration:none;cursor:pointer}
-.btn.ghost{background:#fff;color:var(--blue)}
+.btn{display:inline-block;font:inherit;font-size:15px;font-weight:700;border:0;background:var(--navy);color:#fff;padding:12px 20px;border-radius:13px;text-decoration:none;cursor:pointer}
+.btn.ghost{background:#fff;color:var(--navy);border:1px solid #cdd7e3}
 .note{font-size:14px;color:var(--muted)}
-footer{max-width:1080px;margin:0 auto;padding:20px 16px 40px;font-size:13px;color:var(--muted)}
+footer{max-width:1080px;margin:0 auto;padding:20px 16px 40px;font-size:12px;color:#7a8898}
 
 @media (max-width:640px){
-  h1{font-size:26px}
-  header{padding:10px 16px}
-  header .logo{font-size:17px}
-  header nav{display:none}
+  header{padding:8px 16px}
+  header .logo img{height:36px}
+  header .logo span,header nav{display:none}
+  h1{font-size:32px}
+  .hero{padding:26px 22px;border-radius:22px}
+  .hero h1{font-size:36px}
   .lb-head{flex-direction:column}
-  .themen li{padding:8px 14px}
+  .themen li{padding:9px 16px}
   .themen .art{display:none}
 }
-@media print{header,footer,.noprint{display:none}body{background:#fff}.lb,.card{break-inside:avoid}}
+@media print{header,footer,.noprint{display:none}body{background:#fff}.lb,.card,.paket-head{break-inside:avoid;box-shadow:none}}
