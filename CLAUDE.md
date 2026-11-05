@@ -17,6 +17,12 @@ Der Aufbau und die Pflege von Inhalten stehen in README.md.
 - Vor dem Push lokal prüfen: `python3 -m http.server 8000` → http://localhost:8000
 - Commits auf Deutsch, kurz und mit Bereich vorn („Klasse 10: …“). Pushen erst nach meinem OK.
 
+## Hochladen
+- Der Ordner `webseite/` (OneDrive, …/011_Mathewebseite/webseite) ist ein git-Checkout des Repos, Branch main.
+- Hochladen direkt mit `git add` / `git commit` / `git push`. Die Anmeldung läuft über die GitHub-CLI (`gh`, Konto MarcoNicklas).
+  Kein Upload über Chrome oder die GitHub-Webseite mehr.
+- Vorher `git pull`, falls auf github.com etwas geändert wurde.
+
 ## Stand
 - Klasse 10: lineare und quadratische Funktionen, Prüfungsaufgaben Funktionen, Raum und Form, Daten und Zufall.
 - Klassen 6–9 und 11: noch leer.

@@ -44,24 +44,13 @@ function abhaken(neuZeichnen) {
   });
 }
 
-// ---------- Startseite ----------
+// ---------- Startseite: nur Klasse wählen ----------
+const LETZTE = "mathe-ws-klasse";
 function startseite() {
-  $("#klassen").innerHTML = Object.entries(KLASSEN).map(([k, kl]) => {
-    const fertig = kl.lernbereiche.length > 0;
-    const ids = kl.lernbereiche.flatMap(lb => lb.themen.map(t => t.id));
-    return fertig
-      ? `<a class="tile" href="klasse.html?k=${k}"><div class="big">${k}</div>
-           <span class="tag">${kl.lernbereiche.length} Lernbereiche</span>
-           <b>${esc(kl.titel)}</b><span class="d">${esc(kl.untertitel || "")}</span>
-           <div style="margin-top:10px">${fortschritt(ids)}</div></a>`
-      : `<div class="tile off"><div class="big">${k}</div><span class="tag m">in Arbeit</span>
-           <b>${esc(kl.titel)}</b><span class="d">Inhalte folgen</span></div>`;
-  }).join("");
-
-  const pakete = Object.entries(PAKETE);
-  $("#pakete").innerHTML = pakete.length
-    ? `<div class="tiles">${pakete.map(([id, p]) => paketKachel(`lernpaket.html?id=${encodeURIComponent(id)}`, p)).join("")}</div>`
-    : `<div class="card">Im Moment gibt es keine offenen Lernpakete.</div>`;
+  let letzte = "";
+  try { letzte = localStorage.getItem(LETZTE) || ""; } catch {}
+  $("#klassen").innerHTML = Object.keys(KLASSEN).map(k =>
+    `<a class="klasse${k === letzte ? " zuletzt" : ""}" href="klasse.html?k=${k}"><span>Klasse</span><b>${k}</b></a>`).join("");
 }
 
 function paketKachel(href, p) {
@@ -158,32 +147,75 @@ function baukasten() {
   zeigeThemen();
 }
 
-// ---------- Klassenseite ----------
+// ---------- Klassenseite: vier Wege, je eine Ansicht (#lernen, #schulaufgabe, #pruefung) ----------
+const WEGE = [
+  { id: "lernen",       icon: "📖", titel: "Thema lernen",               d: "Erklärung, Beispiel und Übungen" },
+  { id: "schulaufgabe", icon: "📝", titel: "Schulaufgabe vorbereiten",   d: "Dein Lernpaket mit Checkliste" },
+  { id: "pruefung",     icon: "🎓", titel: "Für die Prüfung trainieren", d: "Echte Prüfungsaufgaben mit Tipps" },
+  { id: "rechentest",   icon: "⚡", titel: "Für den Rechentest trainieren", d: "10 Aufgaben ohne Taschenrechner" }
+];
+
 function klassenseite() {
   const k = new URLSearchParams(location.search).get("k");
   const kl = KLASSEN[k];
   if (!kl) { $("main").innerHTML = `<h1>Klasse nicht gefunden</h1><p><a href="index.html">Zur Startseite</a></p>`; return; }
-  document.title = `${kl.titel} – Mathe Wirtschaftsschule`;
-  $("#titel").textContent = kl.titel;
-  $("#untertitel").textContent = kl.untertitel || "";
-  $("#crumb").textContent = kl.titel;
+  try { localStorage.setItem(LETZTE, k); } catch {}
 
-  const pakete = Object.entries(PAKETE).filter(([, p]) => p.klasse === k);
-  $("#pakete").innerHTML = pakete.length
-    ? `<h2>Lernpakete für Schulaufgaben</h2><div class="tiles">${pakete.map(([id, p]) =>
-        paketKachel(`lernpaket.html?id=${encodeURIComponent(id)}`, p)).join("")}</div>`
-    : "";
+  const leer = text => `<div class="card leer">${text}</div>`;
+  const bereichListe = (bereiche) => bereiche.map(lb => `<details class="bereich">
+      <summary><span><b>${esc(lb.titel)}</b><small>${esc(lb.beschreibung || "")}</small></span>${fortschritt(lb.themen.map(t => t.id))}</summary>
+      <a class="btn voll" href="${esc(lb.link)}">${esc(lb.titel)} öffnen</a>
+      <ul class="themen">${lb.themen.map(themaZeile).join("")}</ul></details>`).join("");
+
+  const ansichten = {
+    lernen: () => kl.lernbereiche.length
+      ? `<p class="lead">Tippe auf ein Thema. Erledigtes kannst du abhaken.</p>${bereichListe(kl.lernbereiche)}`
+      : leer(`Für Klasse ${esc(k)} gibt es hier bald Lernthemen.<br>Bis dahin: <a href="rechentest.html?k=${esc(k)}">Für den Rechentest trainieren</a>.`),
+
+    schulaufgabe: () => {
+      const pakete = Object.entries(PAKETE).filter(([, p]) => p.klasse === k);
+      return (pakete.length ? `<div class="liste">${pakete.map(([id, p]) => `<a class="zeile" href="lernpaket.html?id=${encodeURIComponent(id)}">
+          <b>${esc(p.titel)}</b><small>${p.datum ? "Termin: " + datumText(p.datum) : ""}</small></a>`).join("")}</div>` : "")
+        + leer(`Vor jeder Schulaufgabe bekommst du von deiner Lehrkraft einen <b>Link</b> oder <b>QR-Code</b> zu deinem Lernpaket.
+          Darin steht genau, was drankommt.`);
+    },
+
+    pruefung: () => {
+      const eigene = kl.lernbereiche.flatMap(lb => lb.themen.filter(t => t.ap));
+      if (eigene.length) return `<p class="lead">Rechne zuerst selbst auf Papier – Tipps erst holen, wenn du feststeckst.</p>
+        <div class="card"><ul class="themen">${eigene.map(themaZeile).join("")}</ul></div>`;
+      const alle = Object.values(alleThemen).filter(t => t.ap);
+      return leer(`Die Abschlussprüfung schreibst du am Ende der Wirtschaftsschule. Wenn du schon reinschauen willst:`)
+        + (alle.length ? `<div class="card"><ul class="themen">${alle.map(themaZeile).join("")}</ul></div>` : "");
+    }
+  };
 
   const zeichne = () => {
-    $("#bereiche").innerHTML = kl.lernbereiche.length
-      ? kl.lernbereiche.map(lb => `<div class="lb">
-          <div class="lb-head"><div><div class="typ">${esc(lb.typ)}</div><h3><a href="${esc(lb.link)}">${esc(lb.titel)}</a></h3>
-          <p>${esc(lb.beschreibung)}</p></div>${fortschritt(lb.themen.map(t => t.id))}</div>
-          <ul class="themen">${lb.themen.map(themaZeile).join("")}</ul></div>`).join("")
-      : `<div class="card">Für diese Jahrgangsstufe gibt es noch keine Inhalte.</div>`;
+    const ansicht = location.hash.slice(1);
+    const weg = WEGE.find(w => w.id === ansicht && ansichten[w.id]);
+    if (weg) {
+      document.title = `${weg.titel} · Klasse ${k}`;
+      $("#zurueck").textContent = `← Klasse ${k}`;
+      $("#zurueck").href = `klasse.html?k=${k}`;
+      $("#titel").innerHTML = `<span class="icon">${weg.icon}</span> ${esc(weg.titel)}`;
+      $("#inhalt").innerHTML = ansichten[weg.id]();
+    } else {
+      document.title = `Klasse ${k} – Mathe Wirtschaftsschule`;
+      $("#zurueck").textContent = "← Andere Klasse";
+      $("#zurueck").href = "index.html";
+      $("#titel").textContent = `Klasse ${k}`;
+      $("#inhalt").innerHTML = `<p class="lead">Was möchtest du tun?</p><div class="wahl">${WEGE.map(w => `<a class="weg-knopf ${w.id}"
+        href="${w.id === "rechentest" ? `rechentest.html?k=${k}` : "#" + w.id}"><span class="icon">${w.icon}</span>
+        <span><b>${w.titel}</b><small>${w.d}</small></span><span class="pfeil">›</span></a>`).join("")}</div>`;
+    }
   };
   zeichne();
-  abhaken(zeichne);
+  addEventListener("hashchange", () => { zeichne(); scrollTo(0, 0); });
+  abhaken(() => {
+    const offen = [...document.querySelectorAll("details.bereich")].map(d => d.open);
+    zeichne();
+    document.querySelectorAll("details.bereich").forEach((d, i) => d.open = offen[i]);
+  });
 }
 
 // ---------- Lernpaket ----------

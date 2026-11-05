@@ -6,8 +6,10 @@ Lernseite für Mathematik an der Wirtschaftsschule (Jahrgangsstufen 6–11), geh
 
 | Datei | Zweck |
 |---|---|
-| `index.html` | Startseite mit allen Jahrgangsstufen |
-| `klasse.html?k=10` | Alle Lerninhalte einer Jahrgangsstufe, mit Abhaken |
+| `index.html` | Startseite: nur die Klassenwahl (6–11) |
+| `klasse.html?k=10` | Vier Wege: Thema lernen (`#lernen`), Schulaufgabe (`#schulaufgabe`), Prüfung (`#pruefung`), Rechentest |
+| `rechentest.html?k=8` | Rechentest-Training: 10 zufällige Kopfrechenaufgaben je Stufe (Klasse 10: `&z=v` oder `&z=z`) |
+| `assets/rechentest.js` | Aufgabenarten und Stufen des Rechentests (V6, V7, V8, V9/Z10, V10/Z11) |
 | `lernpaket.html?id=v10-sa1` | Individuelles Lernpaket für eine Schulaufgabe |
 | `pruefung.html` | Abschlussprüfung: alle Themen mit `ap: true` |
 | `lehrkraefte.html` | Baukasten: Lernpaket per Häkchen erstellen, Link + QR-Code |

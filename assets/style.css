@@ -117,3 +117,88 @@ section[id]{scroll-margin-top:80px}
   .themen .art{display:none}
 }
 @media print{header,footer,.noprint{display:none}body{background:#fff}.lb,.card,.paket-head{break-inside:avoid;box-shadow:none}}
+
+/* ===== Einfache Schüler-Navigation (v3): Klasse → Weg → Inhalt ===== */
+main.schmal{max-width:620px;padding-top:22px}
+.start-h1{font-size:34px;margin:8px 0 4px}
+.lead{font-size:17px}
+.zurueck{display:inline-block;font-size:15px;font-weight:700;text-decoration:none;color:var(--navy);padding:8px 0}
+.icon{display:inline-grid;place-items:center}
+h1 .icon{font-size:.8em;margin-right:2px}
+
+/* Klassenwahl: 3 große Knöpfe pro Zeile */
+.klassen{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.klasse{display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:1/0.85;background:var(--card);border:1px solid #fff;border-radius:22px;text-decoration:none;color:var(--navy);box-shadow:var(--shadow-s);transition:transform .15s,box-shadow .15s}
+.klasse span{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+.klasse b{font-size:46px;line-height:1;letter-spacing:-.04em}
+.klasse:hover,.klasse:active{transform:translateY(-2px);box-shadow:var(--shadow)}
+.klasse.zuletzt{outline:3px solid var(--ring)}
+
+/* Vier Wege als große Zeilen */
+.wahl{display:flex;flex-direction:column;gap:12px}
+.weg-knopf{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid #fff;border-left:6px solid var(--navy);border-radius:18px;padding:16px 16px;text-decoration:none;color:var(--ink);box-shadow:var(--shadow-s);transition:transform .15s,box-shadow .15s}
+.weg-knopf:hover,.weg-knopf:active{transform:translateY(-2px);box-shadow:var(--shadow)}
+.weg-knopf .icon{font-size:26px;width:44px;height:44px;border-radius:12px;background:var(--navy-s);flex:0 0 auto;font-weight:800;color:var(--navy)}
+.weg-knopf b{display:block;font-size:18px;letter-spacing:-.02em}
+.weg-knopf small{display:block;font-size:14px;color:var(--muted)}
+.weg-knopf > span:nth-child(2){flex:1}
+.weg-knopf .pfeil{font-size:28px;color:var(--muted)}
+.weg-knopf.schulaufgabe{border-left-color:var(--yellow)}
+.weg-knopf.pruefung{border-left-color:var(--red)}
+.weg-knopf.rechentest{border-left-color:var(--green)}
+.leer{color:var(--ink)}
+.liste{display:flex;flex-direction:column;gap:10px;margin-bottom:6px}
+.zeile{display:block;background:var(--card);border:1px solid #fff;border-left:6px solid var(--yellow);border-radius:16px;padding:14px 16px;text-decoration:none;color:var(--ink);box-shadow:var(--shadow-s)}
+.zeile small{display:block;color:var(--muted)}
+.btn.voll{display:block;width:100%;text-align:center}
+.btn.gross{font-size:18px;padding:16px;margin-top:18px}
+
+/* Lernbereiche aufklappbar */
+.bereich{background:var(--card);border:1px solid #fff;border-radius:18px;margin:12px 0;box-shadow:var(--shadow-s);overflow:hidden}
+.bereich summary{list-style:none;cursor:pointer;display:flex;flex-direction:column;gap:8px;padding:16px 18px}
+.bereich summary::-webkit-details-marker{display:none}
+.bereich summary b{display:block;font-size:18px;letter-spacing:-.02em}
+.bereich summary b::after{content:" ▾";color:var(--muted);font-size:14px}
+.bereich[open] summary b::after{content:" ▴"}
+.bereich summary small{display:block;font-size:14px;color:var(--muted)}
+.bereich > .btn{margin:0 18px 6px;width:auto}
+.card .themen li{padding:9px 4px}
+
+/* Rechentest */
+.rt-leiste{position:sticky;top:66px;z-index:4;display:flex;justify-content:space-between;gap:10px;background:var(--navy);color:#fff;font-weight:700;font-size:15px;border-radius:14px;padding:10px 16px;margin:6px 0 10px;box-shadow:var(--shadow-s)}
+.aufgaben{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+.aufgabe{display:flex;gap:12px;background:var(--card);border:1px solid #fff;border-radius:18px;padding:14px 16px;box-shadow:var(--shadow-s)}
+.aufgabe .nr{flex:0 0 30px;height:30px;border-radius:50%;background:var(--navy-s);color:var(--navy);font-weight:800;display:grid;place-items:center;font-size:15px}
+.aufgabe .inh{flex:1;min-width:0}
+.frage{font-size:21px;font-weight:600;line-height:1.5}
+.frage.text{font-size:17px;font-weight:500}
+.antwort{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:21px;font-weight:600}
+.antwort input{font:inherit;font-size:20px;width:100%;max-width:200px;border:2px solid #cdd7e3;background:#fff;border-radius:12px;padding:8px 12px;color:var(--ink)}
+.antwort input:focus{outline:none;border-color:var(--navy)}
+.einheit{font-size:18px;color:var(--muted)}
+.pm{font:inherit;font-size:20px;font-weight:700;width:42px;height:44px;flex:0 0 auto;border:2px solid #cdd7e3;background:#f4f7fb;border-radius:12px;color:var(--navy);cursor:pointer}
+.br{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.15;margin:0 3px;font-size:.9em}
+.br span:first-child{border-bottom:2px solid currentColor;padding:0 3px}
+.br-ein{display:inline-flex;flex-direction:column;gap:4px}
+.br-ein input{width:90px;text-align:center;padding:5px 8px}
+.br-ein input:first-child{border-bottom-width:4px;border-bottom-color:var(--ink)}
+.optionen{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.optionen label{display:flex;align-items:center;gap:10px;border:2px solid #cdd7e3;background:#fff;border-radius:12px;padding:10px 12px;cursor:pointer;font-size:17px}
+.optionen label:has(input:checked){border-color:var(--navy);background:var(--navy-s)}
+.optionen input{width:20px;height:20px;accent-color:var(--navy)}
+.rueck{font-size:15px;margin-top:6px}
+.rueck:empty{display:none}
+.aufgabe.richtig{border-color:#9fd0b2;background:var(--green-s)}
+.aufgabe.richtig .rueck{color:var(--green);font-weight:700}
+.aufgabe.fehler{border-color:#f1b9be;background:#fdeeee}
+.aufgabe.fehler .rueck{color:#8f1f28}
+.punkte{text-align:center}
+.punkte .zahl{font-size:48px;font-weight:800;color:var(--navy);letter-spacing:-.04em;line-height:1.1}
+.punkte .btn{margin-top:12px}
+@media (max-width:640px){
+  main.schmal{padding-top:14px}
+  .rt-leiste{top:54px}
+  .klassen{gap:10px}
+  .klasse b{font-size:40px}
+}
+#ergebnis{scroll-margin-top:130px}
