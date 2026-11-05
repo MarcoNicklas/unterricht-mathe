@@ -253,7 +253,7 @@ function lernpaket() {
   if (!p) { $("main").innerHTML = `<h1>Lernpaket nicht gefunden</h1><p>Prüfe den Link oder frag deine Lehrkraft.</p><p><a href="index.html">Zur Startseite</a></p>`; return; }
   document.title = `${p.titel} – Lernpaket`;
   const kl = KLASSEN[p.klasse];
-  $("#crumbs").innerHTML = `<a href="index.html">Start</a> › ${kl ? `<a href="klasse.html?k=${esc(p.klasse)}">${esc(kl.titel)}</a> › ` : ""}Lernpaket`;
+  $("#crumbs").innerHTML = kl ? `<a class="zurueck" href="klasse.html?k=${esc(p.klasse)}#schulaufgabe">← Klasse ${esc(p.klasse)}</a>` : `<a class="zurueck" href="index.html">← Start</a>`;
   $("#titel").textContent = p.titel;
 
   let termin = "";
@@ -265,20 +265,22 @@ function lernpaket() {
   $("#kopf").innerHTML = `${termin}${p.hinweis ? `<p style="margin:10px 0 0">${esc(p.hinweis)}</p>` : ""}`;
   $("#kopf").hidden = !termin && !p.hinweis;
 
-  const themen = p.themen.map(t => alleThemen[t]).filter(Boolean);
-  const checkIds = (p.checkliste || []).map((_, i) => `${id}#kann${i}`);
+  // EINE Liste: pro Thema der „Ich kann …“-Satz mit Link zum Üben,
+  // dazu Zusatzpunkte aus der Checkliste (ältere Links / Baukasten), die zu keinem Thema gehören.
+  const zeilen = [
+    ...p.themen.map(t => alleThemen[t]).filter(Boolean)
+      .map(t => ({ id: t.id, text: t.kann || t.titel, link: t.link, linkText: t.titel })),
+    ...(p.checkliste || []).map((c, i) => ({ id: `${id}#kann${i}`, text: c }))
+  ];
 
   const zeichne = () => {
-    $("#themen").innerHTML = `<div class="lb"><div class="lb-head"><div><h3>Das kommt dran</h3>
-      <p>Arbeite jedes Thema durch und hake es ab.</p></div>${fortschritt(themen.map(t => t.id))}</div>
-      <ul class="themen">${themen.map(themaZeile).join("")}</ul></div>`;
     const e = ladeErledigt();
-    $("#check").innerHTML = p.checkliste?.length
-      ? `<h2>Checkliste: Das musst du können</h2><div class="card"><ul class="check">${p.checkliste.map((c, i) =>
-          `<li><input type="checkbox" class="chk" data-id="${esc(checkIds[i])}" ${e.has(checkIds[i]) ? "checked" : ""} id="k${i}">
-           <label for="k${i}">${esc(c)}</label></li>`).join("")}</ul>
-           <p class="note">${fortschritt(checkIds)}</p></div>`
-      : "";
+    $("#themen").innerHTML = `<div class="card lernliste"><div class="ll-kopf"><b>Das kommt dran</b>${fortschritt(zeilen.map(z => z.id))}</div>
+      <p class="note">Übe jedes Thema. Wenn du es kannst, hake es ab.</p>
+      <ul>${zeilen.map((z, i) => `<li class="${e.has(z.id) ? "done" : ""}">
+        <input type="checkbox" class="chk" data-id="${esc(z.id)}" id="z${i}" ${e.has(z.id) ? "checked" : ""}>
+        <div><label for="z${i}">${esc(z.text)}</label>
+        ${z.link ? `<a class="ueben" href="${esc(z.link)}">📖 Üben: ${esc(z.linkText)} ›</a>` : ""}</div></li>`).join("")}</ul></div>`;
   };
   zeichne();
   abhaken(zeichne);

@@ -29,7 +29,7 @@ Lernseite für Mathematik an der Wirtschaftsschule (Jahrgangsstufen 6–11), geh
 an die Klasse geben. Das ganze Paket steckt im Link – nichts muss geändert oder hochgeladen werden.
 
 Dauerhaft auf der Startseite sichtbare Pakete: in `assets/inhalte.js` unter `PAKETE` einen Eintrag kopieren, Schlüssel ändern (z. B. `"v10-sa2"`),
-Datum, Themen-ids und Checkliste anpassen. Den Schülern dann den Link schicken:
+Datum und Themen-ids anpassen. Zu jedem Thema zeigt das Lernpaket automatisch den „Ich kann …“-Satz (`kann`) aus `KLASSEN` – eine eigene Checkliste ist nur für Zusatzpunkte nötig. Den Schülern dann den Link schicken:
 
 `https://marconicklas.github.io/unterricht-mathe/lernpaket.html?id=v10-sa2`
 
