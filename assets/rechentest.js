@@ -6,6 +6,11 @@
    Stufen (wie die Ordner der Rechentests):
      A = V6 · B = V7 · C = V8 · D = V9 / Z10 · E = V10 / Z11
    Welche Aufgabenarten in welcher Stufe vorkommen: siehe STUFEN unten.
+
+   WICHTIG: Die Aufgaben sind ähnlich wie im echten Rechentest, aber nie gleich.
+   Jede erzeugte Aufgabe wird mit allen echten Testaufgaben verglichen
+   (ECHTE_TESTS in rechentest-echt.js) und neu gewürfelt, wenn sie dieselben
+   Zahlen enthält.
    ===================================================================== */
 
 const $ = s => document.querySelector(s);
@@ -161,8 +166,8 @@ const A = {
   rabatt() {
     const p = pick([10, 20, 25, 50]), g = pick([40, 60, 80, 120, 150, 200]);
     return Math.random() < .5
-      ? { frage: `Ein Hoodie kostet ${geld(g)}. Im Sale gibt es ${p} % Rabatt. Wie viel spart man?`, loesung: g * p / 100, einheit: "€", text: true }
-      : { frage: `Mit ${p} % Rabatt spart Jana ${geld(g * p / 100)}. Was hat die Ware ursprünglich gekostet?`, loesung: g, einheit: "€", text: true };
+      ? { frage: `${pick(["Eine Jacke", "Ein Rucksack", "Ein Paar Sneaker", "Ein Kopfhörer"])} kostet ${geld(g)}. Es gibt ${p} % Rabatt. Wie viel Euro spart man?`, loesung: g * p / 100, einheit: "€", text: true }
+      : { frage: `${pick(["Ben", "Aylin", "Luca", "Mila"])} bekommt ${p} % Rabatt und spart dadurch ${geld(g * p / 100)}. Wie viel hat der Artikel vorher gekostet?`, loesung: g, einheit: "€", text: true };
   },
   geld() {
     const g = rnd(10, 19) * 5, a = rnd(4, 20) + pick([0.5, 0.25, 0, 0.75]), b = rnd(3, 20) + pick([0, 0.5]);
@@ -170,7 +175,8 @@ const A = {
   },
   dreisatz() {
     const v = pick([
-      () => { const p = pick([1.8, 2.4, 3, 1.2]), m = pick([2.5, 1.5, 0.5, 3]); return { frage: `1 kg Äpfel kostet ${geld(p)}. Wie viel kosten ${f(m * 1000)} g?`, loesung: rund(p * m), einheit: "€", text: true }; },
+      () => { const [w, p] = pick([["Trauben", 3.2], ["Kirschen", 4.8], ["Tomaten", 2.4], ["Käse", 12], ["Erdbeeren", 6]]), m = pick([0.25, 0.5, 0.75, 1.5]);
+        return { frage: `1 kg ${w} kostet ${geld(p)}. Wie viel kosten ${f(m * 1000)} g?`, loesung: rund(p * m), einheit: "€", text: true }; },
       () => { const s = pick([3, 4, 5, 6]), p = pick([2.5, 4, 1.2, 6]), n = pick([2, 7, 9, 10]); return { frage: `${s} Hefte kosten ${geld(s * p)}. Wie viel kosten ${n} Hefte?`, loesung: rund(n * p), einheit: "€", text: true }; },
       () => { const v = pick([60, 80, 90, 120]), t = pick([0.5, 1.5, 2.5, 3]); return { frage: `Ein Auto fährt ${v} km in einer Stunde. Wie weit kommt es in ${f(t)} Stunden?`, loesung: v * t, einheit: "km", text: true }; }
     ]);
@@ -206,7 +212,7 @@ const A = {
 
 // Schätzfragen: [Frage, richtige Antwort, falsch, falsch]
 const SCHAETZEN = [
-  ["Wie lang ist ein Marienkäfer?", "ca. 6 mm", "ca. 6 cm", "ca. 0,6 mm"],
+  ["Wie lang ist eine Stubenfliege?", "ca. 7 mm", "ca. 7 cm", "ca. 0,7 mm"],
   ["Wie schwer ist eine Tafel Schokolade?", "100 g", "1 kg", "10 g"],
   ["Wie viel Wasser passt in eine volle Badewanne?", "ca. 150 l", "ca. 15 l", "ca. 1.500 l"],
   ["Wie schwer ist ein Kleinwagen?", "ca. 1 t", "ca. 100 kg", "ca. 10 t"],
@@ -220,7 +226,7 @@ const SCHAETZEN = [
   ["Wie groß ist ein DIN-A4-Blatt?", "ca. 6 dm²", "ca. 6 m²", "ca. 6 cm²"],
   ["Wie viel passt in den Tank eines Autos?", "ca. 50 l", "ca. 5 l", "ca. 500 l"],
   ["Wie schwer ist ein Liter Wasser?", "1 kg", "100 g", "10 kg"],
-  ["Wie groß ist der Umfang eines Tablets?", "ca. 90 cm", "ca. 9 cm", "ca. 9 m"],
+  ["Wie groß ist der Umfang eines Fußballs?", "ca. 70 cm", "ca. 7 cm", "ca. 7 m"],
   ["Wie hoch ist eine Zimmertür?", "ca. 2 m", "ca. 4 m", "ca. 80 cm"],
   ["Wie schwer ist ein Schulranzen mit Büchern?", "ca. 5 kg", "ca. 500 g", "ca. 50 kg"],
   ["Wie lang ist ein Bus im Stadtverkehr?", "ca. 12 m", "ca. 4 m", "ca. 40 m"]
@@ -236,6 +242,29 @@ const STUFEN = {
 };
 function stufeFuer(klasse, zweig) {
   return { "6": "A", "7": "B", "8": "C", "9": "D", "11": "E" }[klasse] || (klasse === "10" ? (zweig === "z" ? "D" : zweig === "v" ? "E" : null) : null);
+}
+
+// ---------- Nie eine echte Testaufgabe ----------
+// Fingerabdruck = alle Zahlen der Aufgabe, ohne Vorzeichen, sortiert (wie in rechentest-echt.js)
+function fingerabdruck(frage) {
+  const t = frage.replace(/<sup>(.*?)<\/sup>/g, " $1 ").replace(/<[^>]+>/g, " ").replace(/√/g, " ");
+  const zahlen = (t.match(/\d{1,3}(?:\.\d{3})+(?:,\d+)?|\d+(?:,\d+)?/g) || []).map(z => Number(z.replace(/\./g, "").replace(",", ".")));
+  return zahlen.sort((a, b) => a - b).map(z => String(rund(z))).join("|");
+}
+function fnv(s) {   // gleiche Prüfsumme wie in werkzeuge/rechentest_ausschluss.py
+  let h = 0x811c9dc5;
+  for (const c of new TextEncoder().encode(s)) h = Math.imul(h ^ c, 0x01000193) >>> 0;
+  return h.toString(16).padStart(8, "0");
+}
+const echt = a => typeof ECHTE_TESTS !== "undefined" && ECHTE_TESTS.has(fnv(fingerabdruck(a.frage)));
+function erzeuge(name, stufe, schonDa) {
+  let a;
+  for (let i = 0; i < 200; i++) {
+    a = { typ: "zahl", ...A[name](name === "bruchAdd" && stufe !== "B") };
+    if (!echt(a) && !schonDa.has(a.frage)) break;
+  }
+  schonDa.add(a.frage);
+  return a;
 }
 
 // ---------- Eingaben lesen ----------
@@ -270,7 +299,8 @@ function eingabe(a, i) {
 }
 
 function neuerTest(stufe, name) {
-  test = STUFEN[stufe].aufgaben.map(n => ({ typ: "zahl", ...A[n](n === "bruchAdd" && stufe !== "B") }));
+  const schonDa = new Set();
+  test = STUFEN[stufe].aufgaben.map(n => erzeuge(n, stufe, schonDa));
   ausgewertet = false;
   $("#rt").innerHTML = `
     <div class="rt-leiste"><span>${name}</span><span id="uhr">0:00</span><span id="stand">0 / 10</span></div>

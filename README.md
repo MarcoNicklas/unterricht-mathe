@@ -46,3 +46,14 @@ python3 -m http.server 8000
 ```
 
 Dann im Browser `http://localhost:8000` öffnen.
+
+## Rechentest-Training
+
+- Aufgabenarten und Stufen stehen in `assets/rechentest.js` (`STUFEN`, `SCHAETZEN`).
+- Die Aufgaben sind ähnlich wie im echten Rechentest, aber **nie gleich**: Jede Aufgabe wird mit allen
+  echten Testaufgaben verglichen (`assets/rechentest-echt.js`) und neu gewürfelt, wenn sie dieselben Zahlen enthält.
+- Nach neuen Rechentests die Ausschlussliste neu erzeugen (Word-Dateien vorher entpacken):
+
+```
+python3 werkzeuge/rechentest_ausschluss.py "../Rechentest verschiedener Klassen"
+```
