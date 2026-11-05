@@ -121,3 +121,39 @@ const PAKETE = {
     ]
   }
 };
+
+/* ---------------------------------------------------------------------
+   ABSCHLUSSPRÜFUNG – Aufbau wie die echte AP (Stand: AP 2025)
+   Teil A: ohne Taschenrechner, Pflichtblock + 2 von 3 Wahlblöcken.
+   Teil B: mit Taschenrechner, Aufgaben zu je 15 Punkten.
+   Bei „themen“ die ids aus KLASSEN eintragen, die zur Aufgabe passen.
+   --------------------------------------------------------------------- */
+const PRUEFUNG = {
+  teilA: {
+    titel: "Teil A – ohne Taschenrechner",
+    zeit: "25 Minuten (+ 5 Minuten Einlesezeit)",
+    punkte: 15,
+    hilfsmittel: "Merkhilfe",
+    hinweis: "Den Pflichtblock bearbeiten alle. Von den drei Wahlblöcken wählst du zwei aus.",
+    bloecke: [
+      { id: "pflicht", titel: "Pflichtblock",                   punkte: 7, inhalt: "Prozent und Sachrechnen, Pythagoras, Parabeln, Tilgungsplan" },
+      { id: "w1",      titel: "Wahlblock 1 – Trigonometrie",    punkte: 4, inhalt: "sin, cos, tan im rechtwinkligen Dreieck" },
+      { id: "w2",      titel: "Wahlblock 2 – Daten und Zufall", punkte: 4, inhalt: "Baumdiagramm, Mittelwert, Diagramme" },
+      { id: "w3",      titel: "Wahlblock 3 – Raum und Form",    punkte: 4, inhalt: "Strahlensatz, Kugel, Körper mit π = 3" }
+    ]
+  },
+  teilB: {
+    titel: "Teil B – mit Taschenrechner",
+    zeit: "125 Minuten",
+    punkte: 60,
+    hilfsmittel: "Taschenrechner und Merkhilfe",
+    hinweis: "60 Punkte = 4 Aufgaben zu je 15 Punkten. Welche Aufgaben du bearbeitest, sagt dir deine Lehrkraft.",
+    aufgaben: [
+      { nr: 1, titel: "Finanzmathematik",          inhalt: "Zinseszins, Tilgungsplan, Annuität, Rente",         themen: [] },
+      { nr: 2, titel: "Funktionaler Zusammenhang", inhalt: "Parabeln und Geraden in Sachaufgaben",              themen: ["pruef-strat", "pruef-ap2025", "pruef-ap2024", "pruef-funk", "lin-sach"] },
+      { nr: 3, titel: "Trigonometrie",             inhalt: "Längen und Winkel in Dreiecken, Steigung in %",     themen: [] },
+      { nr: 4, titel: "Daten und Zufall",          inhalt: "Häufigkeiten, Kennzahlen, Diagramme, Baumdiagramm", themen: ["dz-train"] },
+      { nr: 5, titel: "Raum und Form",             inhalt: "Pyramide, Kegel, Zylinder, Kugel – Volumen und Oberfläche", themen: ["ruf-pruef"] }
+    ]
+  }
+};

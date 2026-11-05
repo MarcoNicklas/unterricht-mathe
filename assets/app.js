@@ -77,19 +77,43 @@ function kurzHash(s) {
   return h.toString(36);
 }
 
-// ---------- Abschlussprüfung ----------
-function pruefungsseite() {
-  const zeichne = () => {
-    const bloecke = Object.entries(KLASSEN).map(([k, kl]) => {
-      const themen = kl.lernbereiche.flatMap(lb => lb.themen.filter(t => t.ap));
-      return themen.length ? `<div class="lb"><div class="lb-head"><div><div class="typ">${esc(kl.titel)}</div>
-        <h3>Prüfungstraining</h3><p>Echte Abschlussprüfungen und Sachaufgaben im Prüfungsstil</p></div>
-        ${fortschritt(themen.map(t => t.id))}</div><ul class="themen">${themen.map(themaZeile).join("")}</ul></div>` : "";
-    }).join("");
-    $("#training").innerHTML = bloecke || `<div class="card">Noch keine Prüfungsaufgaben vorhanden.</div>`;
+// ---------- Abschlussprüfung: aufgebaut wie die echte AP (Teil A / Teil B) ----------
+function pruefungAufbau() {
+  const A = PRUEFUNG.teilA, B = PRUEFUNG.teilB;
+  const kopf = t => `<div class="ap-kopf"><span>⏱ ${esc(t.zeit)}</span><span>🏅 ${t.punkte} Punkte</span><span>📎 ${esc(t.hilfsmittel)}</span></div>`;
+  const aufgabeB = a => {
+    const themen = a.themen.map(id => alleThemen[id]).filter(Boolean);
+    return `<details class="bereich ap-b"><summary><span><b>Aufgabe ${a.nr}: ${esc(a.titel)}</b><small>${esc(a.inhalt)} · 15 Punkte</small></span>
+      ${themen.length ? fortschritt(themen.map(t => t.id)) : `<span class="tag-bald">Übungen folgen</span>`}</summary>
+      ${themen.length ? `<ul class="themen">${themen.map(themaZeile).join("")}</ul>` : `<p class="note" style="margin:0 18px 16px">Für diesen Teil gibt es bald Übungen.</p>`}</details>`;
   };
+  return `
+    <div class="card ap-ueberblick"><b>So ist die Abschlussprüfung aufgebaut</b>
+      <div class="ap-teile"><div><span class="ap-tag a">Teil A</span>ohne Taschenrechner<br><small>25 Min. · 15 Punkte</small></div>
+      <div><span class="ap-tag b">Teil B</span>mit Taschenrechner<br><small>125 Min. · 60 Punkte</small></div></div>
+      <small>Zusammen 150 Minuten und 75 Punkte. Die Merkhilfe darfst du in beiden Teilen benutzen.</small></div>
+
+    <h2 class="ap-h2"><span class="ap-tag a">Teil A</span> ohne Taschenrechner</h2>
+    ${kopf(A)}
+    <p class="note">${esc(A.hinweis)}</p>
+    <div class="liste">${A.bloecke.map(b => `<a class="zeile ap-a" href="pruefung-a.html#${b.id}">
+      <b>${esc(b.titel)} <span class="pkt">${b.punkte} P.</span></b><small>${esc(b.inhalt)}</small></a>`).join("")}</div>
+    <a class="btn voll gross" href="pruefung-a.html">⏱ Teil A komplett üben</a>
+
+    <h2 class="ap-h2"><span class="ap-tag b">Teil B</span> mit Taschenrechner</h2>
+    ${kopf(B)}
+    <p class="note">${esc(B.hinweis)}</p>
+    ${B.aufgaben.map(aufgabeB).join("")}`;
+}
+
+function pruefungsseite() {
+  const zeichne = () => { $("#training").innerHTML = pruefungAufbau(); };
   zeichne();
-  abhaken(zeichne);
+  abhaken(() => {
+    const offen = [...document.querySelectorAll("details.bereich")].map(d => d.open);
+    zeichne();
+    document.querySelectorAll("details.bereich").forEach((d, i) => d.open = offen[i]);
+  });
 }
 
 // ---------- Baukasten für Lehrkräfte ----------
@@ -180,14 +204,8 @@ function klassenseite() {
           Darin steht genau, was drankommt.`);
     },
 
-    pruefung: () => {
-      const eigene = kl.lernbereiche.flatMap(lb => lb.themen.filter(t => t.ap));
-      if (eigene.length) return `<p class="lead">Rechne zuerst selbst auf Papier – Tipps erst holen, wenn du feststeckst.</p>
-        <div class="card"><ul class="themen">${eigene.map(themaZeile).join("")}</ul></div>`;
-      const alle = Object.values(alleThemen).filter(t => t.ap);
-      return leer(`Die Abschlussprüfung schreibst du am Ende der Wirtschaftsschule. Wenn du schon reinschauen willst:`)
-        + (alle.length ? `<div class="card"><ul class="themen">${alle.map(themaZeile).join("")}</ul></div>` : "");
-    }
+    pruefung: () => (["10", "11"].includes(k) ? "" : leer(`Die Abschlussprüfung schreibst du am Ende der Wirtschaftsschule. Hier siehst du schon, wie sie aufgebaut ist.`))
+      + pruefungAufbau()
   };
 
   const zeichne = () => {

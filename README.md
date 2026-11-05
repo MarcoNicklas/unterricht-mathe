@@ -11,7 +11,8 @@ Lernseite für Mathematik an der Wirtschaftsschule (Jahrgangsstufen 6–11), geh
 | `rechentest.html?k=8` | Rechentest-Training: 10 zufällige Kopfrechenaufgaben je Stufe (Klasse 10: `&z=v` oder `&z=z`) |
 | `assets/rechentest.js` | Aufgabenarten und Stufen des Rechentests (V6, V7, V8, V9/Z10, V10/Z11) |
 | `lernpaket.html?id=v10-sa1` | Individuelles Lernpaket für eine Schulaufgabe |
-| `pruefung.html` | Abschlussprüfung: alle Themen mit `ap: true` |
+| `pruefung.html` | Abschlussprüfung im Aufbau der echten AP: Teil A (Pflicht + Wahlblöcke) und Teil B (Aufgaben 1–5); gepflegt in `PRUEFUNG` in `inhalte.js` |
+| `pruefung-a.html` | Teil A üben (ohne Taschenrechner, 2 von 3 Wahlblöcken, 25-Minuten-Uhr); Aufgaben in `assets/teil-a.js` |
 | `lehrkraefte.html` | Baukasten: Lernpaket per Häkchen erstellen, Link + QR-Code |
 | `assets/inhalte.js` | **Die einzige Datei, die du für neue Inhalte änderst** |
 | `assets/style.css`, `assets/app.js` | Design und Logik (normalerweise nicht anfassen) |
