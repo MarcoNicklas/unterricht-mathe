@@ -1,0 +1,1006 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fehlersuche Kraftstoffversorgung</title>
+<style>
+:root{
+  --bg:#f4f6f8; --card:#ffffff; --ink:#1d2733; --muted:#5b6876; --line:#d6dde4;
+  --accent:#1f6f78; --accent-soft:#e1f0f1; --fuel:#e0a21a; --fuel-soft:#f7e3b0;
+  --press:#d2452f; --ret:#3a7bd5; --ok:#2e8b57; --ok-soft:#e3f3ea; --bad:#c0392b; --bad-soft:#fbe7e4;
+  --metal:#8796a5; --air:#cfe3f5; --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 14px rgba(0,0,0,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12171c; --card:#1b2229; --ink:#e6edf3; --muted:#9aa8b6; --line:#2f3a45;
+    --accent:#4fb3bd; --accent-soft:#1d3436; --fuel:#f0b43a; --fuel-soft:#4a3a17;
+    --press:#ff6b55; --ret:#6ea3ff; --ok:#4cc47f; --ok-soft:#173326; --bad:#ff6b5b; --bad-soft:#3a1f1c;
+    --metal:#7d8b99; --air:#24394d; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12171c; --card:#1b2229; --ink:#e6edf3; --muted:#9aa8b6; --line:#2f3a45;
+  --accent:#4fb3bd; --accent-soft:#1d3436; --fuel:#f0b43a; --fuel-soft:#4a3a17;
+  --press:#ff6b55; --ret:#6ea3ff; --ok:#4cc47f; --ok-soft:#173326; --bad:#ff6b5b; --bad-soft:#3a1f1c;
+  --metal:#7d8b99; --air:#24394d; --shadow:none;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header.top{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line)}
+.topin{max-width:980px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.topin h1{font-size:1.05rem;margin:0;flex:1;min-width:200px}
+.score{font-size:.9rem;color:var(--muted)}
+.bar{height:4px;background:var(--line)} .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .4s}
+nav.toc{max-width:980px;margin:0 auto;padding:6px 16px 10px;display:flex;gap:6px;overflow-x:auto}
+nav.toc a{white-space:nowrap;font-size:.82rem;text-decoration:none;color:var(--accent);background:var(--accent-soft);padding:3px 10px;border-radius:99px}
+main{max-width:980px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin:0 0 18px;box-shadow:var(--shadow)}
+h2{font-size:1.35rem;margin:.2rem 0 .6rem}
+h3{font-size:1.08rem;margin:1.2rem 0 .4rem}
+.kicker{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.lead{font-size:1.05rem}
+.info{background:var(--accent-soft);border-left:4px solid var(--accent);padding:10px 14px;border-radius:8px;margin:12px 0}
+.warn{background:var(--bad-soft);border-left:4px solid var(--bad);padding:10px 14px;border-radius:8px;margin:12px 0}
+.code{font-family:ui-monospace,Menlo,monospace;background:var(--bad-soft);color:var(--bad);padding:2px 8px;border-radius:6px;font-weight:700}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:720px){.grid2{grid-template-columns:1fr}}
+svg{max-width:100%;height:auto;display:block}
+.sim{border:1px dashed var(--line);border-radius:12px;padding:14px;margin:14px 0;background:color-mix(in srgb,var(--card) 92%,var(--accent) 8%)}
+.sim .simt{font-weight:700;font-size:.95rem;margin-bottom:8px;display:flex;gap:8px;align-items:center}
+.sim .simt::before{content:"▶";font-size:.7rem;color:#fff;background:var(--accent);border-radius:99px;padding:2px 6px}
+.ctrls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:10px 0}
+.ctrls label{font-size:.9rem;display:flex;align-items:center;gap:6px}
+input[type=range]{width:180px;accent-color:var(--accent)}
+select,button,textarea{font:inherit}
+select{padding:5px 8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.btn{border:0;background:var(--accent);color:#fff;padding:7px 14px;border-radius:9px;cursor:pointer;font-weight:600}
+.btn.sec{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.readout{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.pill{padding:4px 10px;border-radius:99px;font-size:.88rem;background:var(--bg);border:1px solid var(--line)}
+.pill.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.pill.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.q{border:2px solid var(--accent);border-radius:12px;padding:16px;margin:16px 0;background:var(--card)}
+.qh{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+.qn{background:var(--accent);color:#fff;font-weight:800;border-radius:8px;min-width:32px;height:32px;display:grid;place-items:center}
+.qt{font-weight:650;font-size:1.05rem}
+.qsub{font-size:.85rem;color:var(--muted)}
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border:1px solid var(--line);border-radius:9px;cursor:pointer;background:var(--bg)}
+.opt input{margin-top:4px;accent-color:var(--accent)}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.qact{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.fb{font-weight:600}
+.fb.ok{color:var(--ok)} .fb.bad{color:var(--bad)}
+.sol{display:none;margin-top:12px;padding:12px 14px;border-radius:9px;background:var(--ok-soft);border-left:4px solid var(--ok)}
+.sol.show{display:block}
+.sol h4{margin:0 0 6px;font-size:.95rem}
+textarea{width:100%;min-height:80px;padding:10px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.tips{margin-top:8px}
+.tips details{font-size:.9rem;margin:4px 0}
+.tips summary{cursor:pointer;color:var(--accent)}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:600}
+.tw{overflow-x:auto}
+.chip{display:inline-block;font-size:.78rem;padding:1px 8px;border-radius:99px;background:var(--fuel-soft);color:var(--ink)}
+.flow{stroke-dasharray:7 9;animation:dash var(--spd,1s) linear infinite}
+.flow.off{animation-play-state:paused;opacity:.35}
+@keyframes dash{to{stroke-dashoffset:-32}}
+.spin{transform-box:fill-box;transform-origin:center;animation:spin .6s linear infinite}
+.spin.off{animation-play-state:paused}
+@keyframes spin{to{transform:rotate(360deg)}}
+.needle{transition:transform .9s cubic-bezier(.3,1.4,.5,1)}
+.clickable{cursor:pointer}
+.clickable:hover>*{filter:brightness(1.08)}
+.lab{font-size:12px;fill:var(--ink)}
+.labm{font-size:11px;fill:var(--muted)}
+.steps{counter-reset:s;list-style:none;padding:0}
+.steps li{counter-increment:s;position:relative;padding:6px 0 6px 38px}
+.steps li::before{content:counter(s);position:absolute;left:0;top:5px;width:26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-weight:800;display:grid;place-items:center;font-size:.85rem}
+footer{max-width:980px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);font-size:.85rem}
+.end{text-align:center}
+.wide{overflow-x:auto}
+@media (max-width:720px){.wide svg{min-width:680px}.wide::after{content:"← zum Verschieben wischen →";display:block;text-align:center;font-size:.75rem;color:var(--muted)}}
+.big{font-size:2.2rem;font-weight:800;color:var(--accent)}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="topin">
+    <h1>🔧 Fehlersuche Kraftstoffversorgung</h1>
+    <span class="score" id="score">0 / 6 Auswahlfragen richtig · 0 / 5 Textfragen bearbeitet</span>
+  </div>
+  <div class="bar"><i id="prog"></i></div>
+  <nav class="toc">
+    <a href="#fall">Der Fall</a><a href="#grundlagen">Grundlagen</a><a href="#system">System-Simulator</a>
+    <a href="#druck">Systemdruck</a><a href="#filter">Kraftstofffilter</a><a href="#pumpe">Fördermenge</a>
+    <a href="#entlueftung">Tankentlüftung</a><a href="#tank">Satteltank</a><a href="#ende">Ergebnis</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ===================== FALL ===================== -->
+<section class="card" id="fall">
+  <div class="kicker">Der Kundenauftrag</div>
+  <h2>„Der Anlasser dreht, aber der Motor springt nicht an.“</h2>
+  <div class="grid2">
+    <div>
+      <p class="lead">Benzinmotor mit <b>Saugrohreinspritzung</b>, <b>Zweileitungssystem</b> mit <b>bedarfsgeregelter Kraftstoffpumpe</b>. Im Fehlerspeicher des Motorsteuergeräts steht:</p>
+      <p><span class="code">P0087</span> Kraftstoffverteilerleiste – Systemdruck zu niedrig</p>
+      <ul>
+        <li>Laut Tankanzeige ist genügend Kraftstoff vorhanden.</li>
+        <li>Sichtprüfung: keine Beschädigungen, keine Undichtigkeiten.</li>
+        <li>Sicherung der Kraftstoffpumpe: in Ordnung.</li>
+        <li>Zündung an → leises <b>Summen</b> am Tank: Die Pumpe wird angesteuert und läuft.</li>
+      </ul>
+      <p>Bleibt die Frage: <b>Wie hoch ist der Systemdruck tatsächlich?</b></p>
+    </div>
+    <div>
+      <svg viewBox="0 0 360 230" role="img" aria-label="Diagnosegerät zeigt Fehlercode P0087">
+        <rect x="10" y="10" width="340" height="210" rx="18" fill="var(--bg)" stroke="var(--line)"/>
+        <rect x="30" y="30" width="200" height="130" rx="8" fill="#0d1b24"/>
+        <text x="44" y="56" fill="#7fd1d9" font-family="monospace" font-size="13">OBD-Diagnose</text>
+        <text x="44" y="86" fill="#ff7a66" font-family="monospace" font-size="22" font-weight="700">P0087</text>
+        <text x="44" y="108" fill="#cfe" font-family="monospace" font-size="11">Kraftstoffverteilerleiste</text>
+        <text x="44" y="124" fill="#cfe" font-family="monospace" font-size="11">Systemdruck zu niedrig</text>
+        <text x="44" y="146" fill="#7fd1d9" font-family="monospace" font-size="10">Status: statisch</text>
+        <g id="hum">
+          <text x="270" y="70" font-size="34">🔊</text>
+          <text x="248" y="105" class="labm">„Summen“ am Tank</text>
+          <text x="248" y="120" class="labm">= Pumpe läuft</text>
+        </g>
+        <rect x="30" y="175" width="300" height="30" rx="8" fill="var(--fuel-soft)"/>
+        <rect x="30" y="175" width="225" height="30" rx="8" fill="var(--fuel)"/>
+        <text x="40" y="195" font-size="13" fill="var(--ink)">⛽ Tankanzeige: ¾ voll</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="q" data-type="mc" data-answer="1" id="q1">
+    <div class="qh"><div class="qn">1</div><div class="qt">Was ist der nächste Schritt, um das Problem mit dem nicht anspringenden Motor zu diagnostizieren?</div></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q1">Den Kraftstofffilter wechseln, um sicherzustellen, dass er nicht verstopft ist.</label>
+      <label class="opt"><input type="radio" name="q1">Den Systemdruck messen, um festzustellen, ob er im Sollbereich liegt.</label>
+      <label class="opt"><input type="radio" name="q1">Die Zündkerzen überprüfen, um sicherzustellen, dass sie ordnungsgemäß funktionieren.</label>
+      <label class="opt"><input type="radio" name="q1">Den Tankdeckel überprüfen, um sicherzustellen, dass er richtig sitzt.</label>
+    </div>
+    <div class="tips"><details><summary>Tipp</summary>Der Fehlercode nennt eine Messgröße. Diagnose heißt: erst messen, dann tauschen.</details></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Den <b>Systemdruck messen</b>. P0087 meldet „Druck zu niedrig“ – das prüfen wir zuerst mit einem Manometer, bevor auf Verdacht Teile getauscht werden.</div>
+  </div>
+</section>
+
+<!-- ===================== GRUNDLAGEN ===================== -->
+<section class="card" id="grundlagen">
+  <div class="kicker">Grundlagen</div>
+  <h2>Wie kommt der Kraftstoff vom Tank zur Einspritzdüse?</h2>
+  <p>Je nach Hersteller und Motor unterscheiden sich die Systeme stark, die Grundlagen sind aber überall gleich. Wichtig ist zuerst: <b>Niederdruck oder Hochdruck?</b></p>
+  <div class="tw"><table>
+    <tr><th>System</th><th>Einspritzdruck</th><th>Warum?</th></tr>
+    <tr><td>Benzin, <b>Saugrohreinspritzung</b> (unser Fall)</td><td>2,5 – 7 bar</td><td>Im Saugrohr nur 0,2–1,5 bar (absolut). Bis zur Zündung ca. 360° KW Zeit → ca. 5 bar reichen.</td></tr>
+    <tr><td>Benzin, Direkteinspritzung</td><td>30 – 200 bar</td><td>Am Ende der Verdichtung 20–30 bar im Zylinder, nur 30–90° KW Zeit → feinste Zerstäubung nötig.</td></tr>
+    <tr><td>Diesel Pumpe-Düse</td><td>ca. 300 – 2200 bar</td><td rowspan="2">Hochdruck wird in einer vom Motor angetriebenen Pumpe erzeugt. Das Niederdrucksystem liefert nur den Kraftstoff dorthin.</td></tr>
+    <tr><td>Diesel Common Rail</td><td>ca. 200 – 2700 bar</td></tr>
+  </table></div>
+  <p class="info">Niederdruck = unter 10 bar. <b>Bei Saugrohreinspritzung erzeugt das Niederdrucksystem selbst den Einspritzdruck.</b> Deshalb beginnt die Fehlersuche hier direkt an der Verteilerleiste.</p>
+
+  <h3>Bauteile im Zweileitungssystem</h3>
+  <ol class="steps">
+    <li><b>Elektrische Kraftstoffpumpe (EKP)</b> im Tank: läuft schon bei „Zündung an“ (teils beim Türöffnen) und baut sofort Druck auf. Innen sitzen ein <b>Druckbegrenzungsventil</b> (Schutz, öffnet z. B. erst bei 6 bar) und ein <b>Rückschlagventil</b> (hält nach dem Abstellen den <b>Haltedruck</b> für einige Minuten).</li>
+    <li><b>Kraftstofffilter</b> in der Förderleitung (Druckseite).</li>
+    <li><b>Kraftstoffverteilerleiste</b> versorgt alle Einspritzventile einer Zylinderreihe.</li>
+    <li><b>Druckregler</b> an der Verteilerleiste: hält den Druck konstant, indem er den <b>Rücklauf</b> zum Tank öffnet oder schließt.</li>
+    <li><b>Kraftstoffpumpensteuergerät</b> (bei Bedarfsregelung): bekommt vom Motorsteuergerät ein PWM-Signal oder Daten (CAN/LIN) und steuert die Pumpendrehzahl.</li>
+  </ol>
+
+  <div class="sim" id="simRegler">
+    <div class="simt">Simulation: Warum hängt der Druckregler am Saugrohr?</div>
+    <p>Auf die Membran des Reglers wirken von oben Federkraft <b>und Saugrohrdruck</b>. Verändere den Saugrohrdruck (Leerlauf ≈ −0,7 bar, Volllast ≈ 0 bar).</p>
+    <div class="grid2">
+      <svg viewBox="0 0 300 230" aria-label="Druckregler">
+        <rect x="80" y="20" width="140" height="80" rx="10" fill="var(--bg)" stroke="var(--metal)" stroke-width="2"/>
+        <path id="rgSpring" d="" fill="none" stroke="var(--metal)" stroke-width="3"/>
+        <rect id="rgMem" x="80" y="96" width="140" height="8" fill="var(--ink)"/>
+        <rect x="80" y="104" width="140" height="70" rx="6" fill="var(--fuel-soft)" stroke="var(--metal)" stroke-width="2"/>
+        <rect id="rgVal" x="140" y="104" width="20" height="40" fill="var(--metal)"/>
+        <line x1="150" y1="20" x2="150" y2="0" stroke="var(--ret)" stroke-width="5"/>
+        <text x="158" y="12" class="labm">Unterdruck vom Saugrohr</text>
+        <rect x="140" y="174" width="20" height="50" fill="var(--ret)" opacity=".8"/>
+        <text x="166" y="214" class="labm">Rücklauf</text>
+        <rect x="0" y="130" width="80" height="16" fill="var(--press)" opacity=".85"/>
+        <text x="4" y="124" class="labm">von der Leiste</text>
+        <text x="96" y="160" class="lab">Kraftstoff</text>
+      </svg>
+      <div>
+        <div class="ctrls"><label>Saugrohrdruck <input type="range" id="rgP" min="-0.9" max="0" step="0.1" value="-0.7"> <b id="rgPv">−0,7 bar</b></label></div>
+        <div class="readout">
+          <span class="pill">Manometer (gegen Atmosphäre): <b id="rgMano">4,3 bar</b></span>
+          <span class="pill ok">Druckdifferenz am Einspritzventil: <b>5,0 bar</b> – immer gleich</span>
+        </div>
+        <p class="qsub" style="margin-top:10px">Deshalb gibt der Hersteller den Sollwert als <b>Bereich</b> an (hier 4–6 bar): Die Anzeige schwankt mit dem Betriebszustand, die Einspritzmenge hängt aber nur von der Einspritzzeit ab. Neuere Systeme messen beide Drücke mit Sensoren und korrigieren per Software.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Vollfördernd oder bedarfsgeregelt?</h3>
+  <p>Eine vollfördernde Pumpe kennt nur „an“ oder „aus“ und fördert immer die volle Menge (60–300 l/h). Rechenbeispiel: Ein 2,0-l-Turbo (162 kW bei 6000 1/min) spritzt bei Volllast 58 mg je Arbeitsspiel ein: 6000/2 · 4 = 12 000 Arbeitsspiele/min · 58 mg = 696 g/min ÷ 0,75 g/cm³ ≈ <b>0,93 l/min</b>. Im Leerlauf (8 mg bei 820 1/min) sind es nur ca. <b>0,018 l/min</b>.</p>
+  <div class="sim" id="simBedarf">
+    <div class="simt">Simulation: Fördermenge und Rücklauf</div>
+    <div class="ctrls">
+      <label>Betriebszustand <input type="range" id="bdL" min="0" max="100" value="0"> <b id="bdLv">Leerlauf</b></label>
+      <label><select id="bdM"><option value="voll">Vollfördernde Pumpe</option><option value="bedarf">Bedarfsgeregelte Pumpe</option></select></label>
+    </div>
+    <svg viewBox="0 0 600 150" aria-label="Balken Fördermenge">
+      <text x="0" y="30" class="lab">Bedarf Motor</text>
+      <rect x="130" y="15" width="440" height="22" rx="4" fill="var(--bg)" stroke="var(--line)"/>
+      <rect id="bdNeed" x="130" y="15" width="10" height="22" rx="4" fill="var(--fuel)"/>
+      <text x="0" y="75" class="lab">Pumpe fördert</text>
+      <rect x="130" y="60" width="440" height="22" rx="4" fill="var(--bg)" stroke="var(--line)"/>
+      <rect id="bdPump" x="130" y="60" width="10" height="22" rx="4" fill="var(--press)"/>
+      <text x="0" y="120" class="lab">Rücklauf → Tank</text>
+      <rect x="130" y="105" width="440" height="22" rx="4" fill="var(--bg)" stroke="var(--line)"/>
+      <rect id="bdRet" x="130" y="105" width="10" height="22" rx="4" fill="var(--ret)"/>
+    </svg>
+    <div class="readout" id="bdOut"></div>
+  </div>
+  <p class="info"><b>Nicht verwechseln:</b> Der <b>Druckregler</b> regelt den <b>Druck</b>. Das <b>Pumpensteuergerät</b> regelt die <b>Fördermenge</b>. Damit der Regler überhaupt regeln kann, muss immer etwas mehr Kraftstoff ankommen als gebraucht wird. <b>Kommt zu wenig an, sinkt der Systemdruck</b> – genau das meldet P0087.</p>
+
+  <h3>Pumpenbauarten</h3>
+  <div class="tw"><table>
+    <tr><th></th><th>Verdrängerpumpe (Zahnrad, Flügel, Rollen)</th><th>Strömungspumpe</th></tr>
+    <tr><td>Prinzip</td><td>Kammern werden größer (ansaugen) und kleiner (verdichten)</td><td>Schaufelrad „schaufelt“ den Kraftstoff weiter</td></tr>
+    <tr><td>Druck</td><td>bis ca. 7 bar, kann ansaugen</td><td>max. ca. 3,5 bar, kaum Saugkraft</td></tr>
+    <tr><td>Einsatz</td><td>Förderpumpe (2,5–6,5 bar)</td><td>Vorförderpumpe, ganz unten im Tank</td></tr>
+  </table></div>
+  <p class="qsub">Elektromotor: Bürsten-Motor (DC, 12 V) oder bürstenloser Motor (BLDC/EC, 48 V PWM vom Pumpensteuergerät). Funken im Kraftstoff sind ungefährlich: In der Pumpe fehlt Sauerstoff, es entsteht kein zündfähiges Gemisch.</p>
+</section>
+
+<!-- ===================== SYSTEM-SIMULATOR ===================== -->
+<section class="card" id="system">
+  <div class="kicker">Simulator</div>
+  <h2>Das Kraftstoffsystem unseres Fahrzeugs</h2>
+  <p>Zweileitungssystem mit Satteltank (Allradfahrzeug), einer Pumpe im Schwalltopf und zwei Saugstrahlpumpen. Schalte die Zündung ein, baue Fehler ein und beobachte das Manometer an der Verteilerleiste. <b>Tipp:</b> Klicke auf ein Bauteil für eine Erklärung.</p>
+  <div class="sim">
+    <div class="simt">Simulation: Fehler einbauen und messen</div>
+    <div class="ctrls">
+      <button class="btn" id="sysIgn">🔑 Zündung an</button>
+      <label>Fehler: <select id="sysFault">
+        <option value="ok">kein Fehler</option>
+        <option value="pumpe">Kraftstoffpumpe verschlissen</option>
+        <option value="filter">Kraftstofffilter stark verstopft</option>
+        <option value="regler">Druckregler hängt offen</option>
+        <option value="pwm">kein PWM-Signal an Pumpen-SG</option>
+        <option value="ssp">unser Fall (Ursache noch geheim)</option>
+      </select></label>
+      <label><input type="checkbox" id="sysRet"> Rücklauf abklemmen</label>
+    </div>
+    <div class="wide"><svg viewBox="0 0 920 450" id="sysSvg" aria-label="Kraftstoffsystem">
+      <!-- Motorsteuergerät -->
+      <g class="clickable" data-info="mot"><rect x="560" y="8" width="150" height="40" rx="8" fill="var(--bg)" stroke="var(--accent)" stroke-width="2"/><text x="572" y="33" class="lab">Motorsteuergerät</text></g>
+      <path id="sysPwm" d="M560 28 H245 V245" fill="none" stroke="var(--ok)" stroke-width="2" stroke-dasharray="4 4"/>
+      <text x="300" y="22" class="labm">PWM-Signal (Sollmenge)</text>
+      <!-- Tank -->
+      <g class="clickable" data-info="tank">
+        <path d="M30 300 H410 V430 H252 V368 H188 V430 H30 Z" fill="var(--bg)" stroke="var(--metal)" stroke-width="3"/>
+      </g>
+      <rect id="fuelL" x="32" y="330" width="154" height="98" fill="var(--fuel)" opacity=".55"/>
+      <rect id="fuelR" x="254" y="330" width="154" height="98" fill="var(--fuel)" opacity=".55"/>
+      <text x="40" y="318" class="labm">linke Hälfte</text><text x="340" y="318" class="labm">rechte Hälfte</text>
+      <text x="196" y="360" class="labm">Kardan</text>
+      <!-- Schwalltopf + EKP -->
+      <g class="clickable" data-info="schwall"><rect x="70" y="340" width="76" height="88" fill="none" stroke="var(--ink)" stroke-width="2" stroke-dasharray="5 3"/></g>
+      <rect id="fuelS" x="71" y="345" width="74" height="82" fill="var(--fuel)" opacity=".85"/>
+      <g class="clickable" data-info="ekp"><rect x="92" y="365" width="32" height="52" rx="5" fill="var(--metal)"/>
+        <g id="sysRotor" class="spin off"><circle cx="108" cy="398" r="10" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="6 4"/></g></g>
+      <text x="74" y="444" class="labm">Schwalltopf + EKP</text>
+      <!-- SSP links (über Förderleitung) -->
+      <g class="clickable" data-info="sspL"><circle cx="52" cy="418" r="9" fill="var(--accent)"/><text x="44" y="422" fill="#fff" font-size="10" font-weight="700">S1</text></g>
+      <path id="sysSspL" d="M100 365 V355 H52 V409" class="flow off" fill="none" stroke="var(--press)" stroke-width="2"/>
+      <!-- SSP rechts (über Rücklauf) -->
+      <g class="clickable" data-info="sspR"><circle id="sspRc" cx="340" cy="418" r="9" fill="var(--accent)"/><text x="332" y="422" fill="#fff" font-size="10" font-weight="700">S2</text></g>
+      <path id="sysSspR" d="M340 409 V380 H220 V350 H140" class="flow off" fill="none" stroke="var(--ret)" stroke-width="2"/>
+      <g id="sspBreak" style="display:none"><text x="300" y="376" font-size="18">💥</text></g>
+      <!-- Pumpensteuergerät -->
+      <g class="clickable" data-info="psg"><rect x="200" y="245" width="90" height="34" rx="6" fill="var(--bg)" stroke="var(--accent)" stroke-width="2"/><text x="208" y="267" class="lab">Pumpen-SG</text></g>
+      <line x1="200" y1="262" x2="116" y2="262" stroke="var(--ok)" stroke-width="2"/><line x1="116" y1="262" x2="116" y2="365" stroke="var(--ok)" stroke-width="2"/>
+      <!-- Förderleitung -->
+      <path id="sysFeed1" d="M108 365 V160 H440" class="flow off" fill="none" stroke="var(--press)" stroke-width="5"/>
+      <g class="clickable" data-info="filter"><rect x="440" y="142" width="80" height="36" rx="8" fill="var(--fuel-soft)" stroke="var(--metal)" stroke-width="2"/>
+        <path d="M450 150 v20 M458 150 v20 M466 150 v20 M474 150 v20 M482 150 v20 M490 150 v20 M498 150 v20 M506 150 v20" stroke="var(--metal)"/></g>
+      <text x="446" y="196" class="labm">Kraftstofffilter</text>
+      <path id="sysFeed2" d="M520 160 H600 V118" class="flow off" fill="none" stroke="var(--press)" stroke-width="5"/>
+      <!-- Manometer am T-Stück -->
+      <line x1="600" y1="150" x2="618" y2="196" stroke="var(--metal)" stroke-width="3"/>
+      <g id="sysGauge" transform="translate(560,188) scale(.5)"></g>
+      <!-- Verteilerleiste -->
+      <g class="clickable" data-info="rail"><rect x="590" y="96" width="270" height="22" rx="6" fill="var(--press)" opacity=".9"/><text x="640" y="90" class="lab">Kraftstoffverteilerleiste</text></g>
+      <g id="sysInj"></g>
+      <!-- Druckregler -->
+      <g class="clickable" data-info="regler"><rect x="860" y="86" width="40" height="42" rx="8" fill="var(--bg)" stroke="var(--ink)" stroke-width="2"/><text x="866" y="112" font-size="11" fill="var(--ink)">DR</text></g>
+      <!-- Rücklauf -->
+      <path id="sysRetP" d="M880 128 V298 H340 V300" class="flow off" fill="none" stroke="var(--ret)" stroke-width="4"/>
+      <g id="sysClamp" style="display:none"><rect x="868" y="140" width="24" height="10" fill="var(--ink)"/><text x="896" y="150" class="labm">zu</text></g>
+      <text x="740" y="314" class="labm">Rücklauf zum Tank</text>
+      <!-- Motor-Status -->
+      <g transform="translate(720,335)"><rect width="180" height="90" rx="12" fill="var(--bg)" stroke="var(--line)"/>
+        <text x="14" y="26" class="labm">Motor</text><text id="sysEng" x="14" y="54" font-size="18" font-weight="700" fill="var(--muted)">aus</text>
+        <text id="sysEng2" x="14" y="76" class="labm"></text></g>
+    </svg></div>
+    <div class="readout" id="sysOut"></div>
+    <div class="info" id="sysInfo">Klicke auf ein Bauteil im Bild.</div>
+  </div>
+</section>
+
+<!-- ===================== SYSTEMDRUCK ===================== -->
+<section class="card" id="druck">
+  <div class="kicker">Schritt 1</div>
+  <h2>Den Systemdruck messen</h2>
+  <p>Für die Prüfung des Systemdrucks (Niederdruck) brauchen Sie ein <b>Druckmanometer (Messbereich 0 bis 10 bar)</b> und für das Fahrzeug passende Anschlussadapter.</p>
+  <p class="warn">⚠️ Das System steht unter Druck. Schutzbrille und Handschuhe tragen, Druck vorsichtig abbauen, Verbindungen mit Lappen abdecken. Brand- und Explosionsgefahr – für Belüftung sorgen.</p>
+
+  <div class="q" data-type="mc" data-answer="1" id="q2">
+    <div class="qh"><div class="qn">2</div><div class="qt">Wo wird das Druckmanometer für die Überprüfung des Systemdrucks angeschlossen?</div></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q2">An der Kraftstoffpumpe im Tank.</label>
+      <label class="opt"><input type="radio" name="q2">An oder nahe der Kraftstoffverteilerleiste.</label>
+      <label class="opt"><input type="radio" name="q2">An der Einspritzdüse des Motors.</label>
+      <label class="opt"><input type="radio" name="q2">An der Rücklaufleitung des Kraftstoffsystems.</label>
+    </div>
+    <div class="tips"><details><summary>Tipp</summary>Wie heißt der Fehlercode genau? „Kraftstoff<b>verteilerleiste</b> Systemdruck zu niedrig“. Schau auch im Simulator, wo das Manometer sitzt.</details></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4><b>An oder nahe der Kraftstoffverteilerleiste</b> – dort sitzt bei Saugrohreinspritzung auch der Druckregler, und genau dort ist mit „Systemdruck“ der Druck gemeint.</div>
+  </div>
+
+  <h3>So wird geprüft</h3>
+  <ol class="steps">
+    <li>Manometer über Adapter oder <b>T-Stück</b> am Zulauf der Verteilerleiste anschließen.</li>
+    <li>Messleitung <b>entlüften</b>: Pumpe 20–60 s aktivieren. Bei vollfördernden Systemen geht das über eine Brücke am Pumpenrelais. <b>Bei bedarfsgeregelten Systemen nicht!</b> Hier läuft die Pumpe nur mit PWM-Signal vom Motorsteuergerät → <b>Diagnosegerät, Stellglied-Diagnose</b>.</li>
+    <li>Über das Umschaltventil Luft ablassen (Auffangbehälter!). Danach Ventil auf „Durchfluss zum Manometer“.</li>
+    <li>Zeiger muss sich bei laufender Pumpe auf einen stabilen Wert einpendeln.</li>
+  </ol>
+
+  <div class="sim" id="simMano">
+    <div class="simt">Simulation: Messung durchführen</div>
+    <div class="grid2">
+      <svg viewBox="0 0 420 300" aria-label="Messaufbau">
+        <rect x="10" y="40" width="200" height="22" rx="6" fill="var(--press)" opacity=".9"/><text x="20" y="32" class="lab">Verteilerleiste</text>
+        <rect x="60" y="62" width="18" height="40" fill="var(--metal)"/><text x="84" y="88" class="labm">T-Stück</text>
+        <path d="M69 102 V150 H230" fill="none" stroke="var(--ret)" stroke-width="6" id="mnHose"/>
+        <g id="mnGauge" transform="translate(230,30) scale(.9)"></g>
+        <rect x="282" y="200" width="40" height="28" rx="4" fill="var(--fuel-soft)" stroke="var(--metal)"/>
+        <g id="mnValve" transform="translate(302,214)"><circle r="10" fill="var(--card)" stroke="var(--ink)"/><line id="mnValveL" x1="-8" y1="0" x2="8" y2="0" stroke="var(--ink)" stroke-width="3"/></g>
+        <text x="326" y="218" class="labm">Umschaltventil</text>
+        <path d="M302 228 V260 H350" fill="none" stroke="var(--ink)" stroke-width="5"/>
+        <path d="M350 250 h40 l-5 45 h-30 z" fill="var(--bg)" stroke="var(--metal)" stroke-width="2"/>
+        <rect id="mnCup" x="356" y="294" width="28" height="0" fill="var(--fuel)"/>
+        <g id="mnBub"></g>
+        <text x="340" y="244" class="labm">Auffang</text>
+      </svg>
+      <div>
+        <div class="ctrls" style="flex-direction:column;align-items:flex-start">
+          <button class="btn" id="mn1">1 · Stellglied-Diagnose: Pumpe aktivieren</button>
+          <button class="btn" id="mn2" disabled>2 · Entlüften (Ventil auf Entlüftung)</button>
+          <button class="btn" id="mn3" disabled>3 · Ventil auf Manometer stellen</button>
+          <button class="btn sec" id="mn0">Zurücksetzen</button>
+        </div>
+        <div class="readout" id="mnOut"><span class="pill">Pumpe aus</span></div>
+      </div>
+    </div>
+  </div>
+
+  <p><b>Das Ergebnis:</b> Der Fahrzeughersteller gibt einen Sollwert von <b>0,4 bis 0,6 MPa</b> an. Umrechnung: 0,1 MPa = 1 bar.</p>
+  <div class="sim">
+    <div class="simt">Umrechner MPa ↔ bar</div>
+    <div class="ctrls"><label><input type="range" id="cvR" min="0" max="1" step="0.05" value="0.4"> <b id="cvV">0,40 MPa = 4,0 bar</b></label></div>
+  </div>
+
+  <div class="q" data-type="mc" data-answer="2" id="q3">
+    <div class="qh"><div class="qn">3</div><div class="qt">Sie vergleichen den Istwert (siehe Manometer in der Simulation oben) mit dem Sollwert. Zu welchem Ergebnis kommen Sie?</div></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q3">Der Istwert befindet sich genau im Sollbereich.</label>
+      <label class="opt"><input type="radio" name="q3">Der Istwert ist zu hoch.</label>
+      <label class="opt"><input type="radio" name="q3">Der Istwert ist zu niedrig.</label>
+    </div>
+    <div class="tips"><details><summary>Tipp 1</summary>Führe die Messung in der Simulation oben bis Schritt 3 durch und lies den Zeiger ab.</details><details><summary>Tipp 2</summary>Rechne den Sollwert in bar um: 0,4–0,6 MPa = ? bar. Der grüne Bogen auf dem Manometer zeigt den Sollbereich.</details></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung: Der Istwert ist zu niedrig</h4>Das Manometer zeigt <b>0,5 bar</b>, Soll sind <b>4–6 bar</b>. Schon beim Entlüften war zu sehen, dass kaum Kraftstoff aus dem Entlüftungsschlauch kommt.</div>
+  </div>
+
+  <div class="q" data-type="multi" data-answer="0,1,3" id="q4">
+    <div class="qh"><div class="qn">4</div><div><div class="qt">Welche Ursachen könnten für den zu geringen Systemdruck verantwortlich sein?</div><div class="qsub">Wählen Sie 3 Optionen aus.</div></div></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox">Die Kraftstoffpumpe ist defekt.</label>
+      <label class="opt"><input type="checkbox">Der Druckregler ist defekt.</label>
+      <label class="opt"><input type="checkbox">Die Rücklaufleitung ist verstopft.</label>
+      <label class="opt"><input type="checkbox">Der Kraftstofffilter ist verstopft.</label>
+    </div>
+    <div class="tips"><details><summary>Tipp</summary>Probiere im System-Simulator alle Fehler aus. Was passiert mit dem Druck, wenn der Rücklauf zu ist (Haken „Rücklauf abklemmen“)?</details></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Möglich sind: <b>Pumpe defekt</b>, <b>Druckregler defekt</b> (hängt offen), <b>Filter verstopft</b>. Ein verstopfter Rücklauf würde den Druck <b>erhöhen</b>, nicht senken.</div>
+  </div>
+
+  <h3>Was wäre, wenn der Druckregler nicht richtig schließt?</h3>
+  <p>Zusammen mit der Systemdruckprüfung kann man prüfen, ob der Rücklauf ständig offen ist: <b>Rücklauf direkt am Ausgang des Druckreglers verschließen und erneut messen.</b></p>
+  <div class="sim" id="simRet">
+    <div class="simt">Simulation: Rücklauf abklemmen</div>
+    <div class="grid2">
+      <div>
+        <div class="ctrls"><label>Fahrzeug: <select id="rtF"><option value="ssp">unser Fahrzeug</option><option value="regler">Vergleich: Regler hängt offen</option></select></label>
+        <button class="btn" id="rtB">Rücklauf abklemmen</button></div>
+        <div class="readout" id="rtOut"></div>
+        <p id="rtTxt" class="qsub"></p>
+      </div>
+      <svg viewBox="0 0 220 200"><g id="rtGauge" transform="translate(10,0)"></g></svg>
+    </div>
+  </div>
+  <p class="info">In unserem Fall bleibt der Druck <b>unverändert bei 0,5 bar</b>. Würde genug Kraftstoff gefördert und nur ein offener Regler den Druckaufbau verhindern, müsste jetzt der Sollwert (4–6 bar) erreicht werden. → Der Druckregler ist in Ordnung. <b>Es kommt zu wenig Kraftstoff an der Verteilerleiste an.</b></p>
+</section>
+
+<!-- ===================== FILTER ===================== -->
+<section class="card" id="filter">
+  <div class="kicker">Schritt 2</div>
+  <h2>Der Kraftstofffilter</h2>
+  <p>Kraftstofffilter nehmen Schmutzpartikel auf und speichern sie dauerhaft. Das Filtermedium ist Mikrofaserpapier: Kraftstoff kommt durch die Poren, Schmutz nicht. Mit der Zeit verstopfen immer mehr Poren und der Filter wird zum wachsenden <b>Strömungswiderstand</b>.</p>
+  <ul>
+    <li>Benzinmotoren: Wechsel oft erst nach 90 000 km oder mehr, viele haben einen „Lifetime-Filter“ (funktioniert bei guter Kraftstoffqualität wie in Deutschland).</li>
+    <li>Gehäuse aus Aluminium oder Kunststoff, als <b>In-Line-Filter</b> außerhalb des Tanks oder als <b>Im-Tank-Filter</b> mit der Pumpe.</li>
+  </ul>
+
+  <div class="sim" id="simFilt">
+    <div class="simt">Simulation: Durchströmrichtung des Filters (Querschnitt)</div>
+    <div class="grid2">
+      <svg viewBox="0 0 260 260" id="ftSvg" aria-label="Filterquerschnitt">
+        <circle cx="130" cy="130" r="122" fill="var(--fuel-soft)" stroke="var(--metal)" stroke-width="3"/>
+        <circle cx="130" cy="130" r="90" fill="none" stroke="var(--metal)" stroke-width="2" stroke-dasharray="3 3"/>
+        <circle cx="130" cy="130" r="38" fill="var(--bg)" stroke="var(--metal)" stroke-width="2" stroke-dasharray="3 3"/>
+        <path id="ftPaper" d="" fill="none" stroke="var(--ink)" stroke-width="1.2" opacity=".55"/>
+        <g id="ftDirt"></g><g id="ftDots"></g>
+        <text x="112" y="134" class="labm">innen</text>
+      </svg>
+      <div>
+        <div class="ctrls">
+          <label><select id="ftDir"><option value="in">richtig: von außen nach innen</option><option value="out">falsch herum: von innen nach außen</option></select></label>
+          <button class="btn sec" id="ftReset">Neuer Filter</button>
+        </div>
+        <div class="readout"><span class="pill">Schmutz aufgenommen: <b id="ftCnt">0</b></span><span class="pill" id="ftState">Filter frei</span></div>
+        <p class="qsub">Schmutzpartikel (dunkle Punkte) bleiben an der Seite des Papiers hängen, an der der Kraftstoff ankommt. Vergleiche, wie viele Partikel in beide Richtungen aufgenommen werden, bis der Filter dicht ist.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="q" data-type="text" id="q5">
+    <div class="qh"><div class="qn">5</div><div class="qt">Warum ist die Fließrichtung wichtig?</div></div>
+    <textarea placeholder="Ihre Antwort eingeben"></textarea>
+    <div class="tips"><details><summary>Tipp</summary>Vergleiche in der Simulation die Fläche außen und innen. Manche Filter haben mehr als zwei Anschlüsse – warum?</details></div>
+    <div class="qact"><button class="btn shw">Musterlösung zeigen</button></div>
+    <div class="sol"><h4>Musterlösung</h4>Das Filtermedium sollte immer <b>von außen nach innen</b> durchströmt werden, denn auf der <b>großen Außenseite</b> kann es mehr Schmutzpartikel aufnehmen als auf der kleineren Innenseite. Das klappt nur bei richtiger Einbau- bzw. Durchflussrichtung. Einige Filter haben zusätzlich <b>Druckbegrenzungsventile</b> (mehr als zwei Anschlüsse) – auch diese funktionieren nur bei richtiger Durchflussrichtung.</div>
+  </div>
+
+  <div class="sim" id="simSaug">
+    <div class="simt">Simulation: Filter auf der Saug- oder der Druckseite?</div>
+    <div class="ctrls"><label>Verstopfung des Filters <input type="range" id="sgC" min="0" max="100" value="50"> <b id="sgCv">50 %</b></label></div>
+    <svg viewBox="0 0 600 170" aria-label="Druckvergleich">
+      <text x="0" y="40" class="lab">Saugseite</text><text x="0" y="56" class="labm">max. 0,9 bar Unterdruck</text>
+      <rect x="150" y="25" width="420" height="26" rx="4" fill="var(--bg)" stroke="var(--line)"/>
+      <rect x="150" y="25" width="63" height="26" rx="4" fill="var(--ret)"/>
+      <text x="0" y="110" class="lab">Druckseite</text><text x="0" y="126" class="labm">ca. 5 bar Überdruck</text>
+      <rect x="150" y="95" width="420" height="26" rx="4" fill="var(--bg)" stroke="var(--line)"/>
+      <rect x="150" y="95" width="350" height="26" rx="4" fill="var(--press)"/>
+      <line id="sgNeed1" x1="200" y1="15" x2="200" y2="135" stroke="var(--ink)" stroke-width="3" stroke-dasharray="5 3"/>
+      <text id="sgNeedT" x="204" y="160" class="lab">nötig: 1,0 bar</text>
+    </svg>
+    <div class="readout" id="sgOut"></div>
+  </div>
+
+  <div class="q" data-type="text" id="q6">
+    <div class="qh"><div class="qn">6</div><div class="qt">Warum wird nicht schon gleich durch den Filter der Kraftstoff im Tank angesaugt?</div></div>
+    <textarea placeholder="Ihre Antwort eingeben"></textarea>
+    <div class="tips"><details><summary>Tipp</summary>Welcher Druck steht vor der Pumpe (Saugseite) zur Verfügung, welcher dahinter (Druckseite)? Schieb den Regler in der Simulation.</details></div>
+    <div class="qact"><button class="btn shw">Musterlösung zeigen</button></div>
+    <div class="sol"><h4>Musterlösung</h4>Auf der <b>Saugseite</b> stehen maximal <b>0,9 bar Unterdruck</b> zur Verfügung, auf der <b>Förderseite</b> ca. <b>5 bar Überdruck</b>. Einen halb verstopften Filter kann man mit 5 bar noch durchströmen, mit 0,9 bar nicht mehr. Deshalb sitzt der Filter immer auf der <b>Druckseite</b> der Pumpe (Förderleitung).</div>
+  </div>
+
+  <div class="sim" id="simLast">
+    <div class="simt">Simulation: Verstopfter Filter bei verschiedenen Lastzuständen</div>
+    <div class="ctrls">
+      <label>Verstopfung <input type="range" id="lsC" min="0" max="100" value="70"> <b id="lsCv">70 %</b></label>
+      <label>Last: <select id="lsL"><option value="0.02">Start / Leerlauf</option><option value="0.3">Teillast</option><option value="0.93" selected>Volllast</option></select></label>
+    </div>
+    <svg viewBox="0 0 600 130">
+      <text x="0" y="32" class="lab">Bedarf</text><rect x="110" y="16" width="460" height="24" rx="4" fill="var(--bg)" stroke="var(--line)"/><rect id="lsNeed" x="110" y="16" width="10" height="24" rx="4" fill="var(--fuel)"/>
+      <text x="0" y="82" class="lab">durch Filter</text><rect x="110" y="66" width="460" height="24" rx="4" fill="var(--bg)" stroke="var(--line)"/><rect id="lsFlow" x="110" y="66" width="10" height="24" rx="4" fill="var(--press)"/>
+      <text x="110" y="118" class="labm">0 l/min</text><text x="530" y="118" class="labm">1,5 l/min</text>
+    </svg>
+    <div class="readout" id="lsOut"></div>
+  </div>
+
+  <div class="q" data-type="text" id="q7">
+    <div class="qh"><div class="qn">7</div><div class="qt">Wie macht sich ein verstopfter Kraftstofffilter bemerkbar?</div></div>
+    <textarea placeholder="Ihre Antwort eingeben"></textarea>
+    <div class="tips"><details><summary>Tipp</summary>Wann braucht der Motor am meisten Kraftstoff? Stelle in der Simulation 70 % Verstopfung ein und wechsle zwischen Leerlauf und Volllast.</details></div>
+    <div class="qact"><button class="btn shw">Musterlösung zeigen</button></div>
+    <div class="sol"><h4>Musterlösung</h4>Je stärker verstopft, desto weniger Kraftstoff kommt durch. Das merkt man zuerst bei <b>Volllast</b>, wenn viel Kraftstoff gebraucht wird: <b>Leistungsabfall bei Volllast</b>, bei Teillast läuft der Motor mit vollem Systemdruck problemlos. Damit nicht einmal die kleine Menge für <b>Start und Leerlauf</b> durchkommt, muss der Filter schon <b>komplett verstopft</b> sein.</div>
+  </div>
+
+  <h3>Wollen Sie den Kraftstofffilter bei unserem Motor (der nicht anspringt) wechseln?</h3>
+  <div class="grid2">
+    <div class="q" data-type="text" id="q8">
+      <div class="qh"><div class="qn">8</div><div class="qt">Was spricht dafür?</div></div>
+      <textarea placeholder="Ihre Antwort eingeben"></textarea>
+      <div class="qact"><button class="btn shw">Musterlösung zeigen</button></div>
+      <div class="sol"><h4>Musterlösung</h4><ul style="margin:0;padding-left:18px"><li>Es könnte die Ursache beheben.</li><li>Ist der Filter leicht zugänglich (In-Line), sind die Arbeitskosten deutlich geringer als für weitere Diagnose.</li><li>Nach dem Wechsel ist der Filter als Ursache ausgeschlossen.</li></ul></div>
+    </div>
+    <div class="q" data-type="text" id="q9">
+      <div class="qh"><div class="qn">9</div><div class="qt">Was spricht dagegen?</div></div>
+      <textarea placeholder="Ihre Antwort eingeben"></textarea>
+      <div class="qact"><button class="btn shw">Musterlösung zeigen</button></div>
+      <div class="sol"><h4>Musterlösung</h4><ul style="margin:0;padding-left:18px"><li>Wechsel auf <b>Verdacht</b>, nicht aufgrund von Diagnoseergebnissen – Erfolg nicht garantiert.</li><li>Ist der Filter schwer zugänglich (Im-Tank-Filter), entstehen hohe Kosten ohne ausreichende Rechtfertigung.</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FÖRDERMENGE ===================== -->
+<section class="card" id="pumpe">
+  <div class="kicker">Schritt 3</div>
+  <h2>Die Fördermenge der Kraftstoffpumpe prüfen</h2>
+  <p>Bevor Teile getauscht werden, brauchen wir Gewissheit, ob die Pumpe in Ordnung ist. Der Filter ist leicht zugänglich, also prüfen wir die Fördermenge <b>direkt an der Förderleitung vom Tank (ohne Filter)</b>: Statt des Filters kommt ein <b>Dreiwegeventil</b> hinein. Direkter Ausgang → Manometer, Ausgang über die <b>Druckeinstellschraube</b> → Schlauch zum Messbecher.</p>
+  <p class="info"><b>Sollwert des Herstellers:</b> mindestens <b>450 ml</b> bei <b>0,4 MPa</b> (4 bar) Systemdruck in <b>30 Sekunden</b>. Also zwei Bedingungen: Pumpe genau 30 s aktivieren (Stoppuhr) und bei 4 bar messen.</p>
+
+  <div class="sim" id="simMenge">
+    <div class="simt">Simulation: Fördermengenmessung (Zeitraffer)</div>
+    <div class="grid2">
+      <svg viewBox="0 0 320 280" aria-label="Messbecher">
+        <path d="M10 60 H120" stroke="var(--press)" stroke-width="6" id="fmLine"/>
+        <text x="10" y="50" class="labm">Förderleitung vom Tank</text>
+        <rect x="120" y="44" width="40" height="32" rx="6" fill="var(--bg)" stroke="var(--ink)" stroke-width="2"/><text x="124" y="64" font-size="10" fill="var(--ink)">3-Wege</text>
+        <path d="M140 76 V110 H200 V130" stroke="var(--press)" stroke-width="5" fill="none"/>
+        <g id="fmBubbles"></g>
+        <path d="M150 140 h120 l-12 130 h-96 z" fill="var(--bg)" stroke="var(--metal)" stroke-width="3"/>
+        <clipPath id="cupClip"><path d="M150 140 h120 l-12 130 h-96 z"/></clipPath>
+        <rect id="fmFill" x="140" y="270" width="140" height="0" fill="var(--fuel)" clip-path="url(#cupClip)"/>
+        <line x1="150" y1="153" x2="270" y2="153" stroke="var(--ok)" stroke-width="2" stroke-dasharray="5 3"/>
+        <text x="274" y="157" class="labm" style="fill:var(--ok)">450 ml</text>
+        <text x="274" y="270" class="labm">0</text><text x="274" y="214" class="labm">250</text>
+        <text x="20" y="150" font-size="34" font-weight="800" fill="var(--ink)" id="fmT">0,0 s</text>
+        <text x="20" y="176" class="labm">Stoppuhr</text>
+        <text x="20" y="220" font-size="22" font-weight="700" fill="var(--accent)" id="fmV">0 ml</text>
+      </svg>
+      <div>
+        <div class="ctrls"><label>Pumpe: <select id="fmP"><option value="ours">unser Fahrzeug</option><option value="good">Vergleich: intakte Anlage</option></select></label></div>
+        <div class="ctrls"><button class="btn" id="fmGo">⏱ 30 s Pumpe aktivieren</button></div>
+        <div class="readout" id="fmOut"></div>
+      </div>
+    </div>
+  </div>
+  <p>Schon beim Entlüften fällt auf: <b>viel Luft, wenig Kraftstoff</b>, der Systemdruck lässt sich nicht auf 4 bar einstellen. Die Messung ist so eigentlich sinnlos – trotzdem: <b>100 ml in 30 Sekunden</b>.</p>
+
+  <div class="q" data-type="multi" data-answer="1,3,5" id="q10">
+    <div class="qh"><div class="qn">10</div><div><div class="qt">Welche Aussagen sind in Bezug auf die erfolgte Prüfung richtig?</div><div class="qsub">Mehrere Antworten möglich.</div></div></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox">Die Kraftstofffördermenge ist ausreichend.</label>
+      <label class="opt"><input type="checkbox">Für die weitere Diagnose muss der Kraftstofftank geöffnet werden.</label>
+      <label class="opt"><input type="checkbox">Für die weitere Fehlersuche sollten wir uns auf die elektrische Pumpensteuerung konzentrieren.</label>
+      <label class="opt"><input type="checkbox">Die Ursache ist nicht ein verstopfter Kraftstofffilter.</label>
+      <label class="opt"><input type="checkbox">Die Ursache ist ein verstopfter Kraftstofffilter.</label>
+      <label class="opt"><input type="checkbox">Die Kraftstofffördermenge ist zu gering.</label>
+    </div>
+    <div class="tips"><details><summary>Tipp 1</summary>Gemessen wurde <b>ohne</b> Filter. Was folgt daraus für den Filter?</details><details><summary>Tipp 2</summary>Die Pumpe summt – sie wird also angesteuert. Wo kann das Problem dann noch liegen?</details></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4><ul style="margin:0;padding-left:18px"><li><b>Die Fördermenge ist zu gering</b> (100 ml statt mind. 450 ml).</li><li><b>Die Ursache ist nicht der Filter</b> – er war bei der Messung gar nicht eingebaut.</li><li><b>Der Tank muss geöffnet werden</b> – das Problem liegt vor dem Filter, also im Tank.</li></ul>Die Pumpe läuft hörbar, die elektrische Ansteuerung funktioniert also.</div>
+  </div>
+</section>
+
+<!-- ===================== TANKENTLÜFTUNG ===================== -->
+<section class="card" id="entlueftung">
+  <div class="kicker">Schritt 4</div>
+  <h2>Liegt es an der Tankentlüftung?</h2>
+  <p>Warum kommt nicht genug Kraftstoff an, obwohl genug im Tank ist und die Pumpe läuft? Vielleicht an einer defekten Tankentlüftung. Das ist das <b>Bierdosen-Prinzip</b>: Damit Flüssigkeit herauskommt, muss Luft hinein.</p>
+  <p>Weil keine Kraftstoffdämpfe in die Umwelt dürfen, reicht ein einfaches Loch nicht. Der Tank wird über mehrere Ventile belüftet, die das Motorsteuergerät steuert. Die Dämpfe (ab ca. 25 °C) saugt der Motor an und verbrennt sie.</p>
+  <div class="sim" id="simVent">
+    <div class="simt">Simulation: Bierdosen-Prinzip</div>
+    <div class="grid2">
+      <svg viewBox="0 0 300 240">
+        <rect x="60" y="30" width="150" height="170" rx="12" fill="var(--bg)" stroke="var(--metal)" stroke-width="3"/>
+        <rect id="vtFuel" x="63" y="100" width="144" height="97" fill="var(--fuel)" opacity=".75"/>
+        <rect id="vtAir" x="63" y="33" width="144" height="67" fill="var(--air)"/>
+        <text id="vtVac" x="80" y="70" class="lab"></text>
+        <rect x="20" y="22" width="40" height="16" fill="var(--metal)"/><text x="4" y="16" class="labm">Belüftung</text>
+        <g id="vtX"><line x1="26" y1="18" x2="54" y2="42" stroke="var(--bad)" stroke-width="4"/><line x1="54" y1="18" x2="26" y2="42" stroke="var(--bad)" stroke-width="4"/></g>
+        <path d="M135 200 V225 H260" fill="none" stroke="var(--press)" stroke-width="6" id="vtOut" class="flow off"/>
+        <text x="200" y="218" class="labm">zum Motor</text>
+        <g id="vtCap"><rect x="180" y="12" width="30" height="18" rx="3" fill="var(--ink)"/></g>
+        <text x="214" y="25" class="labm">Tankdeckel</text>
+      </svg>
+      <div>
+        <div class="ctrls" style="flex-direction:column;align-items:flex-start">
+          <label><input type="checkbox" id="vtBlock" checked> Entlüftungsventil verstopft</label>
+          <label><input type="checkbox" id="vtCapO"> Tankdeckel abnehmen</label>
+          <button class="btn" id="vtGo">Pumpe laufen lassen</button>
+        </div>
+        <div class="readout" id="vtRes"></div>
+      </div>
+    </div>
+  </div>
+  <p class="info"><b>Einfache Prüfung:</b> Tankdeckel abnehmen – dann wird der Tank über den Stutzen auf jeden Fall belüftet. Lag es daran, stimmt der Systemdruck sofort wieder. <b>In unserem Fall ändert sich nichts.</b> Die Tankentlüftung ist also nicht die Ursache.</p>
+</section>
+
+<!-- ===================== SATTELTANK ===================== -->
+<section class="card" id="tank">
+  <div class="kicker">Schritt 5</div>
+  <h2>Die Bauteile im Tank</h2>
+  <p>Bisher haben wir nur außerhalb des Tanks gesucht und nichts gefunden. Jetzt kommen die Bauteile im Tank dran. Bei aktuellen Fahrzeugen sind sie zu einer <b>Kraftstofffördereinheit</b> zusammengefasst, die die Tanköffnung verschließt: Kraftstoffpumpe, Tankgeber und je nach System Schwalltopf mit Saugstrahlpumpe, Filter, Druckregler (nur Einleitungssystem). Beim Ausbau immer auf Schmutz und auf <b>beschädigte oder lose Saugleitungen</b> achten.</p>
+  <div class="grid2">
+    <div>
+      <h3>Schwalltopf</h3>
+      <p>Beim Bremsen, Beschleunigen und in Kurven schwappt der Kraftstoff zur Seite. Der Schwalltopf ist ein „Tank im Tank“, in dem immer Kraftstoff ist. Er verhindert, dass Luft angesaugt wird und die Pumpe trocken läuft (Kraftstoff schmiert die Pumpe), und sorgt dafür, dass auch bei wenig Kraftstoff noch gefördert wird. Ein <b>Tellerventil</b> am Boden lässt beim Tanken Kraftstoff hinein, aber nicht heraus.</p>
+    </div>
+    <div>
+      <h3>Saugstrahlpumpe (Venturi-Prinzip)</h3>
+      <svg viewBox="0 0 320 140" aria-label="Saugstrahlpumpe">
+        <path d="M10 50 H110 L150 62 H190 L240 45 H310" fill="none" stroke="var(--metal)" stroke-width="3"/>
+        <path d="M10 90 H110 L150 78 H190 L240 95 H310" fill="none" stroke="var(--metal)" stroke-width="3"/>
+        <path d="M20 70 H300" class="flow" style="--spd:.5s" stroke="var(--ret)" stroke-width="6" fill="none"/>
+        <path d="M170 135 V80" class="flow" style="--spd:.9s" stroke="var(--fuel)" stroke-width="6" fill="none"/>
+        <text x="12" y="40" class="labm">Treibstrahl (Rücklauf / Förderleitung)</text>
+        <text x="178" y="128" class="labm">angesaugter Kraftstoff</text>
+        <text x="236" y="122" class="labm">→ Schwalltopf</text>
+        <text x="140" y="110" class="lab" font-weight="700">Unterdruck</text>
+      </svg>
+      <p class="qsub">Der Kraftstoff wird in der engen Düse beschleunigt, dort entsteht Unterdruck. Dadurch wird über eine Saugleitung Kraftstoff von der tiefsten Stelle des Tanks mitgerissen und in den Schwalltopf befördert. Keine eigenen beweglichen Teile!</p>
+    </div>
+  </div>
+  <h3>Der Satteltank</h3>
+  <p>Bei Front-Motor und Heck- oder Allradantrieb braucht die Kardanwelle einen Durchlass. Der Tank wird dadurch in zwei Hälften geteilt → <b>Satteltank</b>. Bei unserem Fahrzeug sitzen Pumpe und Schwalltopf <b>links</b>. Die Förderleitung ist zweigeteilt: zum Motor und zur <b>Saugstrahlpumpe S1</b>, die die linke Hälfte in den Schwalltopf pumpt. Rechts sitzt <b>S2</b>, angetrieben vom <b>Rücklauf</b>; sie holt den Kraftstoff aus der rechten Hälfte. Wird mehr hinein- als herausgepumpt, läuft der Schwalltopf über – das ist normal.</p>
+
+  <div class="sim" id="simSattel">
+    <div class="simt">Simulation: Satteltank im Fahrbetrieb (Zeitraffer)</div>
+    <div class="ctrls">
+      <button class="btn" id="stGo">▶ Fahren</button>
+      <label><input type="checkbox" id="stDef"> Leitung an rechter Saugstrahlpumpe S2 abgebrochen</label>
+      <button class="btn sec" id="stFill">⛽ 10 l nachtanken</button>
+      <button class="btn sec" id="stReset">Zurücksetzen</button>
+    </div>
+    <div class="wide"><svg viewBox="0 0 700 300" aria-label="Satteltank">
+      <path d="M20 80 H680 V280 H400 V170 H300 V280 H20 Z" fill="var(--bg)" stroke="var(--metal)" stroke-width="4"/>
+      <clipPath id="stClipL"><rect x="22" y="82" width="276" height="196"/></clipPath>
+      <clipPath id="stClipR"><rect x="402" y="82" width="276" height="196"/></clipPath>
+      <rect id="stL" x="22" y="180" width="276" height="98" fill="var(--fuel)" opacity=".6" clip-path="url(#stClipL)"/>
+      <rect id="stR" x="402" y="180" width="276" height="98" fill="var(--fuel)" opacity=".6" clip-path="url(#stClipR)"/>
+      <circle cx="350" cy="230" r="20" fill="var(--metal)"/><text x="318" y="160" class="labm">Kardanwelle</text>
+      <rect x="150" y="150" width="100" height="128" fill="none" stroke="var(--ink)" stroke-width="2" stroke-dasharray="6 3"/>
+      <rect id="stS" x="151" y="160" width="98" height="117" fill="var(--fuel)" opacity=".95"/>
+      <rect x="184" y="200" width="32" height="64" rx="6" fill="var(--metal)"/>
+      <g id="stRot" class="spin off"><circle cx="200" cy="240" r="10" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="6 4"/></g>
+      <text x="152" y="144" class="lab">Schwalltopf + EKP</text>
+      <path id="stFeed" d="M200 200 V40 H640" class="flow off" fill="none" stroke="var(--press)" stroke-width="5"/>
+      <text x="460" y="32" class="lab">zum Motor →</text>
+      <path id="stRet" d="M660 40 V60 H560 V255" class="flow off" fill="none" stroke="var(--ret)" stroke-width="4"/>
+      <text x="566" y="70" class="labm">Rücklauf</text>
+      <circle cx="70" cy="262" r="12" fill="var(--accent)"/><text x="62" y="267" fill="#fff" font-size="11" font-weight="700">S1</text>
+      <path id="stS1" d="M70 250 V200 H150" class="flow off" fill="none" stroke="var(--fuel)" stroke-width="4"/>
+      <path d="M190 200 V185 H100 V250" fill="none" stroke="var(--press)" stroke-width="2" opacity=".6"/>
+      <circle cx="560" cy="262" r="12" fill="var(--accent)" id="stS2c"/><text x="552" y="267" fill="#fff" font-size="11" font-weight="700">S2</text>
+      <path id="stS2" d="M548 262 H470 V120 H230 V150" class="flow off" fill="none" stroke="var(--fuel)" stroke-width="4"/>
+      <g id="stBreak" style="display:none"><rect x="465" y="210" width="12" height="30" fill="var(--bg)"/><text x="478" y="232" font-size="18">💥</text></g>
+      <text id="stLt" x="30" y="105" class="lab"></text><text id="stRt" x="560" y="105" class="lab"></text>
+    </svg></div>
+    <div class="readout" id="stOut"></div>
+  </div>
+
+  <p>Nach dem Öffnen des Tanks sieht man sofort: <b>Die linke Hälfte ist leer, die rechte gut gefüllt.</b></p>
+  <div class="q" data-type="mc" data-answer="1" id="q11">
+    <div class="qh"><div class="qn">11</div><div class="qt">Was ist die Ursache?</div></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q11">Die Elektrokraftstoffpumpe ist defekt.</label>
+      <label class="opt"><input type="radio" name="q11">Die Saugstrahlpumpe im vollen (rechten) Tank ist defekt.</label>
+      <label class="opt"><input type="radio" name="q11">Die Saugstrahlpumpe im leeren (linken) Tank ist defekt.</label>
+      <label class="opt"><input type="radio" name="q11">Das Tellerventil ist defekt.</label>
+    </div>
+    <div class="tips"><details><summary>Tipp</summary>Welche Hälfte wird nicht mehr leer gepumpt? Welche Saugstrahlpumpe ist dafür zuständig? Probiere es in der Simulation aus.</details></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung: Die Saugstrahlpumpe im vollen (rechten) Tank ist defekt.</h4>Der Anschluss der Leitung zum Schwalltopf ist an der rechten Saugstrahlpumpe <b>abgebrochen</b>. Sie konnte keinen Kraftstoff mehr in den Schwalltopf fördern, also wurde nur noch die linke Hälfte leer gefahren. Als die leer war, ging der Motor aus und sprang nicht mehr an – obwohl die Tankanzeige (Geber rechts) noch genug anzeigte.<br><br><b>Gegenprobe ohne Tank öffnen:</b> 5–10 l nachtanken. Dann ist die linke Hälfte wieder gefüllt und der Motor springt an.</div>
+  </div>
+</section>
+
+<section class="card end" id="ende">
+  <div class="kicker">Ergebnis</div>
+  <h2>Diagnosepfad</h2>
+  <div class="big" id="endScore">0 / 7</div>
+  <p id="endTxt">Auswahlfragen richtig beantwortet</p>
+  <div class="wide"><svg viewBox="0 0 900 120" aria-label="Diagnosepfad">
+    <g font-size="12" fill="var(--ink)">
+      <rect x="5" y="20" width="130" height="70" rx="10" fill="var(--accent-soft)" stroke="var(--accent)"/><text x="18" y="48">P0087 +</text><text x="18" y="66">Pumpe summt</text>
+      <rect x="155" y="20" width="130" height="70" rx="10" fill="var(--bad-soft)" stroke="var(--bad)"/><text x="168" y="48">Systemdruck</text><text x="168" y="66">0,5 bar ✗</text>
+      <rect x="305" y="20" width="130" height="70" rx="10" fill="var(--ok-soft)" stroke="var(--ok)"/><text x="318" y="48">Rücklauf zu:</text><text x="318" y="66">Regler i. O. ✓</text>
+      <rect x="455" y="20" width="130" height="70" rx="10" fill="var(--bad-soft)" stroke="var(--bad)"/><text x="468" y="48">Fördermenge</text><text x="468" y="66">100 ml ✗ (ohne Filter)</text>
+      <rect x="605" y="20" width="130" height="70" rx="10" fill="var(--ok-soft)" stroke="var(--ok)"/><text x="618" y="48">Tankdeckel ab:</text><text x="618" y="66">Entlüftung i. O. ✓</text>
+      <rect x="755" y="20" width="140" height="70" rx="10" fill="var(--fuel-soft)" stroke="var(--fuel)"/><text x="766" y="48">Tank geöffnet:</text><text x="766" y="66">S2 abgebrochen 💥</text>
+    </g>
+    <g stroke="var(--muted)" stroke-width="2"><path d="M135 55h20M285 55h20M435 55h20M585 55h20M735 55h20"/></g>
+  </svg></div>
+  <p class="qsub">Merke: Erst messen, dann tauschen. Jede Prüfung schließt eine mögliche Ursache aus.</p>
+</section>
+</main>
+<footer>Grundlage: Microsoft-Forms-Quiz „Fehlersuche Kraftstoffversorgung“ und E-Lektion „Kraftstoffförderung“. Bilder und Simulationen sind vereinfachte Darstellungen.</footer>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const de=(v,d=1)=>v.toFixed(d).replace('.',',');
+const NS='http://www.w3.org/2000/svg';
+const el=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;};
+
+/* ---------- Manometer ---------- */
+function gauge(g){
+  const cx=100,cy=100,r=80, ang=v=>135+v*27, pt=(v,rr)=>{const a=ang(v)*Math.PI/180;return [cx+rr*Math.cos(a),cy+rr*Math.sin(a)];};
+  el('circle',{cx,cy,r:92,fill:'var(--card)',stroke:'var(--metal)','stroke-width':6},g);
+  const [x1,y1]=pt(4,r-6),[x2,y2]=pt(6,r-6);
+  el('path',{d:`M${x1} ${y1} A${r-6} ${r-6} 0 0 1 ${x2} ${y2}`,fill:'none',stroke:'var(--ok)','stroke-width':10,opacity:.8},g);
+  for(let v=0;v<=10;v+=0.5){const [a,b]=pt(v,r),[c,d]=pt(v,v%1?r-7:r-13);el('line',{x1:a,y1:b,x2:c,y2:d,stroke:'var(--ink)','stroke-width':v%1?1:2},g);
+    if(v%1===0){const [tx,ty]=pt(v,r-26);const t=el('text',{x:tx,y:ty+5,'text-anchor':'middle','font-size':14,'font-weight':700,fill:'var(--ink)'},g);t.textContent=v;}}
+  const t=el('text',{x:cx,y:cy+48,'text-anchor':'middle','font-size':12,fill:'var(--muted)'},g);t.textContent='bar';
+  const nd=el('g',{class:'needle'},g); nd.style.transformOrigin=`${cx}px ${cy}px`; nd.style.transformBox='view-box';
+  el('polygon',{points:`${cx-12},${cy-4} ${cx+r-12},${cy} ${cx-12},${cy+4}`,fill:'var(--press)'},nd);
+  el('circle',{cx,cy,r:8,fill:'var(--press)'},g);
+  const set=v=>{nd.style.transform=`rotate(${ang(Math.max(-0.3,Math.min(10.3,v)))}deg)`;};
+  set(0); return set;
+}
+
+/* ---------- Fragen ---------- */
+const mcQs=$$('.q[data-type=mc],.q[data-type=multi]'), txQs=$$('.q[data-type=text]');
+const st={right:new Set(),text:new Set()};
+function upd(){
+  $('#score').textContent=`${st.right.size} / ${mcQs.length} Auswahlfragen richtig · ${st.text.size} / ${txQs.length} Textfragen bearbeitet`;
+  $('#prog').style.width=((st.right.size+st.text.size)/(mcQs.length+txQs.length)*100)+'%';
+  $('#endScore').textContent=`${st.right.size} / ${mcQs.length}`;
+  $('#endTxt').textContent=`Auswahlfragen richtig · ${st.text.size} von ${txQs.length} Textfragen mit Musterlösung verglichen`;
+}
+mcQs.forEach(q=>{
+  const ans=q.dataset.answer.split(',').map(Number), opts=[...q.querySelectorAll('.opt')], fb=q.querySelector('.fb');
+  let tries=0;
+  q.querySelector('.chk').onclick=()=>{
+    const sel=opts.map((o,i)=>o.querySelector('input').checked?i:-1).filter(i=>i>=0);
+    opts.forEach(o=>o.classList.remove('right','wrong'));
+    if(!sel.length){fb.className='fb bad';fb.textContent='Bitte zuerst eine Antwort wählen.';return;}
+    tries++;
+    const ok=sel.length===ans.length&&sel.every(i=>ans.includes(i));
+    if(ok){opts.forEach((o,i)=>{if(ans.includes(i))o.classList.add('right');});fb.className='fb ok';fb.textContent='✔ Richtig!';q.querySelector('.sol').classList.add('show');st.right.add(q.id);}
+    else{sel.forEach(i=>opts[i].classList.add(ans.includes(i)?'right':'wrong'));fb.className='fb bad';
+      fb.textContent=q.dataset.type==='multi'?`Noch nicht ganz – ${ans.length} Antworten sind richtig.`:'Leider falsch – versuche es nochmal.';
+      const d=q.querySelector('.tips details:not([open])'); if(d)d.open=true;
+      if(tries>=3){q.querySelector('.sol').classList.add('show');fb.textContent+=' Die Lösung ist jetzt eingeblendet.';}}
+    upd();
+  };
+});
+txQs.forEach(q=>{
+  q.querySelector('.shw').onclick=()=>{
+    const ta=q.querySelector('textarea');
+    if(ta.value.trim().length<5&&!q.dataset.warned){q.dataset.warned=1;ta.placeholder='Schreibe zuerst kurz deine eigene Antwort – dann vergleichen!';ta.focus();return;}
+    q.querySelector('.sol').classList.add('show');st.text.add(q.id);upd();
+  };
+});
+upd();
+
+/* ---------- Druckregler ---------- */
+(function(){
+  const r=$('#rgP');
+  const draw=()=>{const p=+r.value; const comp=(-p)*14; // Unterdruck zieht Membran hoch
+    $('#rgPv').textContent=(p<0?'−':'')+de(Math.abs(p))+' bar';
+    $('#rgMano').textContent=de(5+p)+' bar';
+    const top=24, bot=94-comp; let d=`M150 ${top}`;const n=7;for(let i=1;i<=n;i++){d+=` L${i%2?135:165} ${top+(bot-top)*i/n}`;} $('#rgSpring').setAttribute('d',d);
+    $('#rgMem').setAttribute('y',96-comp); $('#rgVal').setAttribute('y',104-comp);
+  }; r.oninput=draw; draw();
+})();
+
+/* ---------- Bedarf ---------- */
+(function(){
+  const L=$('#bdL'),M=$('#bdM'),W=440,MAX=2.2;
+  const draw=()=>{const l=+L.value/100; const need=0.018+l*(0.928-0.018);
+    const pump=M.value==='voll'?2.0:Math.min(2.0,need*1.25+0.05), ret=pump-need;
+    $('#bdLv').textContent=l<.05?'Leerlauf':l>.95?'Volllast':'Teillast '+Math.round(l*100)+' %';
+    $('#bdNeed').setAttribute('width',Math.max(3,need/MAX*W));$('#bdPump').setAttribute('width',pump/MAX*W);$('#bdRet').setAttribute('width',Math.max(2,ret/MAX*W));
+    $('#bdOut').innerHTML=`<span class="pill">Bedarf: <b>${de(need,3)} l/min</b></span><span class="pill">Pumpe: <b>${de(pump,2)} l/min</b></span><span class="pill ${ret/pump>.5?'bad':'ok'}">umsonst gepumpt: <b>${Math.round(ret/pump*100)} %</b></span>`;
+  }; L.oninput=draw; M.onchange=draw; draw();
+})();
+
+/* ---------- System-Simulator ---------- */
+(function(){
+  const setG=gauge($('#sysGauge'));
+  const inj=$('#sysInj'); [640,700,760,820].forEach(x=>{el('path',{d:`M${x-6} 118 h12 l-3 26 h-6 z`,fill:'var(--metal)'},inj);});
+  let ign=false;
+  const P={ok:[5.0,6.0],pumpe:[1.5,1.7],filter:[2.4,2.5],regler:[1.1,5.0],pwm:[0,0],ssp:[0.5,0.5]};
+  const INFO={
+    mot:'<b>Motorsteuergerät:</b> berechnet den Kraftstoffbedarf und schickt die Sollmenge als PWM-Signal (oder über CAN/LIN) an das Pumpensteuergerät. Es speichert auch den Fehler P0087.',
+    psg:'<b>Kraftstoffpumpensteuergerät:</b> erzeugt aus dem Signal des Motorsteuergeräts den gepulsten Arbeitsstrom für die Pumpe (bei BLDC 48 V). Ohne Signal läuft die Pumpe nicht – deshalb Stellglied-Diagnose statt Relaisbrücke!',
+    ekp:'<b>Elektrische Kraftstoffpumpe:</b> sitzt im Schwalltopf. Enthält Druckbegrenzungsventil (Schutz) und Rückschlagventil (Haltedruck).',
+    schwall:'<b>Schwalltopf:</b> „Tank im Tank“. Hier ist immer Kraftstoff, damit die Pumpe keine Luft ansaugt – solange er befüllt wird.',
+    sspL:'<b>Saugstrahlpumpe S1 (links):</b> wird von einem Abzweig der Förderleitung angetrieben und holt Kraftstoff aus der linken Hälfte in den Schwalltopf.',
+    sspR:'<b>Saugstrahlpumpe S2 (rechts):</b> wird vom Rücklauf angetrieben und holt Kraftstoff aus der rechten Hälfte über die Kardanwelle hinweg in den Schwalltopf.',
+    tank:'<b>Satteltank:</b> durch den Kardantunnel zweigeteilt. Der Tankgeber kann noch „genug“ anzeigen, obwohl die Hälfte mit der Pumpe leer ist!',
+    filter:'<b>Kraftstofffilter (In-Line):</b> sitzt auf der Druckseite. Verstopft er, sinkt die Durchflussmenge – zuerst merkbar bei Volllast.',
+    rail:'<b>Kraftstoffverteilerleiste:</b> versorgt alle Einspritzventile. Hier wird der Systemdruck gemessen (T-Stück + Manometer).',
+    regler:'<b>Druckregler (DR):</b> hält den Systemdruck konstant, indem er den Rücklauf öffnet und schließt. Hängt er offen, fließt alles zurück und der Druck bricht ein.'};
+  $$('#sysSvg .clickable').forEach(g=>g.addEventListener('click',()=>{$('#sysInfo').innerHTML=INFO[g.dataset.info];}));
+  function draw(){
+    const f=$('#sysFault').value, ret=$('#sysRet').checked;
+    const running=ign&&f!=='pwm';
+    const p=ign?P[f][ret?1:0]:0;
+    setG(p);
+    const spd=(p<1?2.2:p<3?1.4:0.7)+'s';
+    ['#sysFeed1','#sysFeed2','#sysSspL'].forEach(s=>{const e=$(s);e.classList.toggle('off',!running);e.style.setProperty('--spd',spd);});
+    const retFlow=running&&!ret&&p>0.3;
+    $('#sysRetP').classList.toggle('off',!retFlow);
+    $('#sysSspR').classList.toggle('off',!(retFlow&&f!=='ssp'));
+    $('#sysRotor').classList.toggle('off',!running);
+    $('#sysPwm').style.opacity=ign&&f!=='pwm'?1:.25;
+    $('#sysClamp').style.display=ret?'':'none';
+    
+    const lH=f==='ssp'?2:60, sH=f==='ssp'?8:82;
+    $('#fuelL').setAttribute('y',428-lH);$('#fuelL').setAttribute('height',lH);
+    $('#fuelR').setAttribute('y',428-60);$('#fuelR').setAttribute('height',60);
+    $('#fuelS').setAttribute('y',427-sH);$('#fuelS').setAttribute('height',sH);
+    $('#sysIgn').textContent=ign?'🔑 Zündung aus':'🔑 Zündung an';
+    let eng='aus',eng2='',col='var(--muted)';
+    if(ign){ if(p>=4){eng='springt an ✓';col='var(--ok)';eng2=p>=5.9?'DBV begrenzt bei ≈ 6 bar':'';}
+      else if(p>=2.2){eng='startet schwer';col='var(--fuel)';eng2='Leistungsabfall unter Last';}
+      else {eng='springt nicht an ✗';col='var(--bad)';eng2='P0087 gespeichert';} }
+    $('#sysEng').textContent=eng;$('#sysEng').setAttribute('fill',col);$('#sysEng2').textContent=eng2;
+    const ok=p>=4&&p<=6;
+    $('#sysOut').innerHTML=`<span class="pill ${ign?(ok?'ok':'bad'):''}">Systemdruck: <b>${de(p)} bar</b> (Soll 4–6 bar)</span><span class="pill">Pumpe: <b>${running?'läuft (Summen)':'steht'}</b></span><span class="pill">Rücklauf: <b>${ret?'abgeklemmt':'offen'}</b></span>`;
+  }
+  $('#sysIgn').onclick=()=>{ign=!ign;draw();};
+  $('#sysFault').onchange=draw; $('#sysRet').onchange=draw; draw();
+})();
+
+/* ---------- Messung ---------- */
+(function(){
+  const setG=gauge($('#mnGauge')); let stage=0, timer=null;
+  const out=t=>$('#mnOut').innerHTML=t;
+  const cup=$('#mnCup'), bub=$('#mnBub');
+  function reset(){stage=0;clearInterval(timer);setG(0);cup.setAttribute('height',0);cup.setAttribute('y',294);bub.innerHTML='';
+    $('#mnValveL').setAttribute('transform','');$('#mn1').disabled=false;$('#mn2').disabled=true;$('#mn3').disabled=true;out('<span class="pill">Pumpe aus</span>');}
+  $('#mn0').onclick=reset;
+  $('#mn1').onclick=()=>{stage=1;$('#mn1').disabled=true;$('#mn2').disabled=false;out('<span class="pill ok">Pumpe läuft (Stellglied-Diagnose, begrenzte Zeit)</span><span class="pill">Messleitung voller Luft</span>');setG(0.2);};
+  $('#mn2').onclick=()=>{stage=2;$('#mn2').disabled=true;$('#mn3').disabled=false;$('#mnValveL').setAttribute('transform','rotate(90)');
+    let h=0,n=0;clearInterval(timer);timer=setInterval(()=>{n++;if(n%3===0){h=Math.min(10,h+1);cup.setAttribute('height',h);cup.setAttribute('y',294-h);}
+      const c=el('circle',{cx:360+Math.random()*20,cy:262,r:3,fill:'var(--air)',stroke:'var(--metal)'},bub);setTimeout(()=>c.remove(),600);if(n>30)clearInterval(timer);},120);
+    out('<span class="pill">Entlüften …</span><span class="pill bad">Es kommt viel Luft und kaum Kraftstoff!</span>');};
+  $('#mn3').onclick=()=>{stage=3;$('#mn3').disabled=true;clearInterval(timer);$('#mnValveL').setAttribute('transform','');setG(0.5);
+    out('<span class="pill">Ventil: Durchfluss zum Manometer</span><span class="pill">Zeiger pendelt sich ein – jetzt ablesen!</span>');};
+  reset();
+  const cv=$('#cvR'); cv.oninput=()=>{$('#cvV').textContent=`${de(+cv.value,2)} MPa = ${de(cv.value*10)} bar`;}; cv.oninput();
+})();
+
+/* ---------- Rücklauf abklemmen ---------- */
+(function(){
+  const setG=gauge($('#rtGauge')); let closed=false;
+  const draw=()=>{const f=$('#rtF').value; const p=f==='ssp'?0.5:(closed?5.0:1.1); setG(p);
+    $('#rtB').textContent=closed?'Rücklauf wieder öffnen':'Rücklauf abklemmen';
+    $('#rtOut').innerHTML=`<span class="pill">Rücklauf: <b>${closed?'zu':'offen'}</b></span><span class="pill ${p>=4?'ok':'bad'}">Druck: <b>${de(p)} bar</b></span>`;
+    $('#rtTxt').innerHTML=!closed?'Klemme den Rücklauf ab und beobachte den Zeiger.':(f==='ssp'?'<b>Keine Änderung.</b> Der Regler kann also nicht schuld sein – es kommt einfach zu wenig Kraftstoff an.':'<b>Druck steigt auf Sollwert.</b> → Der Regler hing offen und ließ alles zurücklaufen. Er wäre hier die Ursache.');};
+  $('#rtB').onclick=()=>{closed=!closed;draw();}; $('#rtF').onchange=()=>{closed=false;draw();}; draw();
+})();
+
+/* ---------- Filter-Richtung ---------- */
+(function(){
+  const cx=130,cy=130,dots=$('#ftDots'),dirt=$('#ftDirt');
+  let d='';for(let i=0;i<48;i++){const a=i/48*2*Math.PI,a2=(i+.5)/48*2*Math.PI;d+=`M${cx+38*Math.cos(a)} ${cy+38*Math.sin(a)} L${cx+90*Math.cos(a2)} ${cy+90*Math.sin(a2)} `;}
+  $('#ftPaper').setAttribute('d',d);
+  let parts=[],stuck=0,cap=0,full=false,t=0;
+  function reset(){parts=[];stuck=0;full=false;dots.innerHTML='';dirt.innerHTML='';cap=$('#ftDir').value==='in'?60:24;}
+  $('#ftReset').onclick=reset;$('#ftDir').onchange=reset;reset();
+  function step(){
+    t++; const inward=$('#ftDir').value==='in';
+    if(!full&&t%4===0){const a=Math.random()*2*Math.PI;const r0=inward?120:6;
+      const c=el('circle',{r:2.4,fill:Math.random()<.35?'#3b2f22':'var(--ret)'},dots);parts.push({a,r:r0,c,dirt:c.getAttribute('fill')==='#3b2f22'});}
+    parts=parts.filter(p=>{p.r+=inward?-1.6:1.6; const surf=inward?90:38;
+      if(p.dirt&&((inward&&p.r<=surf)||(!inward&&p.r>=surf))){p.c.remove();
+        const ring=Math.floor(stuck/ (inward?60:24)); const rr=inward?92+ring*3:36-ring*3;
+        el('circle',{cx:cx+rr*Math.cos(p.a),cy:cy+rr*Math.sin(p.a),r:2.6,fill:'#3b2f22'},dirt);stuck++;return false;}
+      if((inward&&p.r<8)||(!inward&&p.r>118)){p.c.remove();return false;}
+      p.c.setAttribute('cx',cx+p.r*Math.cos(p.a));p.c.setAttribute('cy',cy+p.r*Math.sin(p.a));return true;});
+    const max=cap*2; if(stuck>=max&&!full){full=true;}
+    $('#ftCnt').textContent=stuck;
+    const s=$('#ftState'); s.className='pill '+(full?'bad':stuck>max*.6?'':'ok');
+    s.textContent=full?`Filter dicht! (Kapazität ${max} Partikel)`:`Filter ${stuck>max*.6?'setzt sich zu':'frei'} (${Math.round(stuck/max*100)} % belegt)`;
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+})();
+
+/* ---------- Saug-/Druckseite ---------- */
+(function(){
+  const c=$('#sgC'); const draw=()=>{const v=+c.value/100; const need=0.1+6.3*v*v; // bar Druckdifferenz nötig
+    $('#sgCv').textContent=Math.round(v*100)+' %';
+    const x=150+Math.min(need,6)/6*420; $('#sgNeed1').setAttribute('x1',x);$('#sgNeed1').setAttribute('x2',x);
+    const tt=$('#sgNeedT'); tt.setAttribute('x',Math.min(x+4,470)); tt.textContent='nötig: '+de(need)+' bar';
+    const s=need<=0.9, d=need<=5;
+    $('#sgOut').innerHTML=`<span class="pill ${s?'ok':'bad'}">Filter auf Saugseite: <b>${s?'Kraftstoff kommt durch':'reicht nicht!'}</b></span><span class="pill ${d?'ok':'bad'}">Filter auf Druckseite: <b>${d?'Kraftstoff kommt durch':'reicht nicht!'}</b></span>`;};
+  c.oninput=draw;draw();
+})();
+
+/* ---------- Last ---------- */
+(function(){
+  const c=$('#lsC'),l=$('#lsL'),W=460,MAX=1.5;
+  const draw=()=>{const v=+c.value/100, need=+l.value; const cap=1.5*Math.pow(1-v,1.3)+ (v>=1?0:0.004);
+    const flow=Math.min(need,cap); $('#lsCv').textContent=Math.round(v*100)+' %';
+    $('#lsNeed').setAttribute('width',Math.max(3,need/MAX*W));$('#lsFlow').setAttribute('width',Math.max(v>=1?0:3,flow/MAX*W));
+    const p=cap>=need?5:5*cap/need; let txt,cls;
+    if(cap>=need){txt='Motor läuft normal';cls='ok';}else if(need<0.05){txt='Motor springt nicht an / geht aus';cls='bad';}else{txt='Leistungsabfall!';cls='bad';}
+    $('#lsOut').innerHTML=`<span class="pill">Filter schafft max.: <b>${de(cap,2)} l/min</b></span><span class="pill ${p>=4?'ok':'bad'}">Systemdruck: <b>${de(p)} bar</b></span><span class="pill ${cls}">${txt}</span>`;};
+  c.oninput=draw;l.onchange=draw;draw();
+})();
+
+/* ---------- Fördermenge ---------- */
+(function(){
+  let run=null;
+  $('#fmGo').onclick=()=>{
+    if(run)return; const good=$('#fmP').value==='good'; const total=good?620:100; const dur=6000; const t0=performance.now();
+    const fill=$('#fmFill'), bub=$('#fmBubbles'); $('#fmGo').disabled=true; $('#fmOut').innerHTML='<span class="pill">Pumpe läuft …</span>';
+    const tick=now=>{const k=Math.min(1,(now-t0)/dur); const ml=total*k; const h=ml/500*117;
+      fill.setAttribute('y',270-h);fill.setAttribute('height',h);
+      $('#fmT').textContent=de(30*k)+' s'; $('#fmV').textContent=Math.round(ml)+' ml';
+      if(!good&&Math.random()<.4){const c=el('circle',{cx:200+Math.random()*6-3,cy:112+Math.random()*16,r:2.5+Math.random()*2,fill:'var(--air)',stroke:'var(--metal)'},bub);setTimeout(()=>c.remove(),400);}
+      if(k<1){run=requestAnimationFrame(tick);}else{run=null;$('#fmGo').disabled=false;
+        const ok=ml>=450; $('#fmOut').innerHTML=`<span class="pill ${ok?'ok':'bad'}">${Math.round(ml)} ml in 30 s – Soll ≥ 450 ml</span><span class="pill">${good?'Druck stabil bei 4 bar':'viel Luft, 4 bar nicht einstellbar'}</span>`;}};
+    run=requestAnimationFrame(tick);
+  };
+  $('#fmP').onchange=()=>{$('#fmFill').setAttribute('height',0);$('#fmT').textContent='0,0 s';$('#fmV').textContent='0 ml';$('#fmOut').innerHTML='';};
+})();
+
+/* ---------- Tankentlüftung ---------- */
+(function(){
+  let lvl=97,vac=0,running=false,raf;
+  const draw=()=>{const blocked=$('#vtBlock').checked, open=$('#vtCapO').checked; const vented=!blocked||open;
+    $('#vtX').style.display=blocked?'':'none'; $('#vtCap').style.display=open?'none':'';
+    $('#vtFuel').setAttribute('y',197-lvl);$('#vtFuel').setAttribute('height',lvl);$('#vtAir').setAttribute('height',Math.max(0,164-lvl));
+    $('#vtVac').textContent=vac>0.05?`Unterdruck −${de(vac,2)} bar`:'Luft strömt nach';
+    $('#vtRes').innerHTML=`<span class="pill ${vented?'ok':'bad'}">Belüftung: <b>${vented?'ja':'nein'}</b></span><span class="pill ${vac>0.5?'bad':'ok'}">Förderung: <b>${vac>0.5?'bricht ein':'normal'}</b></span><span class="pill">„Unser Fall“: Tankdeckel ab → <b>keine Änderung</b></span>`;};
+  const loop=()=>{const vented=!$('#vtBlock').checked||$('#vtCapO').checked;
+    if(vented){vac=Math.max(0,vac-0.05);}else{vac=Math.min(0.9,vac+0.008);}
+    const flow=Math.max(0,1-vac/0.7); if(lvl>10)lvl-=0.15*flow;
+    $('#vtOut').classList.toggle('off',flow<0.05);draw();
+    if(running)raf=requestAnimationFrame(loop);};
+  $('#vtGo').onclick=()=>{running=!running;$('#vtGo').textContent=running?'Pumpe stoppen':'Pumpe laufen lassen';if(running){if(lvl<=12)lvl=97;loop();}else{$('#vtOut').classList.add('off');}};
+  $('#vtBlock').onchange=draw;$('#vtCapO').onchange=draw;draw();
+})();
+
+/* ---------- Satteltank ---------- */
+(function(){
+  const CAP=30,SCAP=3; let L,R,S,running=false,last=0,engine=true;
+  function reset(){L=12;R=12;S=SCAP;engine=true;draw();}
+  function level(rect,v,cap,x0,ybot,hmax){const h=v/cap*hmax;rect.setAttribute('y',ybot-h);rect.setAttribute('height',h);}
+  function draw(){
+    level($('#stL'),L,CAP,0,278,196);level($('#stR'),R,CAP,0,278,196);level($('#stS'),S,SCAP,0,277,117);
+    const def=$('#stDef').checked; $('#stBreak').style.display=def?'':'none';$('#stS2c').setAttribute('fill',def?'var(--bad)':'var(--accent)');
+    const pumping=running&&engine;
+    $('#stFeed').classList.toggle('off',!pumping);$('#stRet').classList.toggle('off',!pumping);$('#stRot').classList.toggle('off',!pumping);
+    $('#stS1').classList.toggle('off',!(pumping&&L>0.05));$('#stS2').classList.toggle('off',!(pumping&&!def&&R>0.05));
+    $('#stLt').textContent=`links: ${de(L)} l`;$('#stRt').textContent=`rechts: ${de(R)} l`;
+    const gauge=R+L+S; // Tankgeber
+    $('#stOut').innerHTML=`<span class="pill">Schwalltopf: <b>${de(S)} l</b></span><span class="pill ${engine?'ok':'bad'}">Motor: <b>${engine?(running?'läuft':'bereit'):'aus – springt nicht an'}</b></span><span class="pill">Systemdruck: <b>${engine?'5,0':'0,5'} bar</b></span><span class="pill">Tankanzeige: <b>${de(gauge,0)} l</b></span>`;
+    $('#stGo').textContent=running?'⏸ Anhalten':'▶ Fahren';
+  }
+  function loop(now){ if(!running)return; const dt=Math.min(0.05,(now-last)/1000);last=now; const k=dt*4;
+    const def=$('#stDef').checked;
+    if(engine){ S-=0.6*k; // Verbrauch
+      const a=Math.min(L,0.8*k);L-=a;S+=a;
+      if(!def){const b=Math.min(R,0.8*k);R-=b;S+=b;}
+      if(S>SCAP){L+=S-SCAP;S=SCAP;} // Überlauf
+      if(S<=0.05){S=Math.max(0,S);engine=false;}
+    }
+    draw(); requestAnimationFrame(loop);}
+  $('#stGo').onclick=()=>{running=!running;if(running){if(!engine&&S>0.5)engine=true;last=performance.now();requestAnimationFrame(loop);}draw();};
+  $('#stFill').onclick=()=>{L=Math.min(CAP,L+10);const t=Math.min(SCAP-S,L);S+=t;L-=t; if(S>0.5)engine=true;draw();};
+  $('#stReset').onclick=()=>{running=false;reset();};
+  $('#stDef').onchange=draw; reset();
+})();
+})();
+</script>
+</body>
+</html>
