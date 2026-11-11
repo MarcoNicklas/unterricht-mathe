@@ -105,6 +105,7 @@ footer{max-width:980px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);f
 .end{text-align:center}
 .wide{overflow-x:auto}
 @media (max-width:720px){.wide svg{min-width:680px}.wide::after{content:"← zum Verschieben wischen →";display:block;text-align:center;font-size:.75rem;color:var(--muted)}}
+input[type=number]{font:inherit;padding:4px 6px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);width:84px}
 .big{font-size:2.2rem;font-weight:800;color:var(--accent)}
 </style>
 </head>
@@ -112,13 +113,13 @@ footer{max-width:980px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);f
 <header class="top">
   <div class="topin">
     <h1>🔧 Fehlersuche Kraftstoffversorgung</h1>
-    <span class="score" id="score">0 / 6 Auswahlfragen richtig · 0 / 5 Textfragen bearbeitet</span>
+    <span class="score" id="score">0 / 9 Auswahlfragen richtig · 0 / 5 Textfragen bearbeitet</span>
   </div>
   <div class="bar"><i id="prog"></i></div>
   <nav class="toc">
     <a href="#fall">Der Fall</a><a href="#grundlagen">Grundlagen</a><a href="#system">System-Simulator</a>
     <a href="#druck">Systemdruck</a><a href="#filter">Kraftstofffilter</a><a href="#pumpe">Fördermenge</a>
-    <a href="#entlueftung">Tankentlüftung</a><a href="#tank">Satteltank</a><a href="#ende">Ergebnis</a>
+    <a href="#entlueftung">Tankentlüftung</a><a href="#tank">Satteltank</a><a href="#diesel">Ausblick Diesel</a><a href="#ende">Ergebnis</a>
   </nav>
 </header>
 
@@ -197,6 +198,17 @@ footer{max-width:980px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);f
     <li><b>Druckregler</b> an der Verteilerleiste: hält den Druck konstant, indem er den <b>Rücklauf</b> zum Tank öffnet oder schließt.</li>
     <li><b>Kraftstoffpumpensteuergerät</b> (bei Bedarfsregelung): bekommt vom Motorsteuergerät ein PWM-Signal oder Daten (CAN/LIN) und steuert die Pumpendrehzahl.</li>
   </ol>
+
+  <h3>Zweileitungs- oder Einleitungssystem?</h3>
+  <div class="tw"><table>
+    <tr><th></th><th>Zweileitungssystem (unser Fahrzeug)</th><th>Einleitungssystem</th></tr>
+    <tr><td>Leitungen zum Motor</td><td>Förderleitung + Rücklauf</td><td>nur Förderleitung</td></tr>
+    <tr><td>Druckregler</td><td>an der Verteilerleiste, mit Anschluss zum Saugrohr</td><td>im Tank bei der Pumpe, ohne Anschluss zum Saugrohr</td></tr>
+    <tr><td>Rücklauf</td><td>vom Regler zurück zum Tank</td><td>nur innerhalb des Tanks</td></tr>
+    <tr><td>Ausgleich des Saugrohrdrucks</td><td>mechanisch über den Druckregler</td><td>Steuergerät korrigiert die Einspritzzeit</td></tr>
+    <tr><td>Pumpe</td><td>vollfördernd oder bedarfsgeregelt</td><td>nur vollfördernd</td></tr>
+  </table></div>
+  <p class="qsub">Ein Vorteil des Einleitungssystems: Es fließt kein am Motor erwärmter Kraftstoff zurück in den Tank. Der Tank heizt sich weniger auf, es entstehen weniger Kraftstoffdämpfe.</p>
 
   <div class="sim" id="simRegler">
     <div class="simt">Simulation: Warum hängt der Druckregler am Saugrohr?</div>
@@ -439,6 +451,55 @@ footer{max-width:980px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);f
     </div>
   </div>
   <p class="info">In unserem Fall bleibt der Druck <b>unverändert bei 0,5 bar</b>. Würde genug Kraftstoff gefördert und nur ein offener Regler den Druckaufbau verhindern, müsste jetzt der Sollwert (4–6 bar) erreicht werden. → Der Druckregler ist in Ordnung. <b>Es kommt zu wenig Kraftstoff an der Verteilerleiste an.</b></p>
+
+  <h3>Zusatzprüfung: Haltedruck</h3>
+  <p>Nach dem Abstellen soll der Druck noch einige Minuten im System bleiben. Dafür sorgen das <b>Rückschlagventil</b> in der Pumpe, der geschlossene <b>Druckregler</b> und dichte <b>Einspritzventile</b>. Fällt der Druck zu schnell ab, muss die Pumpe beim nächsten Start erst wieder Druck aufbauen: Der Motor <b>springt schlecht an</b>, besonders warm (Dampfblasen in der Leitung).</p>
+  <p><b>So wird geprüft:</b> Manometer wie oben anschließen, Pumpe laufen lassen, abschalten und den Druckabfall beobachten. Wartezeit und Grenzwert stehen in den Herstellerdaten. Fällt der Druck zu schnell, sucht man das Leck durch Abklemmen:</p>
+  <ul>
+    <li><b>Förderleitung</b> abklemmen und der Druck hält → Rückschlagventil der Pumpe undicht.</li>
+    <li><b>Rücklauf</b> abklemmen und der Druck hält → Druckregler undicht.</li>
+    <li>Beides abgeklemmt und der Druck fällt trotzdem → Einspritzventil undicht (tropft nach).</li>
+  </ul>
+  <div class="sim" id="simHalte">
+    <div class="simt">Simulation: Haltedruck messen (Zeitraffer)</div>
+    <div class="grid2">
+      <svg viewBox="0 0 420 220" aria-label="Druckabfall über der Zeit">
+        <line x1="40" y1="190" x2="400" y2="190" stroke="var(--ink)"/><line x1="40" y1="20" x2="40" y2="190" stroke="var(--ink)"/>
+        <line x1="36" y1="190.0" x2="40" y2="190.0" stroke="var(--ink)"/><text x="30" y="194.0" class="labm" text-anchor="end">0</text><line x1="36" y1="161.7" x2="40" y2="161.7" stroke="var(--ink)"/><text x="30" y="165.7" class="labm" text-anchor="end">1</text><line x1="36" y1="133.3" x2="40" y2="133.3" stroke="var(--ink)"/><text x="30" y="137.3" class="labm" text-anchor="end">2</text><line x1="36" y1="105.0" x2="40" y2="105.0" stroke="var(--ink)"/><text x="30" y="109.0" class="labm" text-anchor="end">3</text><line x1="36" y1="76.7" x2="40" y2="76.7" stroke="var(--ink)"/><text x="30" y="80.7" class="labm" text-anchor="end">4</text><line x1="36" y1="48.3" x2="40" y2="48.3" stroke="var(--ink)"/><text x="30" y="52.3" class="labm" text-anchor="end">5</text><line x1="36" y1="20.0" x2="40" y2="20.0" stroke="var(--ink)"/><text x="30" y="24.0" class="labm" text-anchor="end">6</text><line x1="40" y1="190" x2="40" y2="195" stroke="var(--ink)"/><text x="40" y="208" class="labm" text-anchor="middle">0</text><line x1="112" y1="190" x2="112" y2="195" stroke="var(--ink)"/><text x="112" y="208" class="labm" text-anchor="middle">2</text><line x1="184" y1="190" x2="184" y2="195" stroke="var(--ink)"/><text x="184" y="208" class="labm" text-anchor="middle">4</text><line x1="256" y1="190" x2="256" y2="195" stroke="var(--ink)"/><text x="256" y="208" class="labm" text-anchor="middle">6</text><line x1="328" y1="190" x2="328" y2="195" stroke="var(--ink)"/><text x="328" y="208" class="labm" text-anchor="middle">8</text><line x1="400" y1="190" x2="400" y2="195" stroke="var(--ink)"/><text x="400" y="208" class="labm" text-anchor="middle">10</text>
+        <text x="44" y="16" class="labm">Druck in bar</text><text x="400" y="218" class="labm" text-anchor="end">Zeit in min</text>
+        <line x1="40" y1="105" x2="400" y2="105" stroke="var(--ok)" stroke-width="2" stroke-dasharray="5 3"/>
+        <text x="396" y="99" class="labm" text-anchor="end" style="fill:var(--ok)">Beispiel-Grenzwert 3 bar nach 10 min</text>
+        <path id="hdCurve" d="" fill="none" stroke="var(--press)" stroke-width="3"/>
+      </svg>
+      <div>
+        <div class="ctrls"><label>Fahrzeug: <select id="hdF">
+          <option value="ok">Anlage in Ordnung</option>
+          <option value="rsv">Fehler A</option>
+          <option value="reg">Fehler B</option>
+          <option value="ev">Fehler C</option>
+        </select></label></div>
+        <div class="ctrls" style="flex-direction:column;align-items:flex-start">
+          <label><input type="checkbox" id="hdCF"> Förderleitung abklemmen</label>
+          <label><input type="checkbox" id="hdCR"> Rücklauf abklemmen</label>
+          <button class="btn" id="hdGo">Pumpe aus – Druckabfall messen</button>
+        </div>
+        <div class="readout" id="hdOut"><span class="pill">Noch nicht gemessen</span></div>
+        <p class="qsub">Finde für Fehler A, B und C heraus, welches Bauteil undicht ist.</p>
+      </div>
+    </div>
+  </div>
+  <div class="q" data-type="mc" data-answer="1" id="qz1">
+    <div class="qh"><div class="qn">Z1</div><div><div class="qt">Der Haltedruck fällt schnell ab. Klemmt man die Förderleitung ab, bleibt der Druck stabil. Welches Bauteil ist undicht?</div><div class="qsub">Zusatzfrage</div></div></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="qz1">der Druckregler</label>
+      <label class="opt"><input type="radio" name="qz1">das Rückschlagventil in der Kraftstoffpumpe</label>
+      <label class="opt"><input type="radio" name="qz1">ein Einspritzventil</label>
+      <label class="opt"><input type="radio" name="qz1">der Kraftstofffilter</label>
+    </div>
+    <div class="tips"><details><summary>Tipp</summary>Durch das Abklemmen wird ein Bauteil vom Manometer getrennt. Welches sitzt auf der anderen Seite der Förderleitung? Probiere es in der Simulation mit Fehler A aus.</details></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung: das Rückschlagventil in der Pumpe</h4>Hinter der abgeklemmten Förderleitung liegt nur noch die Pumpe. Hält der Druck jetzt, ist der Kraftstoff vorher durch die Pumpe zurück in den Tank geflossen. <b>Bei unserem Fahrzeug bringt diese Prüfung nichts:</b> Es baut sich ja gar kein Druck auf, der gehalten werden könnte.</div>
+  </div>
 </section>
 
 <!-- ===================== FILTER ===================== -->
@@ -579,6 +640,25 @@ footer{max-width:980px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);f
   </div>
   <p>Schon beim Entlüften fällt auf: <b>viel Luft, wenig Kraftstoff</b>, der Systemdruck lässt sich nicht auf 4 bar einstellen. Die Messung ist so eigentlich sinnlos – trotzdem: <b>100 ml in 30 Sekunden</b>.</p>
 
+  <div class="sim" id="simRech">
+    <div class="simt">Rechner: Fördermenge umrechnen</div>
+    <div class="ctrls"><label>gemessen <input type="number" id="rcMl" value="450" min="0" max="3000" step="10"> ml in <input type="number" id="rcS" value="30" min="1" max="300" step="1"> s</label></div>
+    <div class="readout" id="rcOut"></div>
+    <p class="qsub">Umrechnung: ml ÷ 1000 = l · ml pro 30 s × 2 = ml pro Minute · l/min × 60 = l/h</p>
+  </div>
+  <div class="q" data-type="mc" data-answer="1" id="qz2">
+    <div class="qh"><div class="qn">Z2</div><div><div class="qt">Wie viel Prozent der vorgeschriebenen Mindestfördermenge liefert die Pumpe unseres Fahrzeugs?</div><div class="qsub">Zusatzfrage – rechnen Sie selbst oder benutzen Sie den Rechner.</div></div></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="qz2">ca. 10 %</label>
+      <label class="opt"><input type="radio" name="qz2">ca. 22 %</label>
+      <label class="opt"><input type="radio" name="qz2">ca. 45 %</label>
+      <label class="opt"><input type="radio" name="qz2">ca. 78 %</label>
+    </div>
+    <div class="tips"><details><summary>Tipp</summary>Gemessen: 100 ml in 30 s. Soll: mindestens 450 ml in 30 s. Prozentwert = Istwert ÷ Sollwert × 100 %.</details></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung: ca. 22 %</h4>100 ml ÷ 450 ml × 100 % ≈ <b>22 %</b>. Hochgerechnet sind das 100 ml × 2 = 0,2 l/min = <b>12 l/h</b> statt mindestens 0,9 l/min = 54 l/h.</div>
+  </div>
+
   <div class="q" data-type="multi" data-answer="1,3,5" id="q10">
     <div class="qh"><div class="qn">10</div><div><div class="qt">Welche Aussagen sind in Bezug auf die erfolgte Prüfung richtig?</div><div class="qsub">Mehrere Antworten möglich.</div></div></div>
     <div class="opts">
@@ -692,6 +772,8 @@ footer{max-width:980px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);f
     <div class="readout" id="stOut"></div>
   </div>
 
+  <p class="info"><b>Warum zeigt die Tankanzeige trotzdem „genug“?</b> Der <b>Tankgeber</b> ist ein Schwimmer mit Potenziometer (Schleifbahn). Beim Satteltank sitzt meist in jeder Hälfte ein Geber, und die Anzeige wertet beide zusammen aus. Eine leere linke Hälfte fällt deshalb nicht auf, solange rechts genug drin ist. Bei bedarfsgeregelten Systemen versorgt das Pumpensteuergerät den Geber mit 48-V-PWM. Das verhindert einen nicht leitenden Belag auf der Schleifbahn. Alternativ gibt es geschlossene Geber mit Dünnschichtwiderständen.</p>
+
   <p>Nach dem Öffnen des Tanks sieht man sofort: <b>Die linke Hälfte ist leer, die rechte gut gefüllt.</b></p>
   <div class="q" data-type="mc" data-answer="1" id="q11">
     <div class="qh"><div class="qn">11</div><div class="qt">Was ist die Ursache?</div></div>
@@ -703,14 +785,102 @@ footer{max-width:980px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);f
     </div>
     <div class="tips"><details><summary>Tipp</summary>Welche Hälfte wird nicht mehr leer gepumpt? Welche Saugstrahlpumpe ist dafür zuständig? Probiere es in der Simulation aus.</details></div>
     <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
-    <div class="sol"><h4>Lösung: Die Saugstrahlpumpe im vollen (rechten) Tank ist defekt.</h4>Der Anschluss der Leitung zum Schwalltopf ist an der rechten Saugstrahlpumpe <b>abgebrochen</b>. Sie konnte keinen Kraftstoff mehr in den Schwalltopf fördern, also wurde nur noch die linke Hälfte leer gefahren. Als die leer war, ging der Motor aus und sprang nicht mehr an – obwohl die Tankanzeige (Geber rechts) noch genug anzeigte.<br><br><b>Gegenprobe ohne Tank öffnen:</b> 5–10 l nachtanken. Dann ist die linke Hälfte wieder gefüllt und der Motor springt an.</div>
+    <div class="sol"><h4>Lösung: Die Saugstrahlpumpe im vollen (rechten) Tank ist defekt.</h4>Der Anschluss der Leitung zum Schwalltopf ist an der rechten Saugstrahlpumpe <b>abgebrochen</b>. Sie konnte keinen Kraftstoff mehr in den Schwalltopf fördern, also wurde nur noch die linke Hälfte leer gefahren. Als die leer war, ging der Motor aus und sprang nicht mehr an – obwohl die Tankanzeige noch genug anzeigte (die rechte Hälfte war ja voll).<br><br><b>Gegenprobe ohne Tank öffnen:</b> 5–10 l nachtanken. Dann ist die linke Hälfte wieder gefüllt und der Motor springt an.</div>
   </div>
+</section>
+
+<!-- ===================== DIESEL ===================== -->
+<section class="card" id="diesel">
+  <div class="kicker">Ausblick</div>
+  <h2>Besonderheiten beim Diesel</h2>
+  <p>Unser Fahrzeug ist ein Benziner. In der Werkstatt kommen aber genauso oft Diesel. Diesel hat eine <b>höhere Dichte</b> (ca. 0,84 kg/l), ist <b>dickflüssiger</b>, enthält <b>mehr Verunreinigungen</b> und ist bei Kälte nicht ohne Weiteres verwendbar. Weil die Hochdruckpumpe und die Einspritzdüsen sehr enge Spalte haben, muss Diesel etwa <b>doppelt so rein</b> sein wie Benzin. Deshalb gibt es mehrstufige Filter (Grobfilter, Feinfilter, Koaleszenzabscheider) mit Wechselintervallen von 30 000 bis 90 000 km.</p>
+
+  <h3>Wasser im Diesel</h3>
+  <p>Diesel nimmt Wasser auf; erlaubt sind bis 200 mg pro kg (EN 590). Im Kraftstoffsystem wird ein Teil davon wieder ausgeschieden. Wasser (0,998 kg/l) ist schwerer als Diesel (0,84 kg/l) und sinkt deshalb nach unten. Im Hochdrucksystem richtet es großen Schaden an: schlechte Verbrennung, weniger Schmierung, Korrosion und Kavitation an Pumpe und Düsen. Deshalb hat der Dieselfilter einen <b>Wasserabscheider</b>.</p>
+  <div class="sim" id="simWasser">
+    <div class="simt">Simulation: Wasserabscheider im Dieselfilter</div>
+    <div class="grid2">
+      <svg viewBox="0 0 300 270" aria-label="Wasserabscheider">
+        <rect x="90" y="20" width="120" height="210" rx="14" fill="var(--fuel-soft)" stroke="var(--metal)" stroke-width="3"/>
+        <clipPath id="wsClip"><rect x="92" y="22" width="116" height="206" rx="12"/></clipPath>
+        <rect id="wsW" x="92" y="228" width="116" height="0" fill="var(--ret)" opacity=".7" clip-path="url(#wsClip)"/>
+        <rect x="110" y="40" width="80" height="120" rx="6" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M120 44 V156 M130 44 V156 M140 44 V156 M150 44 V156 M160 44 V156 M170 44 V156 M180 44 V156" stroke="var(--line)" stroke-width="2"/>
+        <text x="120" y="104" class="lab" font-weight="700">Filter</text>
+        <path d="M10 60 H90" stroke="var(--fuel)" stroke-width="6"/><text x="6" y="50" class="labm">vom Tank</text>
+        <path d="M150 20 V4 H290" fill="none" stroke="var(--fuel)" stroke-width="6"/><text x="214" y="20" class="labm">zur Pumpe</text>
+        <line x1="210" y1="190" x2="240" y2="190" stroke="var(--ink)" stroke-width="2"/><circle id="wsLamp" cx="250" cy="190" r="8" fill="var(--line)"/>
+        <text x="214" y="210" class="labm">Wasserstand-</text><text x="214" y="222" class="labm">sensor (Lkw)</text>
+        <rect x="140" y="230" width="20" height="12" fill="var(--metal)"/><text x="166" y="242" class="labm">Ablassschraube</text>
+        <path id="wsDrain" d="M150 242 V266" stroke="var(--ret)" stroke-width="5" class="flow" style="display:none"/>
+        <g id="wsDrops"></g>
+      </svg>
+      <div>
+        <div class="ctrls"><button class="btn" id="wsGo">▶ Fahren</button><button class="btn sec" id="wsEnt">Entwässern</button></div>
+        <div class="readout" id="wsOut"></div>
+        <p class="qsub" style="margin-top:10px">Die Koaleszenzschicht im Filter lässt winzige Wassertröpfchen zu großen Tropfen zusammenwachsen. Diese sinken nach unten in den Sammelraum. <b>Entwässern:</b> Ablassschraube öffnen und für Luft von oben sorgen, zum Beispiel über die Entlüftungsschraube (Bierdosen-Prinzip). Die vom Hersteller vorgegebene Menge in einen Auffangbehälter ablassen, dann mit sauberem Diesel auffüllen und gegebenenfalls entlüften. Beim Pkw genügt meist der Filterwechsel nach Plan.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Diesel im Winter: Versulzen</h3>
+  <p>Diesel enthält viel <b>Paraffin</b>. Schon bei leichtem Frost bilden sich daraus Kristalle, die verklumpen und den Filter verstopfen. Die zähe Masse nennt man „Sulz“. Dagegen helfen Zusätze an der Tankstelle und die <b>Kraftstoffvorwärmung am Filter</b>, entweder durch warmen Rücklauf oder durch ein elektrisches Heizelement.</p>
+  <div class="tw"><table>
+    <tr><th>Dieselsorte</th><th>Zeitraum (Deutschland)</th><th>fließt sicher bis</th></tr>
+    <tr><td>Sommerdiesel</td><td>15.04. – 30.09.</td><td>0 °C</td></tr>
+    <tr><td>Übergangsdiesel</td><td>01.03. – 14.04. und 01.10. – 15.11.</td><td>−10 °C</td></tr>
+    <tr><td>Winterdiesel</td><td>16.11. – 28.02.</td><td>−20 °C</td></tr>
+  </table></div>
+  <div class="sim" id="simSulz">
+    <div class="simt">Simulation: Versulzen</div>
+    <div class="grid2">
+      <svg viewBox="0 0 330 190" aria-label="Versulzen">
+        <rect x="10" y="60" width="70" height="90" rx="8" fill="var(--fuel-soft)" stroke="var(--metal)" stroke-width="2"/><text x="26" y="170" class="labm">Tank</text>
+        <path id="vsL1" d="M80 120 H150" class="flow" stroke="var(--fuel)" stroke-width="7" fill="none"/>
+        <rect x="150" y="70" width="60" height="100" rx="6" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M160 74 V166 M170 74 V166 M180 74 V166 M190 74 V166 M200 74 V166" stroke="var(--line)" stroke-width="2"/>
+        <text x="160" y="186" class="labm">Filter</text>
+        <path id="vsL2" d="M210 120 H320" class="flow" stroke="var(--fuel)" stroke-width="7" fill="none"/>
+        <text x="222" y="98" class="labm">zur Hochdruck-</text><text x="222" y="110" class="labm">pumpe →</text>
+        <g id="vsCry"></g>
+        <text id="vsT" x="10" y="40" font-size="30" font-weight="800" fill="var(--ink)"></text>
+        <text id="vsH" x="226" y="150" class="labm" style="fill:var(--press)"></text>
+      </svg>
+      <div>
+        <div class="ctrls"><label>Außentemperatur <input type="range" id="vsR" min="-30" max="10" value="-5"></label></div>
+        <div class="ctrls"><label>getankt: <select id="vsS"><option value="0">Sommerdiesel</option><option value="-10">Übergangsdiesel</option><option value="-20">Winterdiesel</option></select></label></div>
+        <div class="ctrls"><label><input type="checkbox" id="vsW"> Kraftstoffvorwärmung am Filter aktiv (Motor warm)</label></div>
+        <div class="readout" id="vsOut"></div>
+        <p class="qsub" id="vsDate"></p>
+      </div>
+    </div>
+  </div>
+  <div class="q" data-type="mc" data-answer="1" id="qz3">
+    <div class="qh"><div class="qn">Z3</div><div><div class="qt">Ein Kunde hat Anfang Oktober Diesel getankt und seitdem nicht mehr. Heute Nacht sind −15 °C angesagt. Was droht beim Kaltstart am Morgen?</div><div class="qsub">Zusatzfrage</div></div></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="qz3">Nichts, Diesel fließt immer bis −20 °C.</label>
+      <label class="opt"><input type="radio" name="qz3">Paraffinkristalle können den Filter verstopfen (Versulzen).</label>
+      <label class="opt"><input type="radio" name="qz3">Das Wasser im Diesel verdampft und erzeugt Dampfblasen.</label>
+      <label class="opt"><input type="radio" name="qz3">Der Druckregler friert in geöffneter Stellung fest.</label>
+    </div>
+    <div class="tips"><details><summary>Tipp</summary>Welche Dieselsorte gibt es Anfang Oktober an der Zapfsäule, und bis zu welcher Temperatur fließt sie sicher? Stelle es in der Simulation ein (ohne Vorwärmung, der Motor ist ja kalt).</details></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung: Versulzen</h4>Anfang Oktober gibt es <b>Übergangsdiesel</b>, der nur bis <b>−10 °C</b> sicher fließt. Bei −15 °C bilden sich Paraffinkristalle und der Filter kann verstopfen. Der Motor springt nicht an oder geht nach kurzer Zeit aus. Abhilfe: Fahrzeug in einer warmen Halle auftauen lassen und den Filter erneuern. Winterdiesel tanken.</div>
+  </div>
+
+  <h3>Weitere Unterschiede</h3>
+  <ul>
+    <li><b>Filterwechsel:</b> Gehäuse ganz entleeren und reinigen (Schmutz, Wasser). Den neuen Filter <b>vor dem Einbau mit sauberem Diesel befüllen</b>. Sonst kommt zu viel Luft ins System, der Motor springt nicht an und die Hochdruckpumpe kann ohne Schmierung trocken laufen.</li>
+    <li><b>Entlüften:</b> Moderne Systeme entlüften sich über den Rücklauf selbst. Nach Reparaturen geht das per Diagnosetester (Pumpe und Regler ansteuern). Ältere Systeme mit mechanischer Förderpumpe werden von Hand entlüftet: so lange pumpen, bis an der Entlüfterschraube Diesel ohne Luftblasen austritt.</li>
+    <li><b>Kraftstoffkühler:</b> Bei Pumpe-Düse und Common Rail wird der Rücklauf bis zu 200 °C heiß. Ein Wasser- oder Luftkühler schützt die Kunststoff- und Gummiteile im Tank.</li>
+    <li><b>Common Rail – Druck in Stufen:</b> elektrische Vorförderpumpe im Tank → mechanische Zahnradpumpe → Hochdruckpumpe (Kolbenpumpe) → Rail → Injektoren.</li>
+  </ul>
 </section>
 
 <section class="card end" id="ende">
   <div class="kicker">Ergebnis</div>
   <h2>Diagnosepfad</h2>
-  <div class="big" id="endScore">0 / 7</div>
+  <div class="big" id="endScore">0 / 9</div>
   <p id="endTxt">Auswahlfragen richtig beantwortet</p>
   <div class="wide"><svg viewBox="0 0 900 120" aria-label="Diagnosepfad">
     <g font-size="12" fill="var(--ink)">
@@ -724,9 +894,20 @@ footer{max-width:980px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);f
     <g stroke="var(--muted)" stroke-width="2"><path d="M135 55h20M285 55h20M435 55h20M585 55h20M735 55h20"/></g>
   </svg></div>
   <p class="qsub">Merke: Erst messen, dann tauschen. Jede Prüfung schließt eine mögliche Ursache aus.</p>
+  <h3 style="text-align:left">Typische Fehlerbilder in der Kraftstoffversorgung</h3>
+  <div class="tw" style="text-align:left"><table>
+    <tr><th>Symptom</th><th>häufige Ursachen</th><th>erste Prüfung</th></tr>
+    <tr><td>Pumpe läuft nicht (kein Summen bei „Zündung an“)</td><td>Sicherung, Relais oder Pumpensteuergerät, fehlendes PWM-Signal, Masse, Pumpe</td><td>Fehlerspeicher, Stellglied-Diagnose, Spannung an der Pumpe</td></tr>
+    <tr><td>Startet nicht, Pumpe summt, P0087 <span class="chip">unser Fall</span></td><td>Fördermenge zu gering: Pumpe, Filter, Saugseite im Tank (Saugstrahlpumpe, Schwalltopf), Regler hängt offen</td><td>Systemdruck, Rücklauf abklemmen, Fördermenge</td></tr>
+    <tr><td>Leistungsmangel nur bei Volllast</td><td>Filter teilweise zu, Pumpe schwach</td><td>Fördermenge, Systemdruck unter Last</td></tr>
+    <tr><td>Springt warm schlecht an, lange Startzeit</td><td>Haltedruck fällt ab: Rückschlagventil, Druckregler, Einspritzventil</td><td>Haltedruckprüfung mit Abklemmen</td></tr>
+    <tr><td>Geht bei wenig Tankinhalt in Kurven aus</td><td>Schwalltopf leer: Saugstrahlpumpe, Tellerventil, Saugleitung</td><td>Fördereinheit ausbauen, Sichtprüfung</td></tr>
+    <tr><td>Systemdruck zu hoch, Gemisch zu fett</td><td>Rücklauf geknickt oder verstopft, Regler klemmt zu, Unterdruckschlauch am Regler ab</td><td>Systemdruck im Leerlauf mit und ohne Unterdruckschlauch</td></tr>
+    <tr><td>Diesel: geht im Winter kurz nach dem Start aus</td><td>Versulzen, Wasser im Filter</td><td>Dieselsorte, Filter und Wasserabscheider prüfen</td></tr>
+  </table></div>
 </section>
 </main>
-<footer>Grundlage: Microsoft-Forms-Quiz „Fehlersuche Kraftstoffversorgung“ und E-Lektion „Kraftstoffförderung“. Bilder und Simulationen sind vereinfachte Darstellungen.</footer>
+<footer>Grundlage: Microsoft-Forms-Quiz „Fehlersuche Kraftstoffversorgung“ und E-Lektion „Kraftstoffförderung“, ergänzt um Werkstattwissen (Haltedruck, Fehlerbilder, Dieselsorten nach DIN EN 590). Bilder und Simulationen sind vereinfachte Darstellungen.</footer>
 
 <script>
 (function(){
@@ -999,6 +1180,66 @@ upd();
   $('#stFill').onclick=()=>{L=Math.min(CAP,L+10);const t=Math.min(SCAP-S,L);S+=t;L-=t; if(S>0.5)engine=true;draw();};
   $('#stReset').onclick=()=>{running=false;reset();};
   $('#stDef').onchange=draw; reset();
+})();
+/* ---------- Haltedruck ---------- */
+(function(){
+  const x=t=>40+t/10*360, y=p=>190-p/6*170; let raf=0;
+  const rate=()=>{const f=$('#hdF').value,cF=$('#hdCF').checked,cR=$('#hdCR').checked;let k=1/60;
+    if(f==='rsv'&&!cF)k+=.25; if(f==='reg'&&!cR)k+=.25; if(f==='ev')k+=.25; return k;};
+  $('#hdGo').onclick=()=>{cancelAnimationFrame(raf);const k=rate(),t0=performance.now();
+    const step=now=>{const tt=Math.min(10,(now-t0)/4000*10);let d=`M${x(0)} ${y(5)}`;
+      for(let t=0.1;t<=tt+1e-9;t+=0.1)d+=` L${x(t).toFixed(1)} ${y(5*Math.exp(-k*t)).toFixed(1)}`;
+      $('#hdCurve').setAttribute('d',d);const p=5*Math.exp(-k*tt);
+      $('#hdOut').innerHTML=`<span class="pill">nach <b>${de(tt)} min</b></span><span class="pill">Druck: <b>${de(p)} bar</b></span>`+(tt>=10?`<span class="pill ${p>=3?'ok':'bad'}">${p>=3?'Haltedruck i. O.':'Druck fällt zu schnell ab'}</span>`:'');
+      if(tt<10)raf=requestAnimationFrame(step);};
+    raf=requestAnimationFrame(step);};
+  ['#hdF','#hdCF','#hdCR'].forEach(s=>$(s).onchange=()=>{cancelAnimationFrame(raf);$('#hdCurve').setAttribute('d','');$('#hdOut').innerHTML='<span class="pill">Neu messen …</span>';});
+})();
+
+/* ---------- Rechner Fördermenge ---------- */
+(function(){
+  const f=()=>{const ml=Math.max(0,+$('#rcMl').value||0),s=Math.max(1,+$('#rcS').value||1);
+    const lmin=ml/1000/s*60, pct=lmin/0.9*100;
+    $('#rcOut').innerHTML=`<span class="pill"><b>${de(lmin,2)} l/min</b></span><span class="pill"><b>${de(lmin*60,0)} l/h</b></span><span class="pill ${pct>=100?'ok':'bad'}"><b>${de(pct,0)} %</b> der Mindestmenge (0,9 l/min)</span>`;};
+  $('#rcMl').oninput=f;$('#rcS').oninput=f;f();
+})();
+
+/* ---------- Wasserabscheider ---------- */
+(function(){
+  const MAX=60,WARN=42,g=$('#wsDrops'),drops=[];let w=0,run=false,drain=false,active=false,last=0;
+  function draw(){$('#wsW').setAttribute('y',228-w);$('#wsW').setAttribute('height',w);const full=w>=WARN;
+    $('#wsLamp').setAttribute('fill',full?'var(--bad)':'var(--line)');$('#wsDrain').style.display=drain?'':'none';
+    $('#wsOut').innerHTML=`<span class="pill">Sammelraum: <b>${Math.round(w/MAX*100)} %</b> voll</span><span class="pill ${full?'bad':'ok'}">${full?'⚠️ Wasser im Kraftstoff – entwässern!':'Wasserstand i. O.'}</span>`;
+    $('#wsGo').textContent=run?'⏸ Anhalten':'▶ Fahren';}
+  function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+    if(run&&Math.random()<dt*5)drops.push({c:el('circle',{r:3.5,fill:'var(--ret)'},g),x:Math.random()<.5?100:200,y:50+Math.random()*100});
+    for(let i=drops.length-1;i>=0;i--){const d=drops[i];d.y+=dt*70;d.c.setAttribute('cx',d.x);d.c.setAttribute('cy',d.y);
+      if(d.y>=226-w){d.c.remove();drops.splice(i,1);if(!drain)w=Math.min(MAX,w+1.5);}}
+    if(drain){w=Math.max(0,w-dt*20);if(w<=0)drain=false;}
+    draw();if(run||drain||drops.length)requestAnimationFrame(loop);else active=false;}
+  const go=()=>{if(!active){active=true;last=performance.now();requestAnimationFrame(loop);}};
+  $('#wsGo').onclick=()=>{run=!run;draw();go();};
+  $('#wsEnt').onclick=()=>{if(w>0){drain=true;go();}};
+  draw();
+})();
+
+/* ---------- Versulzen ---------- */
+(function(){
+  const g=$('#vsCry'),cr=[];let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+  for(let i=0;i<40;i++){const inF=i%3!==0,x=inF?154+rnd()*52:84+rnd()*62,y=inF?74+rnd()*92:116+rnd()*8;
+    cr.push(el('rect',{x:x.toFixed(1),y:y.toFixed(1),width:4,height:4,fill:'var(--ink)',opacity:.75,transform:`rotate(45 ${(x+2).toFixed(1)} ${(y+2).toFixed(1)})`},g));}
+  const now=new Date(),md=(now.getMonth()+1)*100+now.getDate();
+  const sorte=md>=1116||md<=229?['Winterdiesel','-20']:(md>=415&&md<=930)?['Sommerdiesel','0']:['Übergangsdiesel','-10'];
+  $('#vsS').value=sorte[1];
+  $('#vsDate').textContent=`Heute (${now.getDate()}.${now.getMonth()+1}.) gibt es an der Zapfsäule ${sorte[0]}.`+(sorte[0]==='Übergangsdiesel'&&md>=1001?' Ab dem 16.11. gibt es Winterdiesel.':'');
+  const draw=()=>{const T=+$('#vsR').value,lim=+$('#vsS').value,warm=$('#vsW').checked,Tf=T+(warm?12:0);
+    const sev=Math.max(0,Math.min(1,(lim+2-Tf)/8)),n=Math.round(sev*cr.length),clog=sev>=.5;
+    cr.forEach((c,i)=>c.style.display=i<n?'':'none');
+    $('#vsT').textContent=(T>0?'+':T<0?'−':'')+Math.abs(T)+' °C';$('#vsH').textContent=warm?`am Filter: ${Tf<0?'−':''}${Math.abs(Tf)} °C`:'';
+    ['#vsL1','#vsL2'].forEach(s=>{$(s).classList.toggle('off',clog);$(s).style.setProperty('--spd',sev>0?'1.8s':'1s');});
+    $('#vsOut').innerHTML=`<span class="pill">fließt sicher bis <b>${lim<0?'−':''}${Math.abs(lim)} °C</b></span>`+
+      (sev===0?'<span class="pill ok">Diesel klar – fließt</span>':clog?'<span class="pill bad">Filter versulzt – Motor geht aus</span>':'<span class="pill">erste Kristalle – fließt noch</span>');};
+  ['#vsR','#vsS','#vsW'].forEach(s=>$(s).oninput=draw);draw();
 })();
 })();
 </script>
