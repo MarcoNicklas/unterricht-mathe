@@ -1,0 +1,947 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Luftmassenmesser</title>
+<style>
+:root{
+  --bg:#f4f6f8; --card:#ffffff; --ink:#1d2733; --muted:#5b6876; --line:#d6dde4;
+  --accent:#1f6f78; --accent-soft:#e1f0f1; --hot:#e0702a; --hot-soft:#fbe3d2;
+  --air:#3a7bd5; --air-soft:#dceafb; --ok:#2e8b57; --ok-soft:#e3f3ea; --bad:#c0392b; --bad-soft:#fbe7e4;
+  --metal:#8796a5; --sig:#d4a017; --scope:#0e1a14; --trace:#4cff8a; --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 14px rgba(0,0,0,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12171c; --card:#1b2229; --ink:#e6edf3; --muted:#9aa8b6; --line:#2f3a45;
+    --accent:#4fb3bd; --accent-soft:#1d3436; --hot:#ff8f4d; --hot-soft:#43281a;
+    --air:#6ea3ff; --air-soft:#1c2d45; --ok:#4cc47f; --ok-soft:#173326; --bad:#ff6b5b; --bad-soft:#3a1f1c;
+    --metal:#7d8b99; --sig:#f0c040; --scope:#08110c; --trace:#4cff8a; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12171c; --card:#1b2229; --ink:#e6edf3; --muted:#9aa8b6; --line:#2f3a45;
+  --accent:#4fb3bd; --accent-soft:#1d3436; --hot:#ff8f4d; --hot-soft:#43281a;
+  --air:#6ea3ff; --air-soft:#1c2d45; --ok:#4cc47f; --ok-soft:#173326; --bad:#ff6b5b; --bad-soft:#3a1f1c;
+  --metal:#7d8b99; --sig:#f0c040; --scope:#08110c; --trace:#4cff8a; --shadow:none;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header.top{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line)}
+.topin{max-width:980px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.topin h1{font-size:1.05rem;margin:0;flex:1;min-width:200px}
+.score{font-size:.9rem;color:var(--muted)}
+.bar{height:4px;background:var(--line)} .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .4s}
+nav.toc{max-width:980px;margin:0 auto;padding:6px 16px 10px;display:flex;gap:6px;overflow-x:auto}
+nav.toc a{white-space:nowrap;font-size:.82rem;text-decoration:none;color:var(--accent);background:var(--accent-soft);padding:3px 10px;border-radius:99px}
+main{max-width:980px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin:0 0 18px;box-shadow:var(--shadow)}
+h2{font-size:1.35rem;margin:.2rem 0 .6rem}
+h3{font-size:1.08rem;margin:1.2rem 0 .4rem}
+.kicker{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.lead{font-size:1.05rem}
+.info{background:var(--accent-soft);border-left:4px solid var(--accent);padding:10px 14px;border-radius:8px;margin:12px 0}
+.warn{background:var(--bad-soft);border-left:4px solid var(--bad);padding:10px 14px;border-radius:8px;margin:12px 0}
+.code{font-family:ui-monospace,Menlo,monospace;background:var(--bad-soft);color:var(--bad);padding:2px 8px;border-radius:6px;font-weight:700}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:720px){.grid2{grid-template-columns:1fr}}
+svg{max-width:100%;height:auto;display:block}
+.sim{border:1px dashed var(--line);border-radius:12px;padding:14px;margin:14px 0;background:color-mix(in srgb,var(--card) 92%,var(--accent) 8%)}
+.sim .simt{font-weight:700;font-size:.95rem;margin-bottom:8px;display:flex;gap:8px;align-items:center}
+.sim .simt::before{content:"▶";font-size:.7rem;color:#fff;background:var(--accent);border-radius:99px;padding:2px 6px}
+.ctrls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:10px 0}
+.ctrls label{font-size:.9rem;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+input[type=range]{width:180px;accent-color:var(--accent)}
+select,button,textarea,input{font:inherit}
+select{padding:5px 8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);max-width:100%}
+.btn{border:0;background:var(--accent);color:#fff;padding:7px 14px;border-radius:9px;cursor:pointer;font-weight:600}
+.btn.sec{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.btn.on{background:var(--hot)}
+.readout{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.pill{padding:4px 10px;border-radius:99px;font-size:.88rem;background:var(--bg);border:1px solid var(--line)}
+.pill.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.pill.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.q{border:2px solid var(--accent);border-radius:12px;padding:16px;margin:16px 0;background:var(--card)}
+.qh{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+.qn{background:var(--accent);color:#fff;font-weight:800;border-radius:8px;min-width:32px;height:32px;display:grid;place-items:center;padding:0 6px}
+.qt{font-weight:650;font-size:1.05rem}
+.qsub{font-size:.85rem;color:var(--muted)}
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border:1px solid var(--line);border-radius:9px;cursor:pointer;background:var(--bg)}
+.opt input{margin-top:4px;accent-color:var(--accent)}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.qact{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.fb{font-weight:600}
+.fb.ok{color:var(--ok)} .fb.bad{color:var(--bad)}
+.sol{display:none;margin-top:12px;padding:12px 14px;border-radius:9px;background:var(--ok-soft);border-left:4px solid var(--ok)}
+.sol.show{display:block}
+.sol h4{margin:0 0 6px;font-size:.95rem}
+textarea{width:100%;min-height:80px;padding:10px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.gap{line-height:2.3}
+.gap input,.num{padding:2px 8px;border-radius:7px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:170px;max-width:100%}
+.num{width:90px}
+.gap input.r,.num.r,select.r{border-color:var(--ok);background:var(--ok-soft)}
+.gap input.w,.num.w,select.w{border-color:var(--bad);background:var(--bad-soft)}
+.selrow{display:grid;grid-template-columns:minmax(120px,190px) 1fr;gap:6px 12px;align-items:center;margin:6px 0}
+@media (max-width:560px){.selrow{grid-template-columns:1fr}}
+.tips{margin-top:8px}
+.tips details{font-size:.9rem;margin:4px 0}
+.tips summary{cursor:pointer;color:var(--accent)}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:600}
+.tw{overflow-x:auto}
+.flow{stroke-dasharray:6 10;animation:dash var(--spd,1s) linear infinite}
+@keyframes dash{to{stroke-dashoffset:-32}}
+.lab{font-size:12px;fill:var(--ink)}
+.labm{font-size:11px;fill:var(--muted)}
+footer{max-width:980px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);font-size:.85rem}
+.end{text-align:center}
+.wide{overflow-x:auto}
+@media (max-width:720px){.wide svg{min-width:640px}.wide::after{content:"← zum Verschieben wischen →";display:block;text-align:center;font-size:.75rem;color:var(--muted)}}
+.big{font-size:2.2rem;font-weight:800;color:var(--accent)}
+.meter{font-family:ui-monospace,Menlo,monospace;font-size:1.8rem;font-weight:800;background:#1d2a22;color:#b8ffcf;padding:6px 14px;border-radius:8px;display:inline-block;min-width:150px;text-align:right}
+.cmp td:first-child{font-weight:600;white-space:nowrap}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="topin">
+    <h1>🌬️ Der Luftmassenmesser (LMM)</h1>
+    <span class="score" id="score"></span>
+  </div>
+  <div class="bar"><i id="prog"></i></div>
+  <nav class="toc">
+    <a href="#fall">Der Fall</a><a href="#aufgabe">Aufgabe</a><a href="#einbau">Einbauort</a><a href="#prinzip">Messprinzip</a>
+    <a href="#aufbau">Aufbau</a><a href="#bauarten">Bauarten</a><a href="#kennlinie">Kennlinie</a><a href="#oszi">Oszilloskop</a>
+    <a href="#pruefen">Prüfen</a><a href="#agr">AGR</a><a href="#fehler">Fehler</a><a href="#uebung">Übung</a><a href="#ende">Ergebnis</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ===================== FALL ===================== -->
+<section class="card" id="fall">
+  <div class="kicker">Der Kundenauftrag</div>
+  <h2>„Mein Auto zieht nicht mehr richtig – und die gelbe Lampe leuchtet.“</h2>
+  <div class="grid2">
+    <div>
+      <p class="lead">Ein Kunde bemerkt unterwegs einen <b>starken Leistungsverlust</b>. Gleichzeitig leuchtet die <b>Motorkontrollleuchte (MIL)</b>. Im Fehlerspeicher der Motorsteuerung steht:</p>
+      <p><span class="code">P0100</span> Luftmassenmesser – Funktionsstörung</p>
+      <p>Auf dieser Seite klärst du Schritt für Schritt: Was macht der Luftmassenmesser, wie misst er, und wie prüfst du ihn in der Werkstatt?</p>
+      <div class="info">So arbeitest du: Erst selbst überlegen, dann <b>Prüfen</b> drücken. Bei Textfragen schreibst du zuerst deine Antwort und vergleichst dann mit der Musterlösung. Tipps helfen dir, wenn du nicht weiterkommst.</div>
+    </div>
+    <svg viewBox="0 0 320 220" aria-label="Kombiinstrument mit Motorkontrollleuchte">
+      <rect x="10" y="10" width="300" height="200" rx="22" fill="#20262d"/>
+      <circle cx="110" cy="105" r="70" fill="#111" stroke="#55606b" stroke-width="4"/>
+      <g stroke="#cfd6dc" stroke-width="2">
+        <line x1="60" y1="140" x2="68" y2="134"/><line x1="48" y1="105" x2="58" y2="105"/><line x1="60" y1="70" x2="68" y2="76"/>
+        <line x1="110" y1="45" x2="110" y2="55"/><line x1="160" y1="70" x2="152" y2="76"/><line x1="172" y1="105" x2="162" y2="105"/>
+      </g>
+      <line x1="110" y1="105" x2="76" y2="122" stroke="#ff5a3c" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="110" cy="105" r="6" fill="#ff5a3c"/>
+      <text x="110" y="160" text-anchor="middle" font-size="11" fill="#cfd6dc">x1000 1/min</text>
+      <g transform="translate(205,70)">
+        <rect x="0" y="0" width="90" height="70" rx="10" fill="#2a2f35"/>
+        <g fill="#ffb000">
+          <path d="M18 22h40v6h8v-6h6v26h-6v-6h-8v8H30l-6-6h-6z"/>
+          <rect x="30" y="14" width="18" height="6" rx="2"/>
+        </g>
+        <text x="45" y="64" text-anchor="middle" font-size="10" fill="#ffb000">CHECK</text>
+      </g>
+      <text x="250" y="170" text-anchor="middle" font-size="11" fill="#cfd6dc">P0100</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ===================== AUFGABE ===================== -->
+<section class="card" id="aufgabe">
+  <div class="kicker">Grundlagen</div>
+  <h2>Welche Aufgabe hat der Luftmassenmesser?</h2>
+
+  <div class="q" data-type="gap" id="g1">
+    <div class="qh"><div class="qn">1</div><div class="qt">Ergänze den Merksatz.</div></div>
+    <div class="gap">Ein Luftmassenmesser misst die <input data-ok="angesaugte luftmasse|luftmasse|angesaugte luft"> , die in den Motor gelangt. Diese Information wird vom <input data-ok="motorsteuergerät|steuergerät|ecu|motorsteuergerät (ecu)|motorsteuergeraet|steuergeraet"> genutzt, um die optimale <input data-ok="kraftstoffmenge|einspritzmenge|kraftstoff"> zu berechnen.</div>
+    <div class="tips"><details><summary>Tipp</summary>Der Name verrät schon, was gemessen wird. Wer rechnet im Auto die Einspritzung aus? Wofür braucht man diese Info?</details></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Der LMM misst die <b>angesaugte Luftmasse</b>. Das <b>Motorsteuergerät (ECU)</b> berechnet daraus die optimale <b>Kraftstoffmenge</b>. Der LMM liefert ein vom Luftmassenstrom abhängiges <b>Spannungssignal</b> an das Steuergerät.</div>
+  </div>
+
+  <div class="q" data-type="mc" data-answer="2" id="q1">
+    <div class="qh"><div class="qn">2</div><div class="qt">Warum ist die Messung der Luftmasse für den Motor wichtig?</div></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q1">Damit der Fahrer im Display sieht, wie viel Luft der Motor braucht.</label>
+      <label class="opt"><input type="radio" name="q1">Damit der Luftfilter rechtzeitig gewechselt wird.</label>
+      <label class="opt"><input type="radio" name="q1">Damit das Luft-Kraftstoff-Gemisch optimal dosiert wird und der Motor effizient arbeitet.</label>
+      <label class="opt"><input type="radio" name="q1">Damit die Drosselklappe weiß, wie weit sie öffnen soll.</label>
+    </div>
+    <div class="tips"><details><summary>Tipp</summary>Benzin verbrennt sauber nur in einem bestimmten Verhältnis zur Luft (ca. 14,7 kg Luft auf 1 kg Kraftstoff).</details></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Nur wenn das Steuergerät die Luftmasse genau kennt, kann es die passende Kraftstoffmenge einspritzen. So wird das Gemisch optimal (λ ≈ 1), der Motor arbeitet effizient und sauber.</div>
+  </div>
+
+  <div class="q" data-type="multi" data-answer="0,1,3,4" id="q2">
+    <div class="qh"><div class="qn">3</div><div class="qt">Welche Auswirkungen hat eine falsche Luftmassenmessung? <span class="qsub">(mehrere Antworten richtig)</span></div></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox">Erhöhter Kraftstoffverbrauch</label>
+      <label class="opt"><input type="checkbox">Leistungsverlust</label>
+      <label class="opt"><input type="checkbox">Die Bremsleistung lässt nach</label>
+      <label class="opt"><input type="checkbox">Unruhiger Motorlauf (Ruckeln, Drehzahlschwankungen)</label>
+      <label class="opt"><input type="checkbox">Höhere Schadstoffemissionen</label>
+      <label class="opt"><input type="checkbox">Die Batterie wird nicht mehr geladen</label>
+    </div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>
+      <div class="tw"><table>
+        <tr><th>Symptom</th><th>Grund</th><th>Beschreibung</th></tr>
+        <tr><td>Erhöhter Verbrauch</td><td>zu viel eingespritzter Kraftstoff durch falsche Luftwerte</td><td>Motor läuft zu fett → mehr Spritverbrauch</td></tr>
+        <tr><td>Leistungsverlust</td><td>falsches Luft-Kraftstoff-Gemisch</td><td>schlechte Verbrennung → weniger Leistung</td></tr>
+        <tr><td>Unruhiger Motorlauf</td><td>ungenaue Einspritzung</td><td>Ruckeln, Drehzahlschwankungen</td></tr>
+        <tr><td>Höhere Emissionen</td><td>unvollständige Verbrennung</td><td>mehr Schadstoffe im Abgas</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <div class="q" data-type="num" id="n1">
+    <div class="qh"><div class="qn">4</div><div class="qt">Rechnen wie das Steuergerät</div></div>
+    <p>Der LMM meldet bei Teillast einen Luftmassenstrom von <b>120 kg/h</b>. Für ein stöchiometrisches Gemisch (λ = 1) braucht Benzin <b>14,7 kg Luft je 1 kg Kraftstoff</b>.<br>
+    Wie viel Kraftstoff muss eingespritzt werden? <input class="num" data-ok="8.16" data-tol="0.06"> kg/h</p>
+    <div class="tips"><details><summary>Tipp 1</summary>Je 14,7 kg Luft gibt es 1 kg Kraftstoff. Wie oft passen 14,7 kg in 120 kg?</details><details><summary>Tipp 2</summary>Rechnung: 120 kg/h : 14,7</details></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>120 kg/h : 14,7 ≈ <b>8,2 kg/h</b> Kraftstoff. Meldet der LMM z. B. 20 % zu wenig Luft (96 kg/h), spritzt das Steuergerät nur 6,5 kg/h ein – das Gemisch wird mager.</div>
+  </div>
+</section>
+
+<!-- ===================== EINBAUORT ===================== -->
+<section class="card" id="einbau">
+  <div class="kicker">Einbauort</div>
+  <h2>Wo sitzt der Luftmassenmesser?</h2>
+  <div class="wide"><svg viewBox="0 0 860 210" aria-label="Ansaugsystem">
+    <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="var(--air)"/></marker></defs>
+    <rect x="20" y="85" width="820" height="40" fill="var(--air-soft)" stroke="var(--line)"/>
+    <path class="flow" style="--spd:.9s" d="M30 105H830" stroke="var(--air)" stroke-width="3" fill="none" marker-end="url(#ar)"/>
+    <g id="einbauParts">
+      <g><rect x="40" y="55" width="120" height="100" rx="10" fill="var(--card)" stroke="var(--metal)" stroke-width="2"/>
+        <path d="M55 70v70M70 70v70M85 70v70M100 70v70M115 70v70M130 70v70M145 70v70" stroke="var(--metal)" stroke-width="2"/>
+        <text x="100" y="178" text-anchor="middle" class="lab" id="eb1">?</text></g>
+      <g><rect x="230" y="70" width="100" height="70" rx="8" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="3"/>
+        <rect x="262" y="40" width="36" height="32" rx="4" fill="var(--accent)"/>
+        <text x="280" y="112" text-anchor="middle" font-size="16" font-weight="800" fill="var(--accent)">LMM</text>
+        <text x="280" y="178" text-anchor="middle" class="lab">Luftmassenmesser</text></g>
+      <g><rect x="410" y="70" width="100" height="70" rx="8" fill="var(--card)" stroke="var(--metal)" stroke-width="2"/>
+        <line x1="440" y1="125" x2="480" y2="85" stroke="var(--ink)" stroke-width="5"/><circle cx="460" cy="105" r="5" fill="var(--ink)"/>
+        <text x="460" y="178" text-anchor="middle" class="lab" id="eb2">?</text></g>
+      <g><path d="M590 60h120v20h20v-20h20v100h-20v-20h-20v20H590z" fill="var(--card)" stroke="var(--metal)" stroke-width="2"/>
+        <text x="670" y="178" text-anchor="middle" class="lab" id="eb3">?</text></g>
+    </g>
+    <text x="20" y="30" class="labm">Frischluft →</text><text x="840" y="30" text-anchor="end" class="labm">→ Zylinder</text>
+  </svg></div>
+
+  <div class="q" data-type="sel" id="s1">
+    <div class="qh"><div class="qn">5</div><div class="qt">Benenne die Bauteile im Ansaugsystem (Bild oben, von links nach rechts).</div></div>
+    <div class="selrow"><span>Bauteil vor dem LMM:</span><select data-ok="lf" data-lab="eb1"><option value="">– wählen –</option><option value="dk">Drosselklappe</option><option value="lf">Luftfilter</option><option value="sr">Saugrohr</option><option value="kat">Katalysator</option></select></div>
+    <div class="selrow"><span>Bauteil nach dem LMM:</span><select data-ok="dk" data-lab="eb2"><option value="">– wählen –</option><option value="dk">Drosselklappe</option><option value="lf">Luftfilter</option><option value="sr">Saugrohr</option><option value="kat">Katalysator</option></select></div>
+    <div class="selrow"><span>Danach zu den Zylindern:</span><select data-ok="sr" data-lab="eb3"><option value="">– wählen –</option><option value="dk">Drosselklappe</option><option value="lf">Luftfilter</option><option value="sr">Saugrohr</option><option value="kat">Katalysator</option></select></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Der Luftmassenmesser befindet sich zwischen <b>Luftfilter</b> und <b>Drosselklappe</b>. Danach folgt das <b>Saugrohr</b>. Diese Position ermöglicht eine genaue Erfassung der angesaugten Luftmenge.</div>
+  </div>
+
+  <div class="q" data-type="text" id="t1">
+    <div class="qh"><div class="qn">6</div><div class="qt">Warum ist der Einbauort wichtig? Was passiert, wenn der Ansaugschlauch <i>zwischen</i> LMM und Drosselklappe einen Riss hat?</div></div>
+    <textarea placeholder="Deine Antwort"></textarea>
+    <div class="tips"><details><summary>Tipp</summary>Die Luft, die durch den Riss kommt, ist nie am Sensor vorbeigeströmt. Weiß das Steuergerät davon?</details></div>
+    <div class="qact"><button class="btn shw">Musterlösung zeigen</button></div>
+    <div class="sol"><h4>Musterlösung</h4>Die Luftmasse muss <b>vor der Verbrennung exakt gemessen</b> werden – und zwar <b>alle</b> Luft. Hinter dem Luftfilter ist die Luft sauber (Sensor wird geschont), vor der Drosselklappe strömt die gesamte Luft gleichmäßig durch. Bei einem Riss nach dem LMM gelangt <b>Falschluft</b> (ungemessene Luft) in den Motor: Das Steuergerät spritzt zu wenig Kraftstoff ein → Gemisch <b>zu mager</b>, unruhiger Leerlauf, Leistungsverlust.</div>
+  </div>
+</section>
+
+<!-- ===================== MESSPRINZIP ===================== -->
+<section class="card" id="prinzip">
+  <div class="kicker">Messprinzip</div>
+  <h2>Wie misst der Heißfilm-Luftmassenmesser?</h2>
+  <p>Auf einem kleinen Chip (Membran) sitzt ein <b style="color:var(--hot)">Heizwiderstand</b>, der immer um eine <b>feste Temperaturdifferenz</b> wärmer gehalten wird als die angesaugte Luft. Davor und dahinter sitzen zwei <b>Temperaturfühler</b> (T1, T2). Strömt Luft darüber, wird T1 gekühlt und T2 durch die vorbeiströmende warme Luft erwärmt. <b>Gemessen wird immer eine Temperaturdifferenz.</b></p>
+
+  <div class="sim" id="simHfm">
+    <div class="simt">Simulation: Heißfilm-Sensor im Luftstrom</div>
+    <div class="ctrls">
+      <label>Luftmassenstrom <input type="range" id="hfM" min="-60" max="400" value="15"> <b id="hfMv"></b></label>
+      <label>Ansauglufttemperatur <input type="range" id="hfT" min="-20" max="40" value="20"> <b id="hfTv"></b></label>
+    </div>
+    <div class="wide"><svg viewBox="0 0 640 250" aria-label="Heißfilm-Sensor">
+      <rect x="20" y="20" width="600" height="110" rx="8" fill="var(--air-soft)" stroke="var(--line)"/>
+      <g id="hfDots"></g>
+      <rect x="170" y="100" width="300" height="22" rx="3" fill="var(--metal)"/>
+      <rect x="230" y="96" width="180" height="8" fill="var(--card)" stroke="var(--metal)"/>
+      <rect x="250" y="94" width="28" height="10" rx="2" fill="var(--air)" id="hfS1"/>
+      <rect x="306" y="92" width="28" height="12" rx="2" fill="var(--hot)"/>
+      <rect x="362" y="94" width="28" height="10" rx="2" fill="var(--air)" id="hfS2"/>
+      <text x="264" y="145" text-anchor="middle" class="lab">T1</text><text x="320" y="145" text-anchor="middle" class="lab">Heizer</text><text x="376" y="145" text-anchor="middle" class="lab">T2</text>
+      <!-- Temperaturprofil -->
+      <line x1="170" y1="235" x2="470" y2="235" stroke="var(--muted)"/>
+      <text x="160" y="190" text-anchor="end" class="labm">Temperatur</text><text x="160" y="204" text-anchor="end" class="labm">auf der Membran</text>
+      <path id="hfProf" d="" fill="none" stroke="var(--hot)" stroke-width="3"/>
+      <line x1="264" y1="160" x2="264" y2="235" stroke="var(--air)" stroke-dasharray="3 3"/><line x1="376" y1="160" x2="376" y2="235" stroke="var(--air)" stroke-dasharray="3 3"/>
+      <circle id="hfP1" r="5" fill="var(--air)"/><circle id="hfP2" r="5" fill="var(--air)"/>
+      <!-- Ausgabe -->
+      <text x="500" y="170" class="lab">Signal an ECU</text>
+      <rect x="500" y="180" width="120" height="16" rx="3" fill="var(--bg)" stroke="var(--line)"/>
+      <rect id="hfU" x="500" y="180" width="10" height="16" rx="3" fill="var(--sig)"/>
+      <text id="hfUt" x="560" y="218" text-anchor="middle" font-size="18" font-weight="800" fill="var(--ink)"></text>
+    </svg></div>
+    <div class="readout" id="hfOut"></div>
+    <p class="qsub">Schieb den Luftmassenstrom auch in den negativen Bereich: Bei Pulsationen im Saugrohr strömt kurz Luft <b>zurück</b>. Der HFM erkennt das an der umgedrehten Temperaturdifferenz.</p>
+  </div>
+
+  <div class="q" data-type="gap" id="g2">
+    <div class="qh"><div class="qn">7</div><div class="qt">Ergänze den Text zum Messprinzip.</div></div>
+    <div class="gap">Der Luftmassenmesser arbeitet nach dem <input data-ok="heißfilm|heissfilm|heißfilm-|hitzfilm"> - oder <input data-ok="heißdraht|heissdraht|hitzdraht|heißdraht-"> -Prinzip. Ein elektrisch beheiztes Sensorelement wird vom <input data-ok="luftstrom|luftmassenstrom|luft"> umströmt. Je mehr Luft vorbeiströmt, desto mehr <input data-ok="elektrische energie|energie|strom|heizleistung|heizstrom|elektrischer strom"> wird benötigt, um die Temperatur konstant zu halten. Das Sensorsignal wird in ein elektrisches <input data-ok="spannungssignal|spannung|signal"> umgewandelt. Dieses Signal ist ein Maß für die <input data-ok="luftmasse|angesaugte luftmasse|luftmenge">.</div>
+    <div class="tips"><details><summary>Tipp</summary>Probiere in der Simulation: Was passiert mit der Heizleistung, wenn du den Luftstrom erhöhst?</details></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Heißfilm- oder Heißdraht-Prinzip · Luftstrom · elektrische Energie · Spannungssignal · Luftmasse.<br>Hinweis: Das Signal ist nicht streng proportional (keine Gerade), sondern folgt einer <b>Kennlinie</b> – siehe unten.</div>
+  </div>
+
+  <div class="q" data-type="mc" data-answer="1" id="q3">
+    <div class="qh"><div class="qn">8</div><div class="qt">Warum misst der Sensor die Luft<i>masse</i> und nicht einfach das Luft<i>volumen</i>?</div></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q3">Weil Masse leichter zu messen ist als Volumen.</label>
+      <label class="opt"><input type="radio" name="q3">Weil die Dichte der Luft von Temperatur und Höhe abhängt – für die Verbrennung zählt, wie viel Sauerstoff (Masse) wirklich ankommt.</label>
+      <label class="opt"><input type="radio" name="q3">Weil das Volumen der Luft im Motor immer gleich ist.</label>
+    </div>
+    <div class="tips"><details><summary>Tipp</summary>Kalte Luft ist dichter als warme. In der Simulation ändert sich bei gleichem Massenstrom nichts am Signal, wenn du die Temperatur verschiebst – warum ist das gut?</details></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>1 m³ Luft wiegt bei 20 °C ca. 1,2 kg, bei −10 °C ca. 1,34 kg und auf 2000 m Höhe deutlich weniger. Der Heißfilm misst direkt die <b>Masse</b> – Temperatur und Luftdruck sind damit automatisch berücksichtigt.</div>
+  </div>
+
+  <div class="q" data-type="num" id="n2">
+    <div class="qh"><div class="qn">9</div><div class="qt">Masse oder Menge – Rechenbeispiel</div></div>
+    <p>Ein Motor saugt im Leerlauf <b>12 m³/h</b> Luft an.</p>
+    <p>a) Luftmasse bei 20 °C (ρ = 1,20 kg/m³): <input class="num" data-ok="14.4" data-tol="0.05"> kg/h</p>
+    <p>b) Luftmasse bei −10 °C (ρ = 1,34 kg/m³): <input class="num" data-ok="16.08" data-tol="0.06"> kg/h</p>
+    <div class="tips"><details><summary>Tipp</summary>Masse = Volumen · Dichte, also m = V · ρ</details></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>a) 12 · 1,20 = <b>14,4 kg/h</b> &nbsp; b) 12 · 1,34 ≈ <b>16,1 kg/h</b>.<br>Ein Gerät, das nur das Volumen misst, würde im Winter 1,7 kg/h Luft „übersehen“ – das Gemisch würde zu mager. Darum hatten alte Luft<i>mengen</i>messer einen zusätzlichen Temperaturfühler.</div>
+  </div>
+</section>
+
+<!-- ===================== AUFBAU ===================== -->
+<section class="card" id="aufbau">
+  <div class="kicker">Aufbau</div>
+  <h2>Die Bauteile des Heißfilm-Luftmassenmessers</h2>
+  <div class="grid2">
+    <svg viewBox="0 0 320 240" aria-label="Aufbau Heißfilm-LMM (Steckfühler)">
+      <rect x="40" y="30" width="240" height="190" rx="18" fill="var(--air-soft)" stroke="var(--line)"/>
+      <text x="40" y="232" class="labm">Ansaugrohr (Querschnitt)</text>
+      <path class="flow" style="--spd:.8s" d="M50 175H270" stroke="var(--air)" stroke-width="3"/>
+      <rect x="120" y="10" width="80" height="60" rx="6" fill="var(--metal)"/><text x="160" y="45" text-anchor="middle" font-size="22" font-weight="800" fill="#fff">1</text>
+      <rect x="135" y="70" width="50" height="120" fill="var(--card)" stroke="var(--metal)" stroke-width="2"/>
+      <rect x="142" y="80" width="36" height="50" fill="#5d8a4a" stroke="#3d5a30"/><text x="160" y="112" text-anchor="middle" font-size="20" font-weight="800" fill="#fff">3</text>
+      <path d="M140 150h40v30h-40z" fill="var(--bg)" stroke="var(--accent)" stroke-width="2"/><text x="160" y="168" text-anchor="middle" font-size="15" font-weight="800" fill="var(--accent)">2</text>
+      <circle cx="80" cy="175" r="14" fill="var(--air)"/><text x="80" y="181" text-anchor="middle" font-size="16" font-weight="800" fill="#fff">4</text>
+      <g stroke="var(--metal)" stroke-width="1.5"><path d="M245 40v170M255 40v170M265 40v170"/></g>
+      <text x="255" y="232" text-anchor="middle" class="labm">Schutzgitter</text>
+      <rect x="148" y="173" width="24" height="5" fill="var(--hot)"/>
+      <text x="200" y="210" class="labm">Sensorelement</text><line x1="198" y1="206" x2="172" y2="177" stroke="var(--muted)"/>
+    </svg>
+    <div>
+      <div class="q" data-type="sel" id="s2">
+        <div class="qh"><div class="qn">10</div><div class="qt">Benenne die Teile 1 bis 4 im Bild.</div></div>
+        <div class="selrow"><span>1</span><select data-ok="geh"><option value="">– wählen –</option><option value="geh">Gehäuse mit Stecker</option><option value="mk">Messkanal</option><option value="el">Elektronik (Auswerteschaltung)</option><option value="ls">Luftstrom</option></select></div>
+        <div class="selrow"><span>2</span><select data-ok="mk"><option value="">– wählen –</option><option value="geh">Gehäuse mit Stecker</option><option value="mk">Messkanal</option><option value="el">Elektronik (Auswerteschaltung)</option><option value="ls">Luftstrom</option></select></div>
+        <div class="selrow"><span>3</span><select data-ok="el"><option value="">– wählen –</option><option value="geh">Gehäuse mit Stecker</option><option value="mk">Messkanal</option><option value="el">Elektronik (Auswerteschaltung)</option><option value="ls">Luftstrom</option></select></div>
+        <div class="selrow"><span>4</span><select data-ok="ls"><option value="">– wählen –</option><option value="geh">Gehäuse mit Stecker</option><option value="mk">Messkanal</option><option value="el">Elektronik (Auswerteschaltung)</option><option value="ls">Luftstrom</option></select></div>
+        <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+        <div class="sol"><h4>Lösung</h4>1 Gehäuse · 2 Messkanal · 3 Elektronik · 4 Luftstrom</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="q" data-type="sel" id="s3">
+    <div class="qh"><div class="qn">11</div><div class="qt">Ordne jedem Bauteil seine Aufgabe zu.</div></div>
+    <div class="selrow"><span>Sensorelement</span><select data-ok="a"><option value="">– wählen –</option><option value="c">leitet den Luftstrom gleichmäßig über das Sensorelement</option><option value="a">misst die Luftmasse über Temperaturänderung</option><option value="d">schützt das Sensorelement vor Schmutzpartikeln</option><option value="b">wandelt das Messsignal in ein Spannungssignal um</option></select></div>
+    <div class="selrow"><span>Elektronik</span><select data-ok="b"><option value="">– wählen –</option><option value="c">leitet den Luftstrom gleichmäßig über das Sensorelement</option><option value="a">misst die Luftmasse über Temperaturänderung</option><option value="d">schützt das Sensorelement vor Schmutzpartikeln</option><option value="b">wandelt das Messsignal in ein Spannungssignal um</option></select></div>
+    <div class="selrow"><span>Gehäuse / Messkanal</span><select data-ok="c"><option value="">– wählen –</option><option value="c">leitet den Luftstrom gleichmäßig über das Sensorelement</option><option value="a">misst die Luftmasse über Temperaturänderung</option><option value="d">schützt das Sensorelement vor Schmutzpartikeln</option><option value="b">wandelt das Messsignal in ein Spannungssignal um</option></select></div>
+    <div class="selrow"><span>Schutzgitter</span><select data-ok="d"><option value="">– wählen –</option><option value="c">leitet den Luftstrom gleichmäßig über das Sensorelement</option><option value="a">misst die Luftmasse über Temperaturänderung</option><option value="d">schützt das Sensorelement vor Schmutzpartikeln</option><option value="b">wandelt das Messsignal in ein Spannungssignal um</option></select></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Sensorelement: misst die Luftmasse über Temperaturänderung · Elektronik: wandelt das Messsignal in ein Spannungssignal um · Gehäuse: leitet den Luftstrom gleichmäßig über das Sensorelement · Schutzgitter: schützt vor Schmutzpartikeln.</div>
+  </div>
+
+  <div class="q" data-type="multi" data-answer="0,1,2,3" id="q4">
+    <div class="qh"><div class="qn">12</div><div class="qt">Der Heißfilm wird als dünne Schicht auf den Chip <b>aufgedampft</b>. Welche Vorteile hat das? <span class="qsub">(mehrere richtig)</span></div></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox">Der Sensor reagiert sehr schnell (kleine Masse, wenig Wärme zu speichern).</label>
+      <label class="opt"><input type="checkbox">Er misst sehr empfindlich.</label>
+      <label class="opt"><input type="checkbox">Er lässt sich präzise und gleichmäßig herstellen.</label>
+      <label class="opt"><input type="checkbox">Er bleibt temperaturstabil.</label>
+      <label class="opt"><input type="checkbox">Er braucht keinen Strom mehr.</label>
+    </div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Aufgedampft heißt: schnell reagierend, sehr empfindlich, präzise herstellbar und temperaturstabil. Strom braucht der Sensor natürlich trotzdem – ohne Heizung keine Messung.</div>
+  </div>
+</section>
+
+<!-- ===================== BAUARTEN ===================== -->
+<section class="card" id="bauarten">
+  <div class="kicker">Bauarten im Vergleich</div>
+  <h2>Luftmengenmesser, Hitzdraht, Heißfilm</h2>
+  <div class="tw"><table class="cmp">
+    <tr><th></th><th>Luftmengenmesser (Stauklappe)</th><th>Hitzdraht-LMM</th><th>Heißfilm-LMM</th></tr>
+    <tr><td>misst</td><td>Volumen (Menge)</td><td>Masse</td><td>Masse</td></tr>
+    <tr><td>Prinzip</td><td>Luft drückt eine Klappe auf, Potentiometer misst den Winkel</td><td>dünner Platindraht (ca. 0,07 mm) im Luftstrom wird gekühlt</td><td>beheizter Film auf einem Chip, Temperaturdifferenz T1/T2</td></tr>
+    <tr><td>bewegliche Teile</td><td>ja (Verschleiß)</td><td>nein</td><td>nein</td></tr>
+    <tr><td>Eigenschaften</td><td>träge, großer Luftwiderstand</td><td>sehr präzise, aber empfindlich (Schmutz, Bruch); Freibrennen nach Motor-Aus</td><td>robust, kompakt, schnell, erkennt Rückströmung – heute Standard</td></tr>
+  </table></div>
+
+  <div class="q" data-type="sel" id="s4">
+    <div class="qh"><div class="qn">13</div><div class="qt">Zeitleiste: Welche Bauart kam wann? Ordne zu.</div></div>
+    <div class="selrow"><span>ab ca. 1970</span><select data-ok="lmm0"><option value="">– wählen –</option><option value="hd">Hitzdraht-Luftmassenmesser</option><option value="hfs">Heißfilm-LMM (steckbar)</option><option value="lmm0">Luftmengenmesser</option><option value="hf">Heißfilm-Luftmassenmesser</option></select></div>
+    <div class="selrow"><span>ab ca. 1980</span><select data-ok="hd"><option value="">– wählen –</option><option value="hd">Hitzdraht-Luftmassenmesser</option><option value="hfs">Heißfilm-LMM (steckbar)</option><option value="lmm0">Luftmengenmesser</option><option value="hf">Heißfilm-Luftmassenmesser</option></select></div>
+    <div class="selrow"><span>ab ca. 1990</span><select data-ok="hf"><option value="">– wählen –</option><option value="hd">Hitzdraht-Luftmassenmesser</option><option value="hfs">Heißfilm-LMM (steckbar)</option><option value="lmm0">Luftmengenmesser</option><option value="hf">Heißfilm-Luftmassenmesser</option></select></div>
+    <div class="selrow"><span>ab ca. 2000</span><select data-ok="hfs"><option value="">– wählen –</option><option value="hd">Hitzdraht-Luftmassenmesser</option><option value="hfs">Heißfilm-LMM (steckbar)</option><option value="lmm0">Luftmengenmesser</option><option value="hf">Heißfilm-Luftmassenmesser</option></select></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>1970 Luftmengenmesser → 1980 Hitzdraht → 1990 Heißfilm → 2000 Heißfilm als Steckfühler (z. B. HFM 6/7), der direkt ins Ansaugrohr gesteckt wird.</div>
+  </div>
+
+  <div class="q" data-type="mc" data-answer="0" id="q5">
+    <div class="qh"><div class="qn">14</div><div class="qt">Was unterscheidet einen Luft<i>massen</i>messer von einem Luft<i>mengen</i>messer?</div></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q5">Der Luftmassenmesser hat keine mechanisch beweglichen Teile und misst mit elektrischem Strom (Wärme) die Masse.</label>
+      <label class="opt"><input type="radio" name="q5">Der Luftmengenmesser ist moderner und genauer.</label>
+      <label class="opt"><input type="radio" name="q5">Beide messen gleich, nur der Stecker ist anders.</label>
+    </div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Im Gegensatz zum Luftmengenmesser (Stauklappe) haben Luftmassenmesser <b>keine mechanisch beweglichen Teile</b>, sondern verwenden einen <b>elektrischen Strom</b> zur Messung der Luft<b>masse</b>.</div>
+  </div>
+
+  <div class="q" data-type="mc" data-answer="2" id="q6">
+    <div class="qh"><div class="qn">15</div><div class="qt">Beim Hitzdraht-LMM wird der Draht nach dem Abstellen des Motors kurz auf ca. 1000 °C erhitzt („Freibrennen“). Warum?</div></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q6">Damit der Motor schneller abkühlt.</label>
+      <label class="opt"><input type="radio" name="q6">Damit der Sensor beim nächsten Start schon warm ist.</label>
+      <label class="opt"><input type="radio" name="q6">Damit Ablagerungen (Staub, Öl) auf dem Draht verbrennen und die Messung genau bleibt.</label>
+    </div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Schmutz auf dem Draht isoliert ihn – er wird weniger gekühlt und misst zu wenig Luft. Beim Freibrennen verbrennen die Ablagerungen. Der Heißfilm braucht das nicht: Der Chip liegt geschützt im Messkanal.</div>
+  </div>
+</section>
+
+<!-- ===================== KENNLINIE ===================== -->
+<section class="card" id="kennlinie">
+  <div class="kicker">Kennlinie</div>
+  <h2>Vom Luftmassenstrom zur Signalspannung</h2>
+  <div class="sim">
+    <div class="simt">Simulation: Kennlinie ablesen</div>
+    <div class="ctrls"><label>Luftmassenstrom <input type="range" id="klM" min="-50" max="400" value="15"> <b id="klMv"></b></label>
+      <button class="btn sec" data-kl="15">Leerlauf</button><button class="btn sec" data-kl="120">Teillast</button><button class="btn sec" data-kl="350">Volllast</button></div>
+    <svg viewBox="0 0 600 300" id="klSvg" aria-label="Kennlinie">
+      <g id="klGrid"></g>
+      <path id="klCurve" fill="none" stroke="var(--ink)" stroke-width="3"/>
+      <line id="klV" stroke="var(--bad)" stroke-width="2"/><line id="klH" stroke="var(--bad)" stroke-width="2"/>
+      <circle id="klP" r="6" fill="var(--bad)"/>
+      <text x="320" y="296" text-anchor="middle" class="labm">Luftmassenstrom in kg/h →</text>
+      <text x="14" y="150" transform="rotate(-90 14 150)" text-anchor="middle" class="labm">Signalspannung in V →</text>
+    </svg>
+    <div class="readout" id="klOut"></div>
+  </div>
+
+  <div class="q" data-type="num" id="n3">
+    <div class="qh"><div class="qn">16</div><div class="qt">Lies aus der Kennlinie ab, welche Spannung ein funktionierender Sensor liefern muss.</div></div>
+    <div class="tw"><table>
+      <tr><th>Lastzustand</th><th>Luftmassenstrom</th><th>Signalspannung</th></tr>
+      <tr><td>Leerlauf</td><td>15 kg/h</td><td><input class="num" data-ok="1.4" data-tol="0.15"> V</td></tr>
+      <tr><td>Teillast</td><td>120 kg/h</td><td><input class="num" data-ok="3.5" data-tol="0.15"> V</td></tr>
+      <tr><td>Volllast</td><td>350 kg/h</td><td><input class="num" data-ok="4.8" data-tol="0.15"> V</td></tr>
+    </table></div>
+    <div class="tips"><details><summary>Tipp</summary>Nutze die Knöpfe Leerlauf/Teillast/Volllast in der Simulation und lies die Spannung an der roten Linie ab.</details></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Leerlauf ≈ 1,4 V · Teillast ≈ 3,5 V · Volllast ≈ 4,8 V. Die Kennlinie ist <b>nicht linear</b>: Bei wenig Luft steigt die Spannung stark, bei viel Luft nur noch wenig.</div>
+  </div>
+
+  <div class="q" data-type="mc" data-answer="1" id="q7">
+    <div class="qh"><div class="qn">17</div><div class="qt">Der Motor läuft im Leerlauf. Du gibst einen kurzen Gasstoß. Wie verhält sich die Signalspannung?</div></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q7">Sie bleibt gleich, weil die Drehzahl keine Rolle spielt.</label>
+      <label class="opt"><input type="radio" name="q7">Sie steigt kurzzeitig stark an und fällt dann wieder auf den Leerlaufwert.</label>
+      <label class="opt"><input type="radio" name="q7">Sie fällt kurz auf 0 V ab.</label>
+    </div>
+    <div class="tips"><details><summary>Tipp</summary>Probier es unten am Oszilloskop mit dem Knopf „Gasstoß“ aus.</details></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Die Signalspannung muss <b>kurzzeitig steigen und dann wieder fallen</b> – sie folgt ohne Verzögerung der angesaugten Luftmasse.</div>
+  </div>
+</section>
+
+<!-- ===================== OSZILLOSKOP ===================== -->
+<section class="card" id="oszi">
+  <div class="kicker">Werkstatt-Versuch</div>
+  <h2>Das Signal mit dem Oszilloskop beobachten</h2>
+  <p>Wie im Electude-Simulator: Oszilloskop an die Signalleitung (Pin 5) und Masse anschließen, Motor starten, das Signal im Leerlauf und bei steigender Drehzahl beobachten. Hier kannst du zusätzlich Fehler einbauen.</p>
+  <div class="sim">
+    <div class="simt">Simulation: Oszilloskop am Luftmassenmesser</div>
+    <div class="ctrls">
+      <label>Last <select id="osL"><option value="0">Motor aus (Zündung an)</option><option value="15" selected>Leerlauf</option><option value="120">Teillast</option><option value="350">Volllast</option></select></label>
+      <button class="btn" id="osGas">Gasstoß</button>
+      <label>Fehler <select id="osF"><option value="ok">kein Fehler</option><option value="dirt">Sensor verschmutzt</option><option value="leak">Falschluft nach dem LMM</option><option value="const">Sensor defekt (Signal hängt)</option><option value="open">Signalleitung unterbrochen</option></select></label>
+    </div>
+    <svg viewBox="0 0 620 240" aria-label="Oszilloskop">
+      <rect x="0" y="0" width="620" height="240" rx="10" fill="var(--scope)"/>
+      <g id="osGrid" stroke="#1f3a2a" stroke-width="1"></g>
+      <polyline id="osTr" fill="none" stroke="var(--trace)" stroke-width="2.5"/>
+      <g font-size="11" fill="#7fbf95" id="osAx"></g>
+      <text x="600" y="20" text-anchor="end" font-size="12" fill="#7fbf95">1 V/Div · 0,5 s/Div</text>
+    </svg>
+    <div class="readout" id="osOut"></div>
+  </div>
+
+  <div class="q" data-type="sel" id="s5">
+    <div class="qh"><div class="qn">18</div><div class="qt">Stell die Fehler in der Simulation ein und beobachte das Signal. Welche Aussage passt?</div></div>
+    <div class="selrow"><span>Sensor verschmutzt</span><select data-ok="low"><option value="">– wählen –</option><option value="low">Signal reagiert, ist aber zu niedrig → Gemisch mager</option><option value="flat">Signal bleibt bei Gasstoß flach</option><option value="zero">Signal 0 V</option></select></div>
+    <div class="selrow"><span>Sensor defekt (hängt)</span><select data-ok="flat"><option value="">– wählen –</option><option value="low">Signal reagiert, ist aber zu niedrig → Gemisch mager</option><option value="flat">Signal bleibt bei Gasstoß flach</option><option value="zero">Signal 0 V</option></select></div>
+    <div class="selrow"><span>Signalleitung unterbrochen</span><select data-ok="zero"><option value="">– wählen –</option><option value="low">Signal reagiert, ist aber zu niedrig → Gemisch mager</option><option value="flat">Signal bleibt bei Gasstoß flach</option><option value="zero">Signal 0 V</option></select></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Verschmutzt: Signal folgt dem Gas, aber zu niedrig (Schmutz isoliert, Sensor „sieht“ weniger Luft). Defekt: Signal flach, keine Reaktion. Leitung unterbrochen: 0 V. Falschluft sieht am Oszilloskop sogar normal aus – der Sensor misst ja richtig, nur nicht die ganze Luft!</div>
+  </div>
+</section>
+
+<!-- ===================== PRÜFEN ===================== -->
+<section class="card" id="pruefen">
+  <div class="kicker">Prüfen mit dem Multimeter</div>
+  <h2>Schaltplan: Luftmassenmesser B8.1 am Motorsteuergerät A1.1</h2>
+  <div class="sim">
+    <div class="simt">Simulation: Messen am Stecker des LMM</div>
+    <div class="ctrls">
+      <label>Fahrzeug <select id="mmCar"><option value="0">Fahrzeug A</option><option value="1">Fahrzeug B</option><option value="2">Fahrzeug C</option><option value="3">Fahrzeug D</option></select></label>
+      <label>Zustand <select id="mmZ"><option value="aus">Zündung aus</option><option value="an" selected>Zündung an, Motor aus</option><option value="ll">Motor im Leerlauf</option></select></label>
+      <button class="btn sec" id="mmGas">Gasstoß</button>
+    </div>
+    <div class="ctrls">
+      <label>Messleitung <b>schwarz</b> (COM) an <select id="mmB"><option value="31" selected>Kl. 31 (Fahrzeugmasse)</option><option value="1">Pin 1</option><option value="2">Pin 2</option><option value="3">Pin 3</option><option value="4">Pin 4</option><option value="5">Pin 5</option></select></label>
+      <label>Messleitung <b style="color:var(--bad)">rot</b> (V) an <select id="mmR"><option value="31">Kl. 31 (Fahrzeugmasse)</option><option value="1">Pin 1</option><option value="2" selected>Pin 2</option><option value="3">Pin 3</option><option value="4">Pin 4</option><option value="5">Pin 5</option></select></label>
+    </div>
+    <div class="wide"><svg viewBox="0 0 640 260" aria-label="Schaltplan">
+      <text x="20" y="22" class="labm">Kl. 15 (Zündung an)</text>
+      <line x1="20" y1="30" x2="620" y2="30" stroke="var(--bad)" stroke-width="2"/>
+      <rect x="520" y="45" width="40" height="22" fill="var(--card)" stroke="var(--ink)"/><text x="540" y="60" text-anchor="middle" font-size="10" fill="var(--ink)">F1.26</text>
+      <line x1="540" y1="30" x2="540" y2="45" stroke="var(--ink)" stroke-width="2"/>
+      <polyline points="540,67 540,95 440,95 440,110" fill="none" stroke="var(--ink)" stroke-width="2" id="mmW2"/>
+      <rect x="120" y="105" width="360" height="45" fill="var(--ok-soft)" stroke="var(--ink)"/>
+      <text x="135" y="132" font-weight="700" fill="var(--ink)">B8.1 Luftmassenmesser</text>
+      <g font-size="12" fill="var(--ink)" text-anchor="middle">
+        <text x="150" y="175">1</text><text x="210" y="175">5</text><text x="270" y="175">4</text><text x="330" y="175">3</text><text x="440" y="100">2</text>
+      </g>
+      <g id="mmPins">
+        <circle data-p="1" cx="160" cy="150" r="7"/><circle data-p="5" cx="220" cy="150" r="7"/><circle data-p="4" cx="280" cy="150" r="7"/><circle data-p="3" cx="340" cy="150" r="7"/><circle data-p="2" cx="440" cy="105" r="7"/>
+      </g>
+      <g stroke="var(--ink)" stroke-width="2"><line x1="160" y1="157" x2="160" y2="210"/><line x1="220" y1="157" x2="220" y2="210"/><line x1="280" y1="157" x2="280" y2="210"/><line x1="340" y1="157" x2="340" y2="210"/></g>
+      <rect x="120" y="210" width="360" height="40" fill="var(--air-soft)" stroke="var(--ink)"/>
+      <g font-size="11" fill="var(--ink)" text-anchor="middle"><text x="160" y="226">B-55</text><text x="220" y="226">B-6</text><text x="280" y="226">B-24</text><text x="340" y="226">B-26</text></g>
+      <text x="410" y="238" font-weight="700" fill="var(--ink)">A1.1 Motorsteuergerät</text>
+      <g font-size="10" fill="var(--muted)"><text x="20" y="190">Pin 1: Ansauglufttemperatur (NTC)</text><text x="20" y="204">Pin 2: Versorgung +12 V</text></g>
+      <g font-size="10" fill="var(--muted)" text-anchor="end"><text x="630" y="175">Pin 3: Masse (über Steuergerät)</text><text x="630" y="189">Pin 4: Referenzspannung 5 V</text><text x="630" y="203">Pin 5: Signal Luftmasse</text></g>
+      <path d="M590 250v-20h20v20" fill="none" stroke="var(--ink)" stroke-width="2"/><line x1="585" y1="250" x2="615" y2="250" stroke="var(--ink)" stroke-width="3"/><text x="600" y="223" text-anchor="middle" font-size="10" fill="var(--ink)">Kl. 31</text>
+      <circle id="mmRed" r="10" fill="none" stroke="var(--bad)" stroke-width="3"/><circle id="mmBlk" r="13" fill="none" stroke="var(--ink)" stroke-width="3" stroke-dasharray="4 3"/>
+    </svg></div>
+    <p style="text-align:center"><span class="meter" id="mmVal">0,00 V</span></p>
+    <p class="qsub" style="text-align:center">Tipp: Erst bei Fahrzeug A (fehlerfrei) messen und die Werte merken – dann vergleichen.</p>
+  </div>
+
+  <div class="q" data-type="sel" id="s6">
+    <div class="qh"><div class="qn">19</div><div class="qt">Ergänze den Prüfablauf.</div></div>
+    <div class="tw"><table>
+      <tr><th>Prüfablauf</th><th>Messleitung schwarz</th><th>Messleitung rot</th><th>Sollwert</th></tr>
+      <tr><td>Plusversorgung</td>
+        <td><select data-ok="31"><option value="">–</option><option value="31">Kl. 31</option><option value="p2">Pin 2</option><option value="p3">Pin 3</option><option value="p5">Pin 5</option></select></td>
+        <td><select data-ok="p2"><option value="">–</option><option value="31">Kl. 31</option><option value="p2">Pin 2</option><option value="p3">Pin 3</option><option value="p5">Pin 5</option></select></td>
+        <td><select data-ok="12"><option value="">–</option><option value="0">0 V</option><option value="5">5 V</option><option value="12">ca. 12 V</option><option value="sig">1 V … 4,8 V</option></select></td></tr>
+      <tr><td>Minusversorgung</td>
+        <td><select data-ok="p3"><option value="">–</option><option value="31">Kl. 31</option><option value="p2">Pin 2</option><option value="p3">Pin 3</option><option value="p5">Pin 5</option></select></td>
+        <td><select data-ok="p2"><option value="">–</option><option value="31">Kl. 31</option><option value="p2">Pin 2</option><option value="p3">Pin 3</option><option value="p5">Pin 5</option></select></td>
+        <td><select data-ok="12"><option value="">–</option><option value="0">0 V</option><option value="5">5 V</option><option value="12">ca. 12 V</option><option value="sig">1 V … 4,8 V</option></select></td></tr>
+      <tr><td>Signalspannung</td>
+        <td><select data-ok="31"><option value="">–</option><option value="31">Kl. 31</option><option value="p2">Pin 2</option><option value="p3">Pin 3</option><option value="p5">Pin 5</option></select></td>
+        <td><select data-ok="p5"><option value="">–</option><option value="31">Kl. 31</option><option value="p2">Pin 2</option><option value="p3">Pin 3</option><option value="p5">Pin 5</option></select></td>
+        <td><select data-ok="sig"><option value="">–</option><option value="0">0 V</option><option value="5">5 V</option><option value="12">ca. 12 V</option><option value="sig">1 V … 4,8 V</option></select></td></tr>
+    </table></div>
+    <div class="tips"><details><summary>Tipp 1</summary>Messgerät ist jeweils das Multimeter (Spannungsmessung, DC). Plusversorgung: gegen Fahrzeugmasse messen.</details><details><summary>Tipp 2</summary>Minusversorgung: Die Masse des Sensors prüft man, indem man <i>von Plus (Pin 2) nach Pin 3</i> misst – dann sieht man, ob der Stromkreis über die Sensormasse geschlossen ist.</details></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Alle Messungen mit dem <b>Multimeter</b>: Plusversorgung schwarz Kl. 31, rot Pin 2 → 12 V · Minusversorgung schwarz Pin 3, rot Pin 2 → 12 V · Signalspannung schwarz Kl. 31, rot Pin 5 → 1 V … 4,8 V (je nach Last).</div>
+  </div>
+
+  <div class="q" data-type="sel" id="s7">
+    <div class="qh"><div class="qn">20</div><div class="qt">Diagnose: Miss an den Fahrzeugen B, C und D. Was ist jeweils defekt?</div></div>
+    <div class="selrow"><span>Fahrzeug B</span><select data-ok="fuse"><option value="">– wählen –</option><option value="fuse">Plusversorgung fehlt (z. B. Sicherung F1.26)</option><option value="gnd">Masseleitung Pin 3 unterbrochen</option><option value="lmm">Luftmassenmesser defekt</option><option value="ok">alles in Ordnung</option></select></div>
+    <div class="selrow"><span>Fahrzeug C</span><select data-ok="gnd"><option value="">– wählen –</option><option value="fuse">Plusversorgung fehlt (z. B. Sicherung F1.26)</option><option value="gnd">Masseleitung Pin 3 unterbrochen</option><option value="lmm">Luftmassenmesser defekt</option><option value="ok">alles in Ordnung</option></select></div>
+    <div class="selrow"><span>Fahrzeug D</span><select data-ok="lmm"><option value="">– wählen –</option><option value="fuse">Plusversorgung fehlt (z. B. Sicherung F1.26)</option><option value="gnd">Masseleitung Pin 3 unterbrochen</option><option value="lmm">Luftmassenmesser defekt</option><option value="ok">alles in Ordnung</option></select></div>
+    <div class="tips"><details><summary>Tipp</summary>Gehe bei jedem Fahrzeug die drei Messungen aus Aufgabe 19 durch – bei laufendem Motor und mit Gasstoß.</details></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>B: an Pin 2 keine 12 V → Plusversorgung fehlt (Sicherung F1.26 oder Leitung). C: Pin 2 gegen Kl. 31 = 12 V, aber Pin 2 gegen Pin 3 ≈ 0 V → Masse unterbrochen. D: Versorgung i. O., Signal konstant 1 V auch beim Gasstoß → LMM defekt.</div>
+  </div>
+
+  <div class="q" data-type="mc" data-answer="2" id="q8">
+    <div class="qh"><div class="qn">21</div><div class="qt">Die Versorgungsspannung ist in Ordnung, die Signalspannung beträgt aber bei jeder Drehzahl konstant 1 V. Welchen Schluss ziehst du?</div></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q8">Die Sicherung ist defekt.</label>
+      <label class="opt"><input type="radio" name="q8">Der Luftfilter ist verstopft.</label>
+      <label class="opt"><input type="radio" name="q8">Der Luftmassenmesser ist defekt.</label>
+      <label class="opt"><input type="radio" name="q8">Das ist normal im Leerlauf.</label>
+    </div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Versorgung da, Signal reagiert nicht → <b>der Luftmassenmesser ist defekt</b> und muss ersetzt werden.</div>
+  </div>
+</section>
+
+<!-- ===================== AGR ===================== -->
+<section class="card" id="agr">
+  <div class="kicker">Weitere Aufgaben</div>
+  <h2>Der LMM überwacht auch die Abgasrückführung (AGR)</h2>
+  <p>Bei der AGR wird ein Teil des Abgases wieder angesaugt. Das Steuergerät berechnet z. B.: <b>70 % Frischluft über den Luftfilter + 30 % Abgas über die AGR = 100 % Ansaugluftmasse</b>. Der LMM misst nur die Frischluft – so kann das Steuergerät prüfen, ob die AGR richtig arbeitet.</p>
+  <div class="sim">
+    <div class="simt">Simulation: AGR-Ventil</div>
+    <div class="ctrls"><label>Zustand des AGR-Ventils <select id="agS"><option value="30">arbeitet normal</option><option value="5">verstopft</option><option value="50">klemmt offen</option></select></label></div>
+    <div class="wide"><svg viewBox="0 0 640 200" aria-label="AGR">
+      <rect x="20" y="60" width="380" height="36" fill="var(--air-soft)" stroke="var(--line)"/>
+      <rect x="90" y="48" width="56" height="60" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2"/><text x="118" y="82" text-anchor="middle" font-weight="800" fill="var(--accent)" font-size="13">LMM</text>
+      <path id="agFresh" class="flow" d="M30 78H400" stroke="var(--air)" stroke-width="4"/>
+      <rect x="400" y="30" width="120" height="100" rx="12" fill="var(--metal)"/><text x="460" y="85" text-anchor="middle" fill="#fff" font-weight="700">Motor</text>
+      <path d="M520 110h60v60H260v-74" fill="none" stroke="var(--hot-soft)" stroke-width="18"/>
+      <path id="agEx" class="flow" d="M520 110h60v60H260v-74" fill="none" stroke="var(--hot)" stroke-width="4"/>
+      <rect x="300" y="150" width="40" height="40" rx="4" fill="var(--card)" stroke="var(--ink)"/><text x="320" y="174" text-anchor="middle" font-size="11" fill="var(--ink)">AGR</text>
+      <text x="40" y="30" class="lab" id="agT1"></text><text x="40" y="130" class="lab" id="agT2"></text>
+    </svg></div>
+    <div class="readout" id="agOut"></div>
+  </div>
+  <div class="q" data-type="text" id="t2">
+    <div class="qh"><div class="qn">22</div><div class="qt">Nenne zwei weitere Aufgaben des Luftmassenmessers (außer der Berechnung der Einspritzmenge) und erkläre kurz.</div></div>
+    <textarea placeholder="Deine Antwort"></textarea>
+    <div class="tips"><details><summary>Tipp</summary>Schau dir die AGR-Simulation an. Und: Wofür gibt es Abgasnormen?</details></div>
+    <div class="qact"><button class="btn shw">Musterlösung zeigen</button></div>
+    <div class="sol"><h4>Musterlösung</h4><b>Unterstützung bei der Abgasrückführung (AGR):</b> Das Steuergerät braucht genaue Luftmassenwerte, um zu bestimmen, wie viel Abgas dem Frischluftstrom beigemischt wird, damit die Verbrennung stabil bleibt.<br><b>Einhaltung der Emissionsgrenzwerte:</b> Nur mit korrekter Luftmasse kann das optimale Gemisch eingestellt werden → saubere Verbrennung, gesetzliche Grenzwerte werden eingehalten.</div>
+  </div>
+</section>
+
+<!-- ===================== FEHLER ===================== -->
+<section class="card" id="fehler">
+  <div class="kicker">Fehlerquellen und Instandsetzung</div>
+  <h2>Was kann am LMM kaputtgehen?</h2>
+
+  <div class="q" data-type="multi" data-answer="0,2,3" id="q9">
+    <div class="qh"><div class="qn">23</div><div class="qt">Welche sind typische Fehlerquellen am Luftmassenmesser? <span class="qsub">(mehrere richtig)</span></div></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox">Verschmutzung des Sensorelements (Öl, Staub – z. B. durch geölte Sportluftfilter)</label>
+      <label class="opt"><input type="checkbox">Zu niedriger Reifendruck</label>
+      <label class="opt"><input type="checkbox">Elektrische Defekte (Kabelbruch, Korrosion am Stecker)</label>
+      <label class="opt"><input type="checkbox">Undichtigkeiten im Ansaugsystem</label>
+      <label class="opt"><input type="checkbox">Zu viel Kühlmittel</label>
+    </div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Fehlerquellen: Verschmutzung des Sensorelements, elektrische Defekte (Kabelbruch, Korrosion), Undichtigkeiten im Ansaugsystem. Typische Symptome: Leistungsverlust, erhöhter Kraftstoffverbrauch, unruhiger Motorlauf, Motorkontrollleuchte leuchtet.</div>
+  </div>
+
+  <div class="q" data-type="text" id="t3">
+    <div class="qh"><div class="qn">24</div><div class="qt">Beschreibe zwei Methoden, um den Luftmassenmesser zu prüfen.</div></div>
+    <textarea placeholder="Deine Antwort"></textarea>
+    <div class="qact"><button class="btn shw">Musterlösung zeigen</button></div>
+    <div class="sol"><h4>Musterlösung</h4>1. <b>Sichtprüfung</b> auf Verschmutzung oder Beschädigung (Sensorelement, Stecker, Ansaugschläuche).<br>2. <b>Messung des Ausgangssignals</b> mit Multimeter/Oszilloskop oder Diagnosegerät (Messwertblock „Luftmasse in kg/h“) und Vergleich mit den Sollwerten.</div>
+  </div>
+
+  <div class="q" data-type="mc" data-answer="1" id="q10">
+    <div class="qh"><div class="qn">25</div><div class="qt">Was passiert, wenn der Stecker des Luftmassenmessers abgezogen wird?</div></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q10">Der Motor geht sofort aus und lässt sich nicht mehr starten.</label>
+      <label class="opt"><input type="radio" name="q10">Das Steuergerät schaltet in den Notlaufmodus und verwendet Ersatzwerte (z. B. aus Drehzahl und Drosselklappenstellung).</label>
+      <label class="opt"><input type="radio" name="q10">Nichts – der LMM wird nur für die Tankanzeige gebraucht.</label>
+    </div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Das Motorsteuergerät schaltet in den <b>Notlaufmodus</b> und rechnet mit <b>Ersatzwerten</b>. Der Motor läuft weiter, aber mit weniger Leistung; ein Fehler wird gespeichert und die MIL leuchtet. Manchmal läuft der Motor dann sogar besser als mit einem verschmutzten LMM – ein typischer Werkstatt-Test!</div>
+  </div>
+
+  <div class="q" data-type="gap" id="g3">
+    <div class="qh"><div class="qn">26</div><div class="qt">Ergänze.</div></div>
+    <div class="gap">Ein Luftmassenmesser ist grundsätzlich <input data-ok="wartungsfrei"> . Bei Fehlfunktionen sollte er <input data-ok="gereinigt|gereinigt werden"> oder <input data-ok="ersetzt|getauscht|erneuert|ausgetauscht"> werden.</div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>wartungsfrei · gereinigt · ersetzt. Achtung: Nur mit speziellem Reiniger und ohne das Sensorelement zu berühren – der Film ist extrem empfindlich.</div>
+  </div>
+
+  <div class="q" data-type="multi" data-answer="0,1,2" id="q11">
+    <div class="qh"><div class="qn">27</div><div class="qt">Worauf ist beim Einbau eines neuen Luftmassenmessers zu achten? <span class="qsub">(mehrere richtig)</span></div></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox">Richtige Einbaulage (Pfeil = Strömungsrichtung beachten)</label>
+      <label class="opt"><input type="checkbox">Dichtheit des Ansaugsystems (Schellen, Dichtringe)</label>
+      <label class="opt"><input type="checkbox">Saubere Umgebung, Luftfilter prüfen</label>
+      <label class="opt"><input type="checkbox">Sensorelement vor dem Einbau mit dem Finger auf Funktion prüfen</label>
+    </div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Richtige Einbaulage, Dichtheit des Ansaugsystems und saubere Umgebung. Das Sensorelement <b>niemals berühren</b>! Danach Fehlerspeicher löschen und Probefahrt.</div>
+  </div>
+</section>
+
+<!-- ===================== ÜBUNG ===================== -->
+<section class="card" id="uebung">
+  <div class="kicker">Übungsaufgaben</div>
+  <h2>Teste dein Wissen</h2>
+
+  <div class="q" data-type="text" id="t4">
+    <div class="qh"><div class="qn">28</div><div class="qt">Erkläre den Unterschied zwischen Heißfilm- und Heißdraht-Luftmassenmesser.</div></div>
+    <textarea placeholder="Deine Antwort"></textarea>
+    <div class="qact"><button class="btn shw">Musterlösung zeigen</button></div>
+    <div class="sol"><h4>Musterlösung</h4><b>Heißdraht:</b> dünner Platindraht direkt im Luftstrom → sehr präzise, aber empfindlich (Schmutz, Bruch), braucht Freibrennen.<br><b>Heißfilm:</b> dünne, auf einen Chip aufgedampfte Schicht → robuster, kompakter, reagiert schneller, erkennt Rückströmung – heute Standard.</div>
+  </div>
+
+  <div class="q" data-type="multi" data-answer="0,1,3" id="q12">
+    <div class="qh"><div class="qn">29</div><div class="qt">Welche Vorteile bietet der Heißfilm-Luftmassenmesser? <span class="qsub">(mehrere richtig)</span></div></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox">Kompakte Bauweise</label>
+      <label class="opt"><input type="checkbox">Hohe Genauigkeit</label>
+      <label class="opt"><input type="checkbox">Er hat eine bewegliche Stauklappe</label>
+      <label class="opt"><input type="checkbox">Schnelle Reaktionszeit</label>
+    </div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Kompakte Bauweise, hohe Genauigkeit, schnelle Reaktionszeit. Eine Stauklappe hat nur der alte Luftmengenmesser.</div>
+  </div>
+
+  <div class="q" data-type="text" id="t5">
+    <div class="qh"><div class="qn">30</div><div class="qt">Wie beeinflusst ein defekter Luftmassenmesser den Kraftstoffverbrauch?</div></div>
+    <textarea placeholder="Deine Antwort"></textarea>
+    <div class="tips"><details><summary>Tipp</summary>Was macht das Steuergerät mit einem falschen Luftwert? Denk an zu hohe und zu niedrige Werte.</details></div>
+    <div class="qact"><button class="btn shw">Musterlösung zeigen</button></div>
+    <div class="sol"><h4>Musterlösung</h4>Der Verbrauch steigt meist, weil das Steuergerät falsche Luftmengenwerte erhält: Meldet der LMM zu viel Luft, wird zu viel eingespritzt (fett). Meldet er zu wenig, läuft der Motor mager, hat weniger Leistung – der Fahrer gibt mehr Gas, und im Notlauf rechnet das Steuergerät mit großzügigen Ersatzwerten. Beides kostet Kraftstoff.</div>
+  </div>
+
+  <div class="q" data-type="text" id="t6">
+    <div class="qh"><div class="qn">31</div><div class="qt">Wie wirkt sich eine fehlerhafte Luftmassenmessung auf die Abgaswerte eines Fahrzeugs aus?</div></div>
+    <textarea placeholder="Deine Antwort"></textarea>
+    <div class="qact"><button class="btn shw">Musterlösung zeigen</button></div>
+    <div class="sol"><h4>Musterlösung</h4>Das Luft-Kraftstoff-Gemisch wird unausgewogen (nicht mehr λ = 1). Der Katalysator kann dann nicht mehr optimal arbeiten → <b>höhere Schadstoffemissionen</b>: bei fettem Gemisch mehr CO und HC, bei magerem Gemisch mehr NOx. Beim Diesel stört ein falscher LMM-Wert zusätzlich die AGR (mehr Ruß oder NOx).</div>
+  </div>
+
+  <div class="q" data-type="mc" data-answer="0" id="q13">
+    <div class="qh"><div class="qn">32</div><div class="qt">Was ist der Unterschied zwischen dem Heißdraht- und dem Heißfilmverfahren?</div></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q13">Heißdraht: dünner Draht im Luftstrom (präzise, aber empfindlich) – Heißfilm: auf einen Chip aufgedampfter Film (robuster, heute Standard).</label>
+      <label class="opt"><input type="radio" name="q13">Heißdraht misst das Volumen, Heißfilm die Masse.</label>
+      <label class="opt"><input type="radio" name="q13">Heißfilm wird mit Kühlmittel gekühlt, Heißdraht mit Luft.</label>
+    </div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Beide messen die Masse über Wärmeabgabe. Der Unterschied liegt im Sensorelement: Draht (empfindlich) oder aufgedampfter Film auf einem Chip (robust).</div>
+  </div>
+
+  <div class="q" data-type="mc" data-answer="3" id="q14">
+    <div class="qh"><div class="qn">33</div><div class="qt">Zurück zu unserem Kunden (P0100, Leistungsverlust): Was machst du als Erstes?</div></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q14">Sofort einen neuen Luftmassenmesser einbauen.</label>
+      <label class="opt"><input type="radio" name="q14">Die Zündkerzen wechseln.</label>
+      <label class="opt"><input type="radio" name="q14">Den Fehlerspeicher löschen und den Kunden heimschicken.</label>
+      <label class="opt"><input type="radio" name="q14">Sichtprüfung (Stecker, Ansaugschläuche, Luftfilter), dann Versorgung und Signal messen.</label>
+    </div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Erst prüfen, dann tauschen: Sichtprüfung → Versorgung (Plus, Masse) → Signal im Leerlauf und beim Gasstoß. Erst wenn die Versorgung i. O. ist und das Signal falsch, ist der LMM defekt.</div>
+  </div>
+</section>
+
+<section class="card end" id="ende">
+  <div class="kicker">Ergebnis</div>
+  <h2>Dein Stand</h2>
+  <div class="big" id="endScore">0</div>
+  <p id="endTxt"></p>
+  <div class="wide"><svg viewBox="0 0 900 110" aria-label="Diagnosepfad">
+    <g font-size="12" fill="var(--ink)">
+      <rect x="5" y="20" width="160" height="70" rx="10" fill="var(--accent-soft)" stroke="var(--accent)"/><text x="18" y="48">P0100 +</text><text x="18" y="66">Leistungsverlust</text>
+      <rect x="190" y="20" width="160" height="70" rx="10" fill="var(--card)" stroke="var(--line)"/><text x="203" y="48">Sichtprüfung:</text><text x="203" y="66">Stecker, Schläuche</text>
+      <rect x="375" y="20" width="160" height="70" rx="10" fill="var(--card)" stroke="var(--line)"/><text x="388" y="48">Versorgung:</text><text x="388" y="66">Plus 12 V, Masse</text>
+      <rect x="560" y="20" width="160" height="70" rx="10" fill="var(--card)" stroke="var(--line)"/><text x="573" y="48">Signal Pin 5:</text><text x="573" y="66">1 … 4,8 V, Gasstoß</text>
+      <rect x="745" y="20" width="150" height="70" rx="10" fill="var(--ok-soft)" stroke="var(--ok)"/><text x="758" y="48">Ursache</text><text x="758" y="66">gefunden ✓</text>
+    </g>
+    <g stroke="var(--muted)" stroke-width="2"><path d="M165 55h25M350 55h25M535 55h25M720 55h25"/></g>
+  </svg></div>
+  <p class="qsub">Merke: Erst messen, dann tauschen.</p>
+  <p><a href="kraftstoffversorgung.html">→ Weiter mit: Fehlersuche Kraftstoffversorgung</a></p>
+</section>
+</main>
+<footer>Grundlage: Arbeitsblatt „Luftmassenmesser (LMM)“, Übungsaufgaben und Lernsituation „Luftmassenmesser“ (P0100), ergänzt um Werkstattwissen (HFM-Prinzip, Freibrennen, Masse/Volumen, AGR). Schaltplan und Kennlinie sind vereinfachte Darstellungen; Pinbelegungen sind je nach Hersteller verschieden – immer den Schaltplan des Fahrzeugs verwenden.</footer>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const de=(v,d=1)=>v.toFixed(d).replace('.',',');
+const NS='http://www.w3.org/2000/svg';
+const el=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;};
+
+/* ---------- Fragen ---------- */
+const autoQs=$$('.q[data-type=mc],.q[data-type=multi],.q[data-type=gap],.q[data-type=sel],.q[data-type=num]'), txQs=$$('.q[data-type=text]');
+const st={right:new Set(),text:new Set()};
+function upd(){
+  $('#score').textContent=`${st.right.size} / ${autoQs.length} richtig · ${st.text.size} / ${txQs.length} Textfragen`;
+  $('#prog').style.width=((st.right.size+st.text.size)/(autoQs.length+txQs.length)*100)+'%';
+  $('#endScore').textContent=`${st.right.size} / ${autoQs.length}`;
+  $('#endTxt').textContent=`Aufgaben richtig gelöst · ${st.text.size} von ${txQs.length} Textfragen mit der Musterlösung verglichen`;
+}
+const norm=s=>s.toLowerCase().replace(/ß/g,'ss').replace(/[-–.,()]/g,' ').replace(/\s+/g,' ').trim();
+const num=s=>parseFloat(String(s).replace(',','.').replace(/[^0-9.\-]/g,''));
+function finish(q,ok,tries,msg){
+  const fb=q.querySelector('.fb');
+  if(ok){fb.className='fb ok';fb.textContent='✔ Richtig!';q.querySelector('.sol').classList.add('show');st.right.add(q.id);}
+  else{fb.className='fb bad';fb.textContent=msg;
+    const d=q.querySelector('.tips details:not([open])'); if(d)d.open=true;
+    if(tries>=3){q.querySelector('.sol').classList.add('show');fb.textContent+=' Die Lösung ist jetzt eingeblendet.';}}
+  upd();
+}
+autoQs.forEach(q=>{
+  let tries=0; const t=q.dataset.type, fb=q.querySelector('.fb');
+  q.querySelector('.chk').onclick=()=>{
+    if(t==='mc'||t==='multi'){
+      const ans=q.dataset.answer.split(',').map(Number), opts=[...q.querySelectorAll('.opt')];
+      const sel=opts.map((o,i)=>o.querySelector('input').checked?i:-1).filter(i=>i>=0);
+      opts.forEach(o=>o.classList.remove('right','wrong'));
+      if(!sel.length){fb.className='fb bad';fb.textContent='Bitte zuerst eine Antwort wählen.';return;}
+      tries++;
+      const ok=sel.length===ans.length&&sel.every(i=>ans.includes(i));
+      if(ok)opts.forEach((o,i)=>{if(ans.includes(i))o.classList.add('right');});
+      else sel.forEach(i=>opts[i].classList.add(ans.includes(i)?'right':'wrong'));
+      finish(q,ok,tries,t==='multi'?`Noch nicht ganz – ${ans.length} Antworten sind richtig.`:'Leider falsch – versuche es nochmal.');
+      return;
+    }
+    let fields, good;
+    if(t==='gap'){fields=[...q.querySelectorAll('.gap input')];good=f=>f.dataset.ok.split('|').map(norm).includes(norm(f.value));}
+    if(t==='sel'){fields=[...q.querySelectorAll('select')];good=f=>f.value===f.dataset.ok;}
+    if(t==='num'){fields=[...q.querySelectorAll('input.num')];good=f=>Math.abs(num(f.value)-(+f.dataset.ok))<=(+f.dataset.tol||0.01);}
+    if(fields.some(f=>!f.value.trim())){fb.className='fb bad';fb.textContent='Bitte zuerst alle Felder ausfüllen.';return;}
+    tries++; let n=0;
+    fields.forEach(f=>{const g=good(f);f.classList.toggle('r',g);f.classList.toggle('w',!g);if(g)n++;
+      if(f.dataset.lab){const l=document.getElementById(f.dataset.lab);l.textContent=g?f.options[f.selectedIndex].text:'?';}});
+    finish(q,n===fields.length,tries,`${n} von ${fields.length} richtig – die roten Felder nochmal prüfen.`);
+  };
+});
+txQs.forEach(q=>{
+  q.querySelector('.shw').onclick=()=>{
+    const ta=q.querySelector('textarea');
+    if(ta.value.trim().length<5&&!q.dataset.warned){q.dataset.warned=1;ta.placeholder='Schreibe zuerst kurz deine eigene Antwort – dann vergleichen!';ta.focus();return;}
+    q.querySelector('.sol').classList.add('show');st.text.add(q.id);upd();
+  };
+});
+upd();
+
+/* ---------- Kennlinie (monotoner Spline) ---------- */
+const KP=[[-50,0],[0,1.0],[15,1.4],[50,2.3],[120,3.5],[200,4.2],[300,4.65],[350,4.8],[400,4.9]];
+const kl=(function(P){const n=P.length,x=P.map(p=>p[0]),y=P.map(p=>p[1]),d=[],m=[];
+  for(let i=0;i<n-1;i++)d[i]=(y[i+1]-y[i])/(x[i+1]-x[i]);
+  m[0]=d[0];m[n-1]=d[n-2];for(let i=1;i<n-1;i++)m[i]=d[i-1]*d[i]<=0?0:2/(1/d[i-1]+1/d[i]);
+  return v=>{v=Math.max(x[0],Math.min(x[n-1],v));let i=0;while(i<n-2&&v>x[i+1])i++;
+    const h=x[i+1]-x[i],t=(v-x[i])/h,t2=t*t,t3=t2*t;
+    return (2*t3-3*t2+1)*y[i]+(t3-2*t2+t)*h*m[i]+(-2*t3+3*t2)*y[i+1]+(t3-t2)*h*m[i+1];};})(KP);
+
+/* ---------- HFM-Simulation ---------- */
+(function(){
+  const M=$('#hfM'),T=$('#hfT'),dots=$('#hfDots');const parts=[];
+  for(let i=0;i<40;i++){parts.push({x:20+Math.random()*600,y:30+Math.random()*60,c:el('circle',{r:2.5,fill:'var(--air)',opacity:.7},dots)});}
+  const X=x=>170+x*300, Y=t=>235-t*65;
+  function prof(m){ // Temperaturprofil über Membran, Verschiebung nach Strömung
+    const s=Math.tanh(m/150)*0.13, w=0.11+Math.min(Math.abs(m),400)/4000; let d='';
+    const f=x=>0.12+0.88*Math.exp(-Math.pow((x-0.5-s)/w,2))*(1-0.25*Math.min(1,Math.abs(m)/400));
+    for(let i=0;i<=60;i++){const x=i/60;d+=(i?'L':'M')+X(x).toFixed(1)+' '+Y(f(x)).toFixed(1);}
+    return {d,f};
+  }
+  let m=15;
+  function draw(){
+    m=+M.value; const ta=+T.value; $('#hfMv').textContent=m+' kg/h'; $('#hfTv').textContent=ta+' °C';
+    const p=prof(m); $('#hfProf').setAttribute('d',p.d);
+    const t1=p.f((264-170)/300), t2=p.f((376-170)/300);
+    $('#hfP1').setAttribute('cx',264);$('#hfP1').setAttribute('cy',Y(t1));$('#hfP2').setAttribute('cx',376);$('#hfP2').setAttribute('cy',Y(t2));
+    const dT=(t2-t1)*100, U=m<0?Math.max(0.4,1.0+m/120):kl(m);
+    $('#hfU').setAttribute('width',Math.max(4,U/5*120));$('#hfUt').textContent=de(U,2)+' V';
+    const P=m<0?0.9+0.08*Math.sqrt(-m):0.9+0.08*Math.sqrt(m);
+    $('#hfOut').innerHTML=`<span class="pill">Heizer: immer Lufttemperatur + ΔT = ${ta+120} °C</span><span class="pill">Heizleistung ≈ ${de(P*100,0)} mW</span>`+
+      `<span class="pill ${dT<-1?'bad':''}">Temperaturdifferenz T2 − T1: ${dT>=0?'+':'−'}${de(Math.abs(dT),0)} K ${dT<-1?'→ Rückströmung!':''}</span>`;
+  }
+  M.oninput=draw;T.oninput=draw;draw();
+  let last=performance.now();
+  (function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;const v=m*1.4;
+    parts.forEach(p=>{p.x+=v*dt;if(p.x>620){p.x=20;p.y=30+Math.random()*60;}if(p.x<20){p.x=620;p.y=30+Math.random()*60;}p.c.setAttribute('cx',p.x);p.c.setAttribute('cy',p.y);});
+    requestAnimationFrame(loop);})(last);
+})();
+
+/* ---------- Kennlinien-Diagramm ---------- */
+(function(){
+  const X=v=>60+(v+50)/450*520, Y=u=>270-u/5*250, g=$('#klGrid');
+  for(let v=-50;v<=400;v+=50){el('line',{x1:X(v),y1:20,x2:X(v),y2:270,stroke:'var(--line)'},g);const t=el('text',{x:X(v),y:285,'text-anchor':'middle',class:'labm'},g);t.textContent=v;}
+  for(let u=0;u<=5;u++){el('line',{x1:60,y1:Y(u),x2:580,y2:Y(u),stroke:'var(--line)'},g);const t=el('text',{x:52,y:Y(u)+4,'text-anchor':'end',class:'labm'},g);t.textContent=u;}
+  let d='';for(let v=-50;v<=400;v+=3)d+=(v>-50?'L':'M')+X(v).toFixed(1)+' '+Y(kl(v)).toFixed(1);$('#klCurve').setAttribute('d',d);
+  const r=$('#klM');
+  function draw(){const v=+r.value,u=kl(v);$('#klMv').textContent=v+' kg/h';
+    const a=(id,o)=>{for(const k in o)$(id).setAttribute(k,o[k]);};
+    a('#klV',{x1:X(v),y1:270,x2:X(v),y2:Y(u)});a('#klH',{x1:60,y1:Y(u),x2:X(v),y2:Y(u)});a('#klP',{cx:X(v),cy:Y(u)});
+    $('#klOut').innerHTML=`<span class="pill">Luftmassenstrom: ${v} kg/h</span><span class="pill ok">Signalspannung: ${de(u,1)} V</span>`;}
+  r.oninput=draw;$$('[data-kl]').forEach(b=>b.onclick=()=>{r.value=b.dataset.kl;draw();});draw();
+})();
+
+/* ---------- Oszilloskop ---------- */
+(function(){
+  const W=600,x0=10,N=240,g=$('#osGrid'),ax=$('#osAx'),Y=u=>225-u*40;
+  for(let i=0;i<=12;i++)el('line',{x1:x0+i*50,y1:25,x2:x0+i*50,y2:225},g);
+  for(let u=0;u<=5;u++){el('line',{x1:x0,y1:Y(u),x2:x0+W,y2:Y(u)},g);const t=el('text',{x:x0+4,y:Y(u)-3},ax);t.textContent=u+' V';}
+  const buf=new Array(N).fill(1.4); let m=15, gas=0, last=performance.now(), acc=0;
+  $('#osGas').onclick=()=>{gas=1.6;};
+  function out(meas,act,f,load){
+    const pills=[];let lam=act>0.5?act/Math.max(meas,0.01):1;
+    if(f==='const'||f==='open'){pills.push(`<span class="pill bad">ECU: Signal unplausibel → Notlauf mit Ersatzwerten</span>`,`<span class="pill bad">MIL an · P0100</span>`,`<span class="pill">Leistung begrenzt</span>`);}
+    else{pills.push(`<span class="pill">tatsächliche Luft: ${de(act,0)} kg/h</span>`,`<span class="pill ${Math.abs(meas-act)>2?'bad':'ok'}">ECU rechnet mit: ${de(meas,0)} kg/h</span>`);
+      if(load>0)pills.push(`<span class="pill ${lam>1.05?'bad':'ok'}">Gemisch ohne Regelung: λ ≈ ${de(lam,2)} ${lam>1.05?'(mager → Leistungsverlust, Ruckeln)':'(optimal)'}</span>`);
+      if(f!=='ok'&&load>0)pills.push(`<span class="pill">Lambdaregelung korrigiert nur in Grenzen → Gemischadaption, Fehler wird gespeichert</span>`);}
+    $('#osOut').innerHTML=pills.join('');
+  }
+  function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+    const load=+$('#osL').value, f=$('#osF').value;
+    let target=load; if(gas>0){gas-=dt;const k=gas>1.0?1:Math.max(0,gas/1.0);target=Math.max(load,load+(330-load)*k);}
+    if(load===0&&gas>0)target=0; // Motor aus: kein Luftstrom
+    m+=(target-m)*Math.min(1,dt*(target>m?9:3));
+    const act=m*(f==='leak'?1.25:1), meas=f==='dirt'?m*0.72:m;
+    let U=kl(meas); if(f==='const')U=1.0; if(f==='open')U=0.02; if(load===0&&f!=='open')U=f==='const'?1.0:kl(0);
+    acc+=dt; while(acc>0.025){acc-=0.025;buf.shift();buf.push(U+(f==='open'?0:(Math.random()-.5)*0.04*(m>5?1:0.3)));}
+    $('#osTr').setAttribute('points',buf.map((u,i)=>(x0+i*W/(N-1)).toFixed(1)+','+Y(Math.max(0,u)).toFixed(1)).join(' '));
+    out(f==='dirt'?meas:m,act,f,load);
+    requestAnimationFrame(loop);}
+  requestAnimationFrame(loop);
+})();
+
+/* ---------- Multimeter ---------- */
+(function(){
+  const pos={31:[600,250],1:[160,150],2:[440,105],3:[340,150],4:[280,150],5:[220,150]};
+  let gas=0,last=performance.now(),m=15;
+  $('#mmGas').onclick=()=>{gas=1.6;};
+  $$('#mmPins circle').forEach(c=>{c.setAttribute('fill','var(--card)');c.setAttribute('stroke','var(--ink)');c.setAttribute('stroke-width',2);});
+  function pot(p,car,z,flow){
+    const on=z!=='aus', plus=on&&car!==1?12.4:0;
+    if(p==31)return 0;
+    if(p==2)return plus;
+    if(p==3)return car===2&&plus?11.9:0;            // Masse unterbrochen: Pin 3 "schwimmt" auf Plus
+    if(p==4)return on?5.0:0;
+    if(p==1)return on?2.6:0;                         // NTC bei ca. 20 °C
+    if(p==5){if(!plus||car===2)return 0; if(car===3)return 1.0; return z==='ll'?kl(flow):kl(0);}
+  }
+  function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+    const z=$('#mmZ').value, car=+$('#mmCar').value;
+    let target=z==='ll'?15:0; if(gas>0){gas-=dt;if(z==='ll')target=15+315*Math.min(1,gas/1.0);}
+    m+=(target-m)*Math.min(1,dt*(target>m?9:3));
+    const b=$('#mmB').value,r=$('#mmR').value;
+    const v=pot(+r,car,z,m)-pot(+b,car,z,m)+(Math.random()-.5)*0.01;
+    $('#mmVal').textContent=(v<0?'−':'')+de(Math.abs(v),2)+' V';
+    const [rx,ry]=pos[r],[bx,by]=pos[b];
+    $('#mmRed').setAttribute('cx',rx);$('#mmRed').setAttribute('cy',ry);$('#mmBlk').setAttribute('cx',bx);$('#mmBlk').setAttribute('cy',by);
+    requestAnimationFrame(loop);}
+  requestAnimationFrame(loop);
+})();
+
+/* ---------- AGR ---------- */
+(function(){
+  function draw(){const a=+$('#agS').value, fr=100-a;
+    $('#agFresh').style.setProperty('--spd',(1.4-fr/100)+'s');$('#agEx').style.opacity=a<10?0.15:1;$('#agEx').style.setProperty('--spd',(1.6-a/60)+'s');
+    $('#agT1').textContent=`LMM misst Frischluft: ${fr} %`;$('#agT2').textContent=`Abgas über AGR: ${a} %`;
+    const ok=a===30;
+    $('#agOut').innerHTML=`<span class="pill">ECU erwartet: 70 % Frischluft + 30 % AGR</span><span class="pill ${ok?'ok':'bad'}">gemessen: ${fr} % Frischluft ${ok?'= erwartet ✓':'≠ erwartet → Fehlercode'}</span>`+
+      (a===5?`<span class="pill bad">AGR verstopft: zu viel Frischluft → höhere Verbrennungstemperatur, mehr NOx</span>`:'')+
+      (a===50?`<span class="pill bad">AGR klemmt offen: zu wenig Frischluft → Leistungsverlust, Ruß</span>`:'');}
+  $('#agS').onchange=draw;draw();
+})();
+})();
+</script>
+</body>
+</html>
