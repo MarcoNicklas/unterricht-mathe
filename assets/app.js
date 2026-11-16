@@ -15,6 +15,10 @@ function setzeErledigt(id, an) {
   try { localStorage.setItem(SPEICHER, JSON.stringify([...s])); } catch {}
 }
 
+// Alte Links (?k=10 / ?k=11) auf die neuen Klassen umleiten
+const ALIAS = { "10": "V10", "11": "Z11" };
+const klasseVon = k => KLASSEN[k] ? k : ALIAS[k];
+
 const alleThemen = {};
 for (const [k, kl] of Object.entries(KLASSEN))
   for (const lb of kl.lernbereiche)
@@ -51,22 +55,18 @@ function abhaken(neuZeichnen) {
 
 // ---------- Startseite ----------
 function startseite() {
-  $("#klassen").innerHTML = Object.entries(KLASSEN).map(([k, kl]) => {
-    const fertig = kl.lernbereiche.length > 0;
+  const kachel = ([k, kl]) => {
     const ids = kl.lernbereiche.flatMap(lb => lb.themen.map(t => t.id));
-    return fertig
+    return kl.lernbereiche.length
       ? `<a class="tile" href="klasse.html?k=${k}"><div class="big">${k}</div>
            <span class="tag">${kl.lernbereiche.length} Lernbereiche</span>
            <b>${esc(kl.titel)}</b><span class="d">${esc(kl.untertitel || "")}</span>
            <div style="margin-top:10px">${fortschritt(ids)}</div></a>`
       : `<div class="tile off"><div class="big">${k}</div><span class="tag m">in Arbeit</span>
            <b>${esc(kl.titel)}</b><span class="d">Inhalte folgen</span></div>`;
-  }).join("");
-
-  const pakete = Object.entries(PAKETE);
-  $("#pakete").innerHTML = pakete.length
-    ? `<div class="tiles">${pakete.map(([id, p]) => paketKachel(`lernpaket.html?id=${encodeURIComponent(id)}`, p)).join("")}</div>`
-    : `<div class="card">Im Moment gibt es keine offenen Lernpakete.</div>`;
+  };
+  for (const zweig of ["vierstufig", "zweistufig"])
+    $(`#klassen-${zweig}`).innerHTML = Object.entries(KLASSEN).filter(([, kl]) => kl.zweig === zweig).map(kachel).join("");
 }
 
 function paketKachel(href, p) {
@@ -94,13 +94,25 @@ function kurzHash(s) {
 }
 
 // ---------- Abschlussprüfung ----------
-// Prüfungen gibt es erst in den Abschlussklassen 10 und 11.
-const PRUEFUNGSKLASSEN = ["10", "11"];
+// Prüfungen gibt es nur in den Abschlussklassen (pruefung: true, also V10 und Z11).
 function pruefungsseite() {
+  const k = klasseVon(new URLSearchParams(location.search).get("k"));
+  const kl = KLASSEN[k];
+  if (kl) {
+    $("#crumbs").innerHTML = `<a href="index.html">Start</a> › <a href="klasse.html?k=${esc(k)}">${esc(kl.titel)}</a> › Abschlussprüfung`;
+    $("#zum-lernen").href = `klasse.html?k=${esc(k)}#lernen`;
+  }
+  // V10 und Z11 teilen sich denselben Stoff – dann nur einmal anzeigen
+  const gruppen = new Map();
+  for (const [key, x] of Object.entries(KLASSEN)) {
+    if (!x.pruefung || (kl && key !== k)) continue;
+    if (!gruppen.has(x.lernbereiche)) gruppen.set(x.lernbereiche, []);
+    gruppen.get(x.lernbereiche).push(key);
+  }
   const zeichne = () => {
-    const bloecke = Object.entries(KLASSEN).filter(([k]) => PRUEFUNGSKLASSEN.includes(k)).map(([k, kl]) => {
-      const themen = kl.lernbereiche.flatMap(lb => lb.themen.filter(t => t.ap));
-      return themen.length ? `<div class="lb"><div class="lb-head"><div><div class="typ">${esc(kl.titel)}</div>
+    const bloecke = [...gruppen].map(([lbs, keys]) => {
+      const themen = lbs.flatMap(lb => lb.themen.filter(t => t.ap));
+      return themen.length ? `<div class="lb"><div class="lb-head"><div><div class="typ">${esc(keys.join(" · "))}</div>
         <h3>Prüfungstraining</h3><p>Echte Abschlussprüfungen und Sachaufgaben im Prüfungsstil</p></div>
         ${fortschritt(themen.map(t => t.id))}</div><ul class="themen">${themen.map(themaZeile).join("")}</ul></div>` : "";
     }).join("");
@@ -167,7 +179,7 @@ function baukasten() {
 
 // ---------- Klassenseite ----------
 function klassenseite() {
-  const k = new URLSearchParams(location.search).get("k");
+  const k = klasseVon(new URLSearchParams(location.search).get("k"));
   const kl = KLASSEN[k];
   if (!kl) { $("main").innerHTML = `<h1>Klasse nicht gefunden</h1><p><a href="index.html">Zur Startseite</a></p>`; return; }
   document.title = `${kl.titel} – Mathe Wirtschaftsschule`;
@@ -175,11 +187,20 @@ function klassenseite() {
   $("#untertitel").textContent = kl.untertitel || "";
   $("#crumb").textContent = kl.titel;
 
-  const pakete = Object.entries(PAKETE).filter(([, p]) => p.klasse === k);
+  // Lernwege – „Prüfung“ nur in den Abschlussklassen
+  $("#wege").innerHTML = `
+    <a class="weg w1" href="#lernen"><span class="eyebrow">Lernen</span><b>Thema lernen</b>
+      <span class="d">Ein Thema Schritt für Schritt erarbeiten – mit Erklärung, Beispiel und Übungen.</span></a>
+    <a class="weg w2" href="#schulaufgabe"><span class="eyebrow">Schulaufgabe</span><b>Schulaufgabe vorbereiten</b>
+      <span class="d">Ein Lernpaket mit genau den Themen, die drankommen – und einer Checkliste.</span></a>
+    ${kl.pruefung ? `<a class="weg w3" href="pruefung.html?k=${esc(k)}"><span class="eyebrow">Abschlussprüfung</span><b>Für die Prüfung trainieren</b>
+      <span class="d">Echte Abschlussprüfungen und Sachaufgaben im Prüfungsstil mit gestuften Tipps.</span></a>` : ""}`;
+
+  const pakete = Object.entries(PAKETE).filter(([, p]) => klasseVon(p.klasse) === k);
   $("#pakete").innerHTML = pakete.length
-    ? `<h2>Lernpakete für Schulaufgaben</h2><div class="tiles">${pakete.map(([id, p]) =>
-        paketKachel(`lernpaket.html?id=${encodeURIComponent(id)}`, p)).join("")}</div>`
-    : "";
+    ? `<div class="tiles">${pakete.map(([id, p]) => paketKachel(`lernpaket.html?id=${encodeURIComponent(id)}`, p)).join("")}</div>`
+    : `<div class="card">Vor einer Schulaufgabe bekommst du von deiner Lehrkraft einen Link oder QR-Code zu deinem Lernpaket.
+       Hake erledigte Themen ab – dein Fortschritt wird nur auf deinem Gerät gespeichert.</div>`;
 
   const zeichne = () => {
     $("#bereiche").innerHTML = kl.lernbereiche.length
@@ -209,8 +230,9 @@ function lernpaket() {
   if (!p && q.get("p")) { p = paketDekodieren(q.get("p")); id = "link-" + kurzHash(q.get("p")); }
   if (!p) { $("main").innerHTML = `<h1>Lernpaket nicht gefunden</h1><p>Prüfe den Link oder frag deine Lehrkraft.</p><p><a href="index.html">Zur Startseite</a></p>`; return; }
   document.title = `${p.titel} – Lernpaket`;
-  const kl = KLASSEN[p.klasse];
-  $("#crumbs").innerHTML = `<a href="index.html">Start</a> › ${kl ? `<a href="klasse.html?k=${esc(p.klasse)}">${esc(kl.titel)}</a> › ` : ""}Lernpaket`;
+  const kk = klasseVon(p.klasse);
+  const kl = KLASSEN[kk];
+  $("#crumbs").innerHTML = `<a href="index.html">Start</a> › ${kl ? `<a href="klasse.html?k=${esc(kk)}">${esc(kl.titel)}</a> › ` : ""}Lernpaket`;
   $("#titel").textContent = p.titel;
 
   let termin = "";
