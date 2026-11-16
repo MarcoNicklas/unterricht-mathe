@@ -132,6 +132,7 @@ footer{max-width:980px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);f
       <p><span class="code">P0100</span> Luftmassenmesser – Funktionsstörung</p>
       <p>Auf dieser Seite klärst du Schritt für Schritt: Was macht der Luftmassenmesser, wie misst er, und wie prüfst du ihn in der Werkstatt?</p>
       <div class="info">So arbeitest du: Erst selbst überlegen, dann <b>Prüfen</b> drücken. Bei Textfragen schreibst du zuerst deine Antwort und vergleichst dann mit der Musterlösung. Tipps helfen dir, wenn du nicht weiterkommst.</div>
+      <div class="info">📖 Zum Nachlesen: <a href="https://www.tekniwiki.com/de/e-learning/#/ger/06/01/01/content.html" target="_blank" rel="noopener">E-Learning „Luftmassenmesser“ auf TekniWiki</a> – passend zum Arbeitsblatt (Kapitel 1–4).</div>
     </div>
     <svg viewBox="0 0 320 220" aria-label="Kombiinstrument mit Motorkontrollleuchte">
       <rect x="10" y="10" width="300" height="200" rx="22" fill="#20262d"/>
@@ -166,7 +167,7 @@ footer{max-width:980px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);f
     <div class="gap">Ein Luftmassenmesser misst die <input data-ok="angesaugte luftmasse|luftmasse|angesaugte luft"> , die in den Motor gelangt. Diese Information wird vom <input data-ok="motorsteuergerät|steuergerät|ecu|motorsteuergerät (ecu)|motorsteuergeraet|steuergeraet"> genutzt, um die optimale <input data-ok="kraftstoffmenge|einspritzmenge|kraftstoff"> zu berechnen.</div>
     <div class="tips"><details><summary>Tipp</summary>Der Name verrät schon, was gemessen wird. Wer rechnet im Auto die Einspritzung aus? Wofür braucht man diese Info?</details></div>
     <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
-    <div class="sol"><h4>Lösung</h4>Der LMM misst die <b>angesaugte Luftmasse</b>. Das <b>Motorsteuergerät (ECU)</b> berechnet daraus die optimale <b>Kraftstoffmenge</b>. Der LMM liefert ein vom Luftmassenstrom abhängiges <b>Spannungssignal</b> an das Steuergerät.</div>
+    <div class="sol"><h4>Lösung</h4>Der LMM misst die <b>angesaugte Luftmasse</b>. Das <b>Motorsteuergerät (ECU)</b> berechnet daraus die optimale <b>Kraftstoffmenge</b>. Der LMM liefert ein vom Luftmassenstrom abhängiges <b>Spannungssignal</b> an das Steuergerät. Bei <b>Dieselmotoren</b> dient er hauptsächlich zur Regelung der <b>Abgasrückführung (AGR)</b>.</div>
   </div>
 
   <div class="q" data-type="mc" data-answer="2" id="q1">
@@ -202,6 +203,17 @@ footer{max-width:980px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);f
         <tr><td>Höhere Emissionen</td><td>unvollständige Verbrennung</td><td>mehr Schadstoffe im Abgas</td></tr>
       </table></div>
     </div>
+  </div>
+
+  <div class="q" data-type="mc" data-answer="1" id="q15">
+    <div class="qh"><div class="qn">3b</div><div class="qt">Wie merkt das Steuergerät, dass mit dem Luftmassenmesser etwas nicht stimmt?</div></div>
+    <div class="opts">
+      <label class="opt"><input type="radio" name="q15">Der LMM schickt bei einem Defekt eine Warnmeldung per Funk.</label>
+      <label class="opt"><input type="radio" name="q15">Es vergleicht die berechnete (theoretische) Luftmenge mit der gemessenen. Bei einer Abweichung speichert es einen Fehlercode (DTC).</label>
+      <label class="opt"><input type="radio" name="q15">Gar nicht – das merkt nur der Fahrer.</label>
+    </div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Das Steuergerät vergleicht die <b>berechnete</b> Luftmenge mit der <b>gemessenen</b>. Weichen sie ab, wird ein <b>Fehlercode (DTC)</b> gespeichert. Achtung: Der Fehlercode bedeutet <b>nicht automatisch</b>, dass der LMM defekt ist – siehe Fehlersuche unten.</div>
   </div>
 
   <div class="q" data-type="num" id="n1">
@@ -340,7 +352,7 @@ footer{max-width:980px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);f
       <path d="M140 150h40v30h-40z" fill="var(--bg)" stroke="var(--accent)" stroke-width="2"/><text x="160" y="168" text-anchor="middle" font-size="15" font-weight="800" fill="var(--accent)">2</text>
       <circle cx="80" cy="175" r="14" fill="var(--air)"/><text x="80" y="181" text-anchor="middle" font-size="16" font-weight="800" fill="#fff">4</text>
       <g stroke="var(--metal)" stroke-width="1.5"><path d="M245 40v170M255 40v170M265 40v170"/></g>
-      <text x="255" y="232" text-anchor="middle" class="labm">Schutzgitter</text>
+      <text x="255" y="232" text-anchor="middle" class="labm">Gitter</text>
       <rect x="148" y="173" width="24" height="5" fill="var(--hot)"/>
       <text x="200" y="210" class="labm">Sensorelement</text><line x1="198" y1="206" x2="172" y2="177" stroke="var(--muted)"/>
     </svg>
@@ -359,12 +371,12 @@ footer{max-width:980px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);f
 
   <div class="q" data-type="sel" id="s3">
     <div class="qh"><div class="qn">11</div><div class="qt">Ordne jedem Bauteil seine Aufgabe zu.</div></div>
-    <div class="selrow"><span>Sensorelement</span><select data-ok="a"><option value="">– wählen –</option><option value="c">leitet den Luftstrom gleichmäßig über das Sensorelement</option><option value="a">misst die Luftmasse über Temperaturänderung</option><option value="d">schützt das Sensorelement vor Schmutzpartikeln</option><option value="b">wandelt das Messsignal in ein Spannungssignal um</option></select></div>
-    <div class="selrow"><span>Elektronik</span><select data-ok="b"><option value="">– wählen –</option><option value="c">leitet den Luftstrom gleichmäßig über das Sensorelement</option><option value="a">misst die Luftmasse über Temperaturänderung</option><option value="d">schützt das Sensorelement vor Schmutzpartikeln</option><option value="b">wandelt das Messsignal in ein Spannungssignal um</option></select></div>
-    <div class="selrow"><span>Gehäuse / Messkanal</span><select data-ok="c"><option value="">– wählen –</option><option value="c">leitet den Luftstrom gleichmäßig über das Sensorelement</option><option value="a">misst die Luftmasse über Temperaturänderung</option><option value="d">schützt das Sensorelement vor Schmutzpartikeln</option><option value="b">wandelt das Messsignal in ein Spannungssignal um</option></select></div>
-    <div class="selrow"><span>Schutzgitter</span><select data-ok="d"><option value="">– wählen –</option><option value="c">leitet den Luftstrom gleichmäßig über das Sensorelement</option><option value="a">misst die Luftmasse über Temperaturänderung</option><option value="d">schützt das Sensorelement vor Schmutzpartikeln</option><option value="b">wandelt das Messsignal in ein Spannungssignal um</option></select></div>
+    <div class="selrow"><span>Sensorelement</span><select data-ok="a"><option value="">– wählen –</option><option value="c">hier strömt nur ein Teil der Luft am Messelement vorbei</option><option value="a">misst die Luftmasse über Temperaturänderung</option><option value="d">beruhigt den Luftstrom vor dem Sensor (bessere Messsignale)</option><option value="b">wandelt das Messsignal in ein Spannungssignal um</option></select></div>
+    <div class="selrow"><span>Elektronik</span><select data-ok="b"><option value="">– wählen –</option><option value="c">hier strömt nur ein Teil der Luft am Messelement vorbei</option><option value="a">misst die Luftmasse über Temperaturänderung</option><option value="d">beruhigt den Luftstrom vor dem Sensor (bessere Messsignale)</option><option value="b">wandelt das Messsignal in ein Spannungssignal um</option></select></div>
+    <div class="selrow"><span>Messkanal</span><select data-ok="c"><option value="">– wählen –</option><option value="c">hier strömt nur ein Teil der Luft am Messelement vorbei</option><option value="a">misst die Luftmasse über Temperaturänderung</option><option value="d">beruhigt den Luftstrom vor dem Sensor (bessere Messsignale)</option><option value="b">wandelt das Messsignal in ein Spannungssignal um</option></select></div>
+    <div class="selrow"><span>Gitter</span><select data-ok="d"><option value="">– wählen –</option><option value="c">hier strömt nur ein Teil der Luft am Messelement vorbei</option><option value="a">misst die Luftmasse über Temperaturänderung</option><option value="d">beruhigt den Luftstrom vor dem Sensor (bessere Messsignale)</option><option value="b">wandelt das Messsignal in ein Spannungssignal um</option></select></div>
     <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
-    <div class="sol"><h4>Lösung</h4>Sensorelement: misst die Luftmasse über Temperaturänderung · Elektronik: wandelt das Messsignal in ein Spannungssignal um · Gehäuse: leitet den Luftstrom gleichmäßig über das Sensorelement · Schutzgitter: schützt vor Schmutzpartikeln.</div>
+    <div class="sol"><h4>Lösung</h4>Sensorelement: misst die Luftmasse über Temperaturänderung · Elektronik: wandelt das Messsignal in ein Spannungssignal um · Messkanal: nur ein Teil der Luft strömt am Messelement vorbei · Gitter: beruhigt den Luftstrom vor dem Sensor, dadurch liefert er bessere Messsignale.</div>
   </div>
 
   <div class="q" data-type="multi" data-answer="0,1,2,3" id="q4">
@@ -388,9 +400,9 @@ footer{max-width:980px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);f
   <div class="tw"><table class="cmp">
     <tr><th></th><th>Luftmengenmesser (Stauklappe)</th><th>Hitzdraht-LMM</th><th>Heißfilm-LMM</th></tr>
     <tr><td>misst</td><td>Volumen (Menge)</td><td>Masse</td><td>Masse</td></tr>
-    <tr><td>Prinzip</td><td>Luft drückt eine Klappe auf, Potentiometer misst den Winkel</td><td>dünner Platindraht (ca. 0,07 mm) im Luftstrom wird gekühlt</td><td>beheizter Film auf einem Chip, Temperaturdifferenz T1/T2</td></tr>
+    <tr><td>Prinzip</td><td>Luft drückt eine Klappe auf, Potentiometer misst den Winkel</td><td>dünner Platindraht im Luftstrom, 75–100 °C über der Ansauglufttemperatur beheizt; der Heizstrom ist proportional zur Luftmasse</td><td>beheizter Film auf einem Chip, Temperaturdifferenz T1/T2</td></tr>
     <tr><td>bewegliche Teile</td><td>ja (Verschleiß)</td><td>nein</td><td>nein</td></tr>
-    <tr><td>Eigenschaften</td><td>träge, großer Luftwiderstand</td><td>sehr präzise, aber empfindlich (Schmutz, Bruch); Freibrennen nach Motor-Aus</td><td>robust, kompakt, schnell, erkennt Rückströmung – heute Standard</td></tr>
+    <tr><td>Eigenschaften</td><td>träge, großer Luftwiderstand</td><td>sehr präzise, aber empfindlich (Schmutz, Bruch); Freibrennen nach Motor-Aus</td><td>kleineres Sensorelement → besseres Messverhalten, weniger empfindlich gegen Partikel, erkennt Rückströmung – heute Standard</td></tr>
   </table></div>
 
   <div class="q" data-type="sel" id="s4">
@@ -511,7 +523,7 @@ footer{max-width:980px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);f
     <div class="simt">Simulation: Messen am Stecker des LMM</div>
     <div class="ctrls">
       <label>Fahrzeug <select id="mmCar"><option value="0">Fahrzeug A</option><option value="1">Fahrzeug B</option><option value="2">Fahrzeug C</option><option value="3">Fahrzeug D</option></select></label>
-      <label>Zustand <select id="mmZ"><option value="aus">Zündung aus</option><option value="an" selected>Zündung an, Motor aus</option><option value="ll">Motor im Leerlauf</option></select></label>
+      <label>Zustand <select id="mmZ"><option value="aus">Zündung aus</option><option value="an" selected>Zündung an, Motor aus</option><option value="ll">Motor im Leerlauf</option><option value="blow">Zündung an, Luft einblasen</option></select></label>
       <button class="btn sec" id="mmGas">Gasstoß</button>
     </div>
     <div class="ctrls">
@@ -637,11 +649,26 @@ footer{max-width:980px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);f
     <div class="sol"><h4>Lösung</h4>Fehlerquellen: Verschmutzung des Sensorelements, elektrische Defekte (Kabelbruch, Korrosion), Undichtigkeiten im Ansaugsystem. Typische Symptome: Leistungsverlust, erhöhter Kraftstoffverbrauch, unruhiger Motorlauf, Motorkontrollleuchte leuchtet.</div>
   </div>
 
+  <div class="q" data-type="multi" data-answer="0,1,2,4,5" id="q16">
+    <div class="qh"><div class="qn">23b</div><div class="qt">Der Fehlerspeicher meldet einen LMM-Fehler. Welche <b>anderen</b> Ursachen kommen in Frage? <span class="qsub">(mehrere richtig)</span></div></div>
+    <div class="opts">
+      <label class="opt"><input type="checkbox">Geborstener oder undichter Ansaug- bzw. Unterdruckschlauch, Kurbelgehäuseentlüftung</label>
+      <label class="opt"><input type="checkbox">Klemmendes oder verstopftes AGR-Ventil</label>
+      <label class="opt"><input type="checkbox">Verschmutzte oder defekte Lambdasonde</label>
+      <label class="opt"><input type="checkbox">Abgefahrene Bremsbeläge</label>
+      <label class="opt"><input type="checkbox">Verstopfter Luftfilter oder defekte Drosselklappe</label>
+      <label class="opt"><input type="checkbox">Defektes Kabel oder korrodierter Stecker am LMM</label>
+    </div>
+    <div class="tips"><details><summary>Tipp</summary>Das Steuergerät vergleicht berechnete und gemessene Luft. Alles, was zusätzliche (ungemessene) Luft oder falsche Gemischwerte erzeugt, kann den Fehler auslösen.</details></div>
+    <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
+    <div class="sol"><h4>Lösung</h4>Ein LMM-Fehlercode heißt nicht, dass der LMM kaputt ist. Auch <b>Falschluft</b> (geborstener Schlauch, Kurbelgehäuseentlüftung), ein <b>klemmendes AGR-Ventil</b>, eine <b>verschmutzte Lambdasonde</b>, Kabel/Stecker, ein verstopfter Luftfilter oder eine defekte Drosselklappe können ihn auslösen. Erst prüfen, dann tauschen!</div>
+  </div>
+
   <div class="q" data-type="text" id="t3">
     <div class="qh"><div class="qn">24</div><div class="qt">Beschreibe zwei Methoden, um den Luftmassenmesser zu prüfen.</div></div>
     <textarea placeholder="Deine Antwort"></textarea>
     <div class="qact"><button class="btn shw">Musterlösung zeigen</button></div>
-    <div class="sol"><h4>Musterlösung</h4>1. <b>Sichtprüfung</b> auf Verschmutzung oder Beschädigung (Sensorelement, Stecker, Ansaugschläuche).<br>2. <b>Messung des Ausgangssignals</b> mit Multimeter/Oszilloskop oder Diagnosegerät (Messwertblock „Luftmasse in kg/h“) und Vergleich mit den Sollwerten.</div>
+    <div class="sol"><h4>Musterlösung</h4>1. <b>Scan-Tool (Diagnosegerät):</b> Fahrt im 3. oder 4. Gang mit Vollgas, in der Parameterliste den berechneten und den gemessenen Luftmassenwert vergleichen – sie müssen übereinstimmen.<br>2. <b>Multimeter:</b> Motor aus, Zündung ein, Stecker bleibt drauf, Luftschlauch ab. Vorsichtig Luft einblasen (z. B. Druckluftpistole, nicht zu nah): Die Ausgangsspannung muss steigen und konstant bei <b>4,2–4,8 V</b> bleiben.<br>Außerdem immer: <b>Sichtprüfung</b> (Sensorelement, Stecker, Ansaugschläuche).</div>
   </div>
 
   <div class="q" data-type="mc" data-answer="1" id="q10">
@@ -652,26 +679,27 @@ footer{max-width:980px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);f
       <label class="opt"><input type="radio" name="q10">Nichts – der LMM wird nur für die Tankanzeige gebraucht.</label>
     </div>
     <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
-    <div class="sol"><h4>Lösung</h4>Das Motorsteuergerät schaltet in den <b>Notlaufmodus</b> und rechnet mit <b>Ersatzwerten</b>. Der Motor läuft weiter, aber mit weniger Leistung; ein Fehler wird gespeichert und die MIL leuchtet. Manchmal läuft der Motor dann sogar besser als mit einem verschmutzten LMM – ein typischer Werkstatt-Test!</div>
+    <div class="sol"><h4>Lösung</h4>Das Motorsteuergerät schaltet in den <b>Notlaufmodus</b> und rechnet mit <b>Ersatzwerten</b>. Der Motor läuft weiter, aber mit weniger Leistung; ein Fehler wird gespeichert und die MIL leuchtet. Typischer Werkstatt-Test, wenn ein Benziner gar nicht startet: Stecker abziehen. Läuft oder startet der Motor jetzt besser, ist der LMM defekt oder verschmutzt.</div>
   </div>
 
   <div class="q" data-type="gap" id="g3">
     <div class="qh"><div class="qn">26</div><div class="qt">Ergänze.</div></div>
-    <div class="gap">Ein Luftmassenmesser ist grundsätzlich <input data-ok="wartungsfrei"> . Bei Fehlfunktionen sollte er <input data-ok="gereinigt|gereinigt werden"> oder <input data-ok="ersetzt|getauscht|erneuert|ausgetauscht"> werden.</div>
+    <div class="gap">Ein Luftmassenmesser ist grundsätzlich <input data-ok="wartungsfrei"> . Die Reinigung eines verschmutzten Sensorelements ist nur <input data-ok="selten|selten erfolgreich"> erfolgreich, deshalb wird meist ein <input data-ok="neuer sensor|neuer luftmassenmesser|neuer lmm|neues teil"> eingebaut.</div>
     <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
-    <div class="sol"><h4>Lösung</h4>wartungsfrei · gereinigt · ersetzt. Achtung: Nur mit speziellem Reiniger und ohne das Sensorelement zu berühren – der Film ist extrem empfindlich.</div>
+    <div class="sol"><h4>Lösung</h4>wartungsfrei · selten · neuer Sensor. Für die volle Motorleistung hilft meist nur ein neuer LMM. Das Sensorelement nie berühren – der Film ist extrem empfindlich.</div>
   </div>
 
-  <div class="q" data-type="multi" data-answer="0,1,2" id="q11">
+  <div class="q" data-type="multi" data-answer="0,1,2,4" id="q11">
     <div class="qh"><div class="qn">27</div><div class="qt">Worauf ist beim Einbau eines neuen Luftmassenmessers zu achten? <span class="qsub">(mehrere richtig)</span></div></div>
     <div class="opts">
       <label class="opt"><input type="checkbox">Richtige Einbaulage (Pfeil = Strömungsrichtung beachten)</label>
       <label class="opt"><input type="checkbox">Dichtheit des Ansaugsystems (Schellen, Dichtringe)</label>
-      <label class="opt"><input type="checkbox">Saubere Umgebung, Luftfilter prüfen</label>
+      <label class="opt"><input type="checkbox">Luftfilter gleich mittauschen, saubere Umgebung</label>
       <label class="opt"><input type="checkbox">Sensorelement vor dem Einbau mit dem Finger auf Funktion prüfen</label>
+      <label class="opt"><input type="checkbox">Danach Fahrversuch machen, ggf. Adaptionswerte mit dem Diagnosegerät zurücksetzen</label>
     </div>
     <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
-    <div class="sol"><h4>Lösung</h4>Richtige Einbaulage, Dichtheit des Ansaugsystems und saubere Umgebung. Das Sensorelement <b>niemals berühren</b>! Danach Fehlerspeicher löschen und Probefahrt.</div>
+    <div class="sol"><h4>Lösung</h4>Richtige Einbaulage, Dichtheit des Ansaugsystems, Luftfilter mittauschen. Das Sensorelement <b>niemals berühren</b>! Läuft der Motor nach dem Tausch etwas rau oder hält den Leerlauf nicht, ist das nicht ungewöhnlich: Ein <b>Fahrversuch</b> kalibriert die anderen Regelungen neu, manchmal müssen die <b>Adaptionswerte</b> zurückgesetzt werden. Danach Fehlerspeicher löschen.</div>
   </div>
 </section>
 
@@ -684,7 +712,7 @@ footer{max-width:980px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);f
     <div class="qh"><div class="qn">28</div><div class="qt">Erkläre den Unterschied zwischen Heißfilm- und Heißdraht-Luftmassenmesser.</div></div>
     <textarea placeholder="Deine Antwort"></textarea>
     <div class="qact"><button class="btn shw">Musterlösung zeigen</button></div>
-    <div class="sol"><h4>Musterlösung</h4><b>Heißdraht:</b> dünner Platindraht direkt im Luftstrom → sehr präzise, aber empfindlich (Schmutz, Bruch), braucht Freibrennen.<br><b>Heißfilm:</b> dünne, auf einen Chip aufgedampfte Schicht → robuster, kompakter, reagiert schneller, erkennt Rückströmung – heute Standard.</div>
+    <div class="sol"><h4>Musterlösung</h4><b>Heißdraht:</b> dünner Platindraht direkt im Luftstrom, 75–100 °C über der Ansauglufttemperatur beheizt; der nötige Heizstrom ist proportional zur Luftmasse → präzise, aber empfindlich (Schmutz, Bruch), braucht Freibrennen.<br><b>Heißfilm:</b> dünne, auf einen Chip aufgedampfte Schicht → robuster, kompakter, reagiert schneller, erkennt Rückströmung – heute Standard.</div>
   </div>
 
   <div class="q" data-type="multi" data-answer="0,1,3" id="q12">
@@ -696,7 +724,7 @@ footer{max-width:980px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);f
       <label class="opt"><input type="checkbox">Schnelle Reaktionszeit</label>
     </div>
     <div class="qact"><button class="btn chk">Prüfen</button><span class="fb"></span></div>
-    <div class="sol"><h4>Lösung</h4>Kompakte Bauweise, hohe Genauigkeit, schnelle Reaktionszeit. Eine Stauklappe hat nur der alte Luftmengenmesser.</div>
+    <div class="sol"><h4>Lösung</h4>Kompakte Bauweise, hohe Genauigkeit, schnelle Reaktionszeit. Laut TekniWiki: besseres Messverhalten durch das kleinere Sensorelement und weniger empfindlich gegen Partikel. Eine Stauklappe hat nur der alte Luftmengenmesser.</div>
   </div>
 
   <div class="q" data-type="text" id="t5">
@@ -757,7 +785,7 @@ footer{max-width:980px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);f
   <p><a href="kraftstoffversorgung.html">→ Weiter mit: Fehlersuche Kraftstoffversorgung</a></p>
 </section>
 </main>
-<footer>Grundlage: Arbeitsblatt „Luftmassenmesser (LMM)“, Übungsaufgaben und Lernsituation „Luftmassenmesser“ (P0100), ergänzt um Werkstattwissen (HFM-Prinzip, Freibrennen, Masse/Volumen, AGR). Schaltplan und Kennlinie sind vereinfachte Darstellungen; Pinbelegungen sind je nach Hersteller verschieden – immer den Schaltplan des Fahrzeugs verwenden.</footer>
+<footer>Grundlage: TekniWiki E-Learning „Luftmassenmesser“ (Niterra/NTK), Arbeitsblatt „Luftmassenmesser (LMM)“, Übungsaufgaben und Lernsituation „Luftmassenmesser“ (P0100), ergänzt um Werkstattwissen (HFM-Prinzip, Freibrennen, Masse/Volumen, AGR). Schaltplan und Kennlinie sind vereinfachte Darstellungen; Pinbelegungen sind je nach Hersteller verschieden – immer den Schaltplan des Fahrzeugs verwenden.</footer>
 
 <script>
 (function(){
@@ -849,7 +877,7 @@ const kl=(function(P){const n=P.length,x=P.map(p=>p[0]),y=P.map(p=>p[1]),d=[],m=
     const dT=(t2-t1)*100, U=m<0?Math.max(0.4,1.0+m/120):kl(m);
     $('#hfU').setAttribute('width',Math.max(4,U/5*120));$('#hfUt').textContent=de(U,2)+' V';
     const P=m<0?0.9+0.08*Math.sqrt(-m):0.9+0.08*Math.sqrt(m);
-    $('#hfOut').innerHTML=`<span class="pill">Heizer: immer Lufttemperatur + ΔT = ${ta+120} °C</span><span class="pill">Heizleistung ≈ ${de(P*100,0)} mW</span>`+
+    $('#hfOut').innerHTML=`<span class="pill">Heizer: immer Lufttemperatur + ΔT = ${ta+100} °C</span><span class="pill">Heizleistung ≈ ${de(P*100,0)} mW</span>`+
       `<span class="pill ${dT<-1?'bad':''}">Temperaturdifferenz T2 − T1: ${dT>=0?'+':'−'}${de(Math.abs(dT),0)} K ${dT<-1?'→ Rückströmung!':''}</span>`;
   }
   M.oninput=draw;T.oninput=draw;draw();
@@ -915,11 +943,11 @@ const kl=(function(P){const n=P.length,x=P.map(p=>p[0]),y=P.map(p=>p[1]),d=[],m=
     if(p==3)return car===2&&plus?11.9:0;            // Masse unterbrochen: Pin 3 "schwimmt" auf Plus
     if(p==4)return on?5.0:0;
     if(p==1)return on?2.6:0;                         // NTC bei ca. 20 °C
-    if(p==5){if(!plus||car===2)return 0; if(car===3)return 1.0; return z==='ll'?kl(flow):kl(0);}
+    if(p==5){if(!plus||car===2)return 0; if(car===3)return 1.0; return (z==='ll'||z==='blow')?kl(flow):kl(0);}
   }
   function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
     const z=$('#mmZ').value, car=+$('#mmCar').value;
-    let target=z==='ll'?15:0; if(gas>0){gas-=dt;if(z==='ll')target=15+315*Math.min(1,gas/1.0);}
+    let target=z==='ll'?15:z==='blow'?280:0; if(gas>0){gas-=dt;if(z==='ll')target=15+315*Math.min(1,gas/1.0);}
     m+=(target-m)*Math.min(1,dt*(target>m?9:3));
     const b=$('#mmB').value,r=$('#mmR').value;
     const v=pot(+r,car,z,m)-pot(+b,car,z,m)+(Math.random()-.5)*0.01;
