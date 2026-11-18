@@ -19,6 +19,9 @@ function setzeErledigt(id, an) {
 const ALIAS = { "10": "V10", "11": "Z11" };
 const klasseVon = k => KLASSEN[k] ? k : ALIAS[k];
 
+// Externe Links (z. B. Webquests) in neuem Tab öffnen
+const ziel = url => /^https?:/.test(url) ? ` target="_blank" rel="noopener"` : "";
+
 const alleThemen = {};
 for (const [k, kl] of Object.entries(KLASSEN))
   for (const lb of kl.lernbereiche)
@@ -29,11 +32,6 @@ function fortschritt(ids) {
   const n = ids.filter(id => e.has(id)).length;
   const p = ids.length ? Math.round(n / ids.length * 100) : 0;
   return `<span class="prog">${n} von ${ids.length} <span class="bar"><i style="width:${p}%"></i></span></span>`;
-}
-
-// Externe Links (z. B. Webquests) in neuem Tab öffnen
-function ziel(url) {
-  return /^https?:/.test(url) ? ` target="_blank" rel="noopener"` : "";
 }
 
 function themaZeile(t) {
@@ -53,20 +51,15 @@ function abhaken(neuZeichnen) {
   });
 }
 
-// ---------- Startseite ----------
+// ---------- Startseite: nur Klasse wählen ----------
+const LETZTE = "mathe-ws-klasse";
 function startseite() {
-  const kachel = ([k, kl]) => {
-    const ids = kl.lernbereiche.flatMap(lb => lb.themen.map(t => t.id));
-    return kl.lernbereiche.length
-      ? `<a class="tile" href="klasse.html?k=${k}"><div class="big">${k}</div>
-           <span class="tag">${kl.lernbereiche.length} Lernbereiche</span>
-           <b>${esc(kl.titel)}</b><span class="d">${esc(kl.untertitel || "")}</span>
-           <div style="margin-top:10px">${fortschritt(ids)}</div></a>`
-      : `<div class="tile off"><div class="big">${k}</div><span class="tag m">in Arbeit</span>
-           <b>${esc(kl.titel)}</b><span class="d">Inhalte folgen</span></div>`;
-  };
-  for (const zweig of ["vierstufig", "zweistufig"])
-    $(`#klassen-${zweig}`).innerHTML = Object.entries(KLASSEN).filter(([, kl]) => kl.zweig === zweig).map(kachel).join("");
+  let letzte = "";
+  try { letzte = localStorage.getItem(LETZTE) || ""; } catch {}
+  const knopf = k => `<a class="klasse${k === letzte ? " zuletzt" : ""}" href="klasse.html?k=${k}"><span>Klasse</span><b>${k}</b></a>`;
+  $("#klassen").innerHTML = [["vierstufig", "Vierstufige Wirtschaftsschule"], ["zweistufig", "Zweistufige Wirtschaftsschule"]]
+    .map(([zweig, titel]) => `<h2 class="zweig">${titel}</h2><div class="klassen">${Object.entries(KLASSEN)
+      .filter(([, kl]) => kl.zweig === zweig).map(([k]) => knopf(k)).join("")}</div>`).join("");
 }
 
 function paketKachel(href, p) {
@@ -93,33 +86,45 @@ function kurzHash(s) {
   return h.toString(36);
 }
 
-// ---------- Abschlussprüfung ----------
-// Prüfungen gibt es nur in den Abschlussklassen (pruefung: true, also V10 und Z11).
+// ---------- Abschlussprüfung: aufgebaut wie die echte AP (Teil A / Teil B) ----------
+function pruefungAufbau() {
+  const A = PRUEFUNG.teilA, B = PRUEFUNG.teilB;
+  const kopf = t => `<div class="ap-kopf"><span>⏱ ${esc(t.zeit)}</span><span>🏅 ${t.punkte} Punkte</span><span>📎 ${esc(t.hilfsmittel)}</span></div>`;
+  const aufgabeB = a => {
+    const themen = a.themen.map(id => alleThemen[id]).filter(Boolean);
+    return `<details class="bereich ap-b"><summary><span><b>Aufgabe ${a.nr}: ${esc(a.titel)}</b><small>${esc(a.inhalt)} · 15 Punkte</small></span>
+      ${themen.length ? fortschritt(themen.map(t => t.id)) : `<span class="tag-bald">Übungen folgen</span>`}</summary>
+      ${themen.length ? `<ul class="themen">${themen.map(themaZeile).join("")}</ul>` : `<p class="note" style="margin:0 18px 16px">Für diesen Teil gibt es bald Übungen.</p>`}</details>`;
+  };
+  return `
+    <div class="card ap-ueberblick"><b>So ist die Abschlussprüfung aufgebaut</b>
+      <div class="ap-teile"><div><span class="ap-tag a">Teil A</span>ohne Taschenrechner<br><small>25 Min. · 15 Punkte</small></div>
+      <div><span class="ap-tag b">Teil B</span>mit Taschenrechner<br><small>125 Min. · 60 Punkte</small></div></div>
+      <small>Zusammen 150 Minuten und 75 Punkte. Die Merkhilfe darfst du in beiden Teilen benutzen.</small></div>
+
+    <h2 class="ap-h2"><span class="ap-tag a">Teil A</span> ohne Taschenrechner</h2>
+    ${kopf(A)}
+    <p class="note">${esc(A.hinweis)}</p>
+    <div class="liste">${A.bloecke.map(b => `<a class="zeile ap-a" href="pruefung-a.html#${b.id}">
+      <b>${esc(b.titel)} <span class="pkt">${b.punkte} P.</span></b><small>${esc(b.inhalt)}</small></a>`).join("")}</div>
+    <a class="btn voll gross" href="pruefung-a.html">⏱ Teil A komplett üben</a>
+
+    <h2 class="ap-h2"><span class="ap-tag b">Teil B</span> mit Taschenrechner</h2>
+    ${kopf(B)}
+    <p class="note">${esc(B.hinweis)}</p>
+    ${B.aufgaben.map(aufgabeB).join("")}`;
+}
+
 function pruefungsseite() {
   const k = klasseVon(new URLSearchParams(location.search).get("k"));
-  const kl = KLASSEN[k];
-  if (kl) {
-    $("#crumbs").innerHTML = `<a href="index.html">Start</a> › <a href="klasse.html?k=${esc(k)}">${esc(kl.titel)}</a> › Abschlussprüfung`;
-    $("#zum-lernen").href = `klasse.html?k=${esc(k)}#lernen`;
-  }
-  // V10 und Z11 teilen sich denselben Stoff – dann nur einmal anzeigen
-  const gruppen = new Map();
-  for (const [key, x] of Object.entries(KLASSEN)) {
-    if (!x.pruefung || (kl && key !== k)) continue;
-    if (!gruppen.has(x.lernbereiche)) gruppen.set(x.lernbereiche, []);
-    gruppen.get(x.lernbereiche).push(key);
-  }
-  const zeichne = () => {
-    const bloecke = [...gruppen].map(([lbs, keys]) => {
-      const themen = lbs.flatMap(lb => lb.themen.filter(t => t.ap));
-      return themen.length ? `<div class="lb"><div class="lb-head"><div><div class="typ">${esc(keys.join(" · "))}</div>
-        <h3>Prüfungstraining</h3><p>Echte Abschlussprüfungen und Sachaufgaben im Prüfungsstil</p></div>
-        ${fortschritt(themen.map(t => t.id))}</div><ul class="themen">${themen.map(themaZeile).join("")}</ul></div>` : "";
-    }).join("");
-    $("#training").innerHTML = bloecke || `<div class="card">Noch keine Prüfungsaufgaben vorhanden.</div>`;
-  };
+  if (k && KLASSEN[k]) { $(".zurueck").href = `klasse.html?k=${k}`; $(".zurueck").textContent = `← Klasse ${k}`; }
+  const zeichne = () => { $("#training").innerHTML = pruefungAufbau(); };
   zeichne();
-  abhaken(zeichne);
+  abhaken(() => {
+    const offen = [...document.querySelectorAll("details.bereich")].map(d => d.open);
+    zeichne();
+    document.querySelectorAll("details.bereich").forEach((d, i) => d.open = offen[i]);
+  });
 }
 
 // ---------- Baukasten für Lehrkräfte ----------
@@ -177,41 +182,70 @@ function baukasten() {
   zeigeThemen();
 }
 
-// ---------- Klassenseite ----------
+// ---------- Klassenseite: vier Wege, je eine Ansicht (#lernen, #schulaufgabe, #pruefung) ----------
+const WEGE = [
+  { id: "lernen",       icon: "📖", titel: "Thema lernen",               d: "Erklärung, Beispiel und Übungen" },
+  { id: "schulaufgabe", icon: "📝", titel: "Schulaufgabe vorbereiten",   d: "Dein Lernpaket mit Checkliste" },
+  { id: "pruefung",     icon: "🎓", titel: "Für die Prüfung trainieren", d: "Echte Prüfungsaufgaben mit Tipps" },
+  { id: "rechentest",   icon: "⚡", titel: "Für den Rechentest trainieren", d: "10 Aufgaben ohne Taschenrechner" }
+];
+
 function klassenseite() {
   const k = klasseVon(new URLSearchParams(location.search).get("k"));
   const kl = KLASSEN[k];
   if (!kl) { $("main").innerHTML = `<h1>Klasse nicht gefunden</h1><p><a href="index.html">Zur Startseite</a></p>`; return; }
-  document.title = `${kl.titel} – Mathe Wirtschaftsschule`;
-  $("#titel").textContent = kl.titel;
-  $("#untertitel").textContent = kl.untertitel || "";
-  $("#crumb").textContent = kl.titel;
+  try { localStorage.setItem(LETZTE, k); } catch {}
 
-  // Lernwege – „Prüfung“ nur in den Abschlussklassen
-  $("#wege").innerHTML = `
-    <a class="weg w1" href="#lernen"><span class="eyebrow">Lernen</span><b>Thema lernen</b>
-      <span class="d">Ein Thema Schritt für Schritt erarbeiten – mit Erklärung, Beispiel und Übungen.</span></a>
-    <a class="weg w2" href="#schulaufgabe"><span class="eyebrow">Schulaufgabe</span><b>Schulaufgabe vorbereiten</b>
-      <span class="d">Ein Lernpaket mit genau den Themen, die drankommen – und einer Checkliste.</span></a>
-    ${kl.pruefung ? `<a class="weg w3" href="pruefung.html?k=${esc(k)}"><span class="eyebrow">Abschlussprüfung</span><b>Für die Prüfung trainieren</b>
-      <span class="d">Echte Abschlussprüfungen und Sachaufgaben im Prüfungsstil mit gestuften Tipps.</span></a>` : ""}`;
+  const leer = text => `<div class="card leer">${text}</div>`;
+  const bereichListe = (bereiche) => bereiche.map(lb => `<details class="bereich">
+      <summary><span><b>${esc(lb.titel)}</b><small>${esc(lb.beschreibung || "")}</small></span>${fortschritt(lb.themen.map(t => t.id))}</summary>
+      <a class="btn voll" href="${esc(lb.link)}"${ziel(lb.link)}>${esc(lb.titel)} öffnen${ziel(lb.link) ? " ↗" : ""}</a>
+      <ul class="themen">${lb.themen.map(themaZeile).join("")}</ul></details>`).join("");
 
-  const pakete = Object.entries(PAKETE).filter(([, p]) => klasseVon(p.klasse) === k);
-  $("#pakete").innerHTML = pakete.length
-    ? `<div class="tiles">${pakete.map(([id, p]) => paketKachel(`lernpaket.html?id=${encodeURIComponent(id)}`, p)).join("")}</div>`
-    : `<div class="card">Vor einer Schulaufgabe bekommst du von deiner Lehrkraft einen Link oder QR-Code zu deinem Lernpaket.
-       Hake erledigte Themen ab – dein Fortschritt wird nur auf deinem Gerät gespeichert.</div>`;
+  const ansichten = {
+    lernen: () => kl.lernbereiche.length
+      ? `<p class="lead">Tippe auf ein Thema. Erledigtes kannst du abhaken.</p>${bereichListe(kl.lernbereiche)}`
+      : leer(`Für Klasse ${esc(k)} gibt es hier bald Lernthemen.<br>Bis dahin: <a href="rechentest.html?k=${esc(k)}">Für den Rechentest trainieren</a>.`),
+
+    schulaufgabe: () => {
+      const pakete = Object.entries(PAKETE).filter(([, p]) => klasseVon(p.klasse) === k);
+      return (pakete.length ? `<div class="liste">${pakete.map(([id, p]) => `<a class="zeile" href="lernpaket.html?id=${encodeURIComponent(id)}">
+          <b>${esc(p.titel)}</b><small>${p.datum ? "Termin: " + datumText(p.datum) : ""}</small></a>`).join("")}</div>` : "")
+        + leer(`Vor jeder Schulaufgabe bekommst du von deiner Lehrkraft einen <b>Link</b> oder <b>QR-Code</b> zu deinem Lernpaket.
+          Darin steht genau, was drankommt.`);
+    },
+
+    // Prüfungsvorbereitung nur in den Abschlussklassen V10 und Z11 (pruefung: true)
+    pruefung: () => pruefungAufbau()
+  };
 
   const zeichne = () => {
-    $("#bereiche").innerHTML = kl.lernbereiche.length
-      ? kl.lernbereiche.map(lb => `<div class="lb">
-          <div class="lb-head"><div><div class="typ">${esc(lb.typ)}</div><h3><a href="${esc(lb.link)}"${ziel(lb.link)}>${esc(lb.titel)}</a></h3>
-          <p>${esc(lb.beschreibung)}</p></div>${fortschritt(lb.themen.map(t => t.id))}</div>
-          <ul class="themen">${lb.themen.map(themaZeile).join("")}</ul></div>`).join("")
-      : `<div class="card">Für diese Jahrgangsstufe gibt es noch keine Inhalte.</div>`;
+    const ansicht = location.hash.slice(1);
+    const wege = WEGE.filter(w => w.id !== "pruefung" || kl.pruefung);
+    const weg = wege.find(w => w.id === ansicht && ansichten[w.id]);
+    if (weg) {
+      document.title = `${weg.titel} · Klasse ${k}`;
+      $("#zurueck").textContent = `← Klasse ${k}`;
+      $("#zurueck").href = `klasse.html?k=${k}`;
+      $("#titel").innerHTML = `<span class="icon">${weg.icon}</span> ${esc(weg.titel)}`;
+      $("#inhalt").innerHTML = ansichten[weg.id]();
+    } else {
+      document.title = `Klasse ${k} – Mathe Wirtschaftsschule`;
+      $("#zurueck").textContent = "← Andere Klasse";
+      $("#zurueck").href = "index.html";
+      $("#titel").textContent = `Klasse ${k}`;
+      $("#inhalt").innerHTML = `<p class="lead">Was möchtest du tun?</p><div class="wahl">${wege.map(w => `<a class="weg-knopf ${w.id}"
+        href="${w.id === "rechentest" ? `rechentest.html?k=${k}` : "#" + w.id}"><span class="icon">${w.icon}</span>
+        <span><b>${w.titel}</b><small>${w.d}</small></span><span class="pfeil">›</span></a>`).join("")}</div>`;
+    }
   };
   zeichne();
-  abhaken(zeichne);
+  addEventListener("hashchange", () => { zeichne(); scrollTo(0, 0); });
+  abhaken(() => {
+    const offen = [...document.querySelectorAll("details.bereich")].map(d => d.open);
+    zeichne();
+    document.querySelectorAll("details.bereich").forEach((d, i) => d.open = offen[i]);
+  });
 }
 
 // ---------- Lernpaket ----------
@@ -230,9 +264,8 @@ function lernpaket() {
   if (!p && q.get("p")) { p = paketDekodieren(q.get("p")); id = "link-" + kurzHash(q.get("p")); }
   if (!p) { $("main").innerHTML = `<h1>Lernpaket nicht gefunden</h1><p>Prüfe den Link oder frag deine Lehrkraft.</p><p><a href="index.html">Zur Startseite</a></p>`; return; }
   document.title = `${p.titel} – Lernpaket`;
-  const kk = klasseVon(p.klasse);
-  const kl = KLASSEN[kk];
-  $("#crumbs").innerHTML = `<a href="index.html">Start</a> › ${kl ? `<a href="klasse.html?k=${esc(kk)}">${esc(kl.titel)}</a> › ` : ""}Lernpaket`;
+  const kk = klasseVon(p.klasse), kl = KLASSEN[kk];
+  $("#crumbs").innerHTML = kl ? `<a class="zurueck" href="klasse.html?k=${esc(kk)}#schulaufgabe">← Klasse ${esc(kk)}</a>` : `<a class="zurueck" href="index.html">← Start</a>`;
   $("#titel").textContent = p.titel;
 
   let termin = "";
@@ -244,20 +277,22 @@ function lernpaket() {
   $("#kopf").innerHTML = `${termin}${p.hinweis ? `<p style="margin:10px 0 0">${esc(p.hinweis)}</p>` : ""}`;
   $("#kopf").hidden = !termin && !p.hinweis;
 
-  const themen = p.themen.map(t => alleThemen[t]).filter(Boolean);
-  const checkIds = (p.checkliste || []).map((_, i) => `${id}#kann${i}`);
+  // EINE Liste: pro Thema der „Ich kann …“-Satz mit Link zum Üben,
+  // dazu Zusatzpunkte aus der Checkliste (ältere Links / Baukasten), die zu keinem Thema gehören.
+  const zeilen = [
+    ...p.themen.map(t => alleThemen[t]).filter(Boolean)
+      .map(t => ({ id: t.id, text: t.kann || t.titel, link: t.link, linkText: t.titel })),
+    ...(p.checkliste || []).map((c, i) => ({ id: `${id}#kann${i}`, text: c }))
+  ];
 
   const zeichne = () => {
-    $("#themen").innerHTML = `<div class="lb"><div class="lb-head"><div><h3>Das kommt dran</h3>
-      <p>Arbeite jedes Thema durch und hake es ab.</p></div>${fortschritt(themen.map(t => t.id))}</div>
-      <ul class="themen">${themen.map(themaZeile).join("")}</ul></div>`;
     const e = ladeErledigt();
-    $("#check").innerHTML = p.checkliste?.length
-      ? `<h2>Checkliste: Das musst du können</h2><div class="card"><ul class="check">${p.checkliste.map((c, i) =>
-          `<li><input type="checkbox" class="chk" data-id="${esc(checkIds[i])}" ${e.has(checkIds[i]) ? "checked" : ""} id="k${i}">
-           <label for="k${i}">${esc(c)}</label></li>`).join("")}</ul>
-           <p class="note">${fortschritt(checkIds)}</p></div>`
-      : "";
+    $("#themen").innerHTML = `<div class="card lernliste"><div class="ll-kopf"><b>Das kommt dran</b>${fortschritt(zeilen.map(z => z.id))}</div>
+      <p class="note">Übe jedes Thema. Wenn du es kannst, hake es ab.</p>
+      <ul>${zeilen.map((z, i) => `<li class="${e.has(z.id) ? "done" : ""}">
+        <input type="checkbox" class="chk" data-id="${esc(z.id)}" id="z${i}" ${e.has(z.id) ? "checked" : ""}>
+        <div><label for="z${i}">${esc(z.text)}</label>
+        ${z.link ? `<a class="ueben" href="${esc(z.link)}"${ziel(z.link)}>📖 Üben: ${esc(z.linkText)} ›</a>` : ""}</div></li>`).join("")}</ul></div>`;
   };
   zeichne();
   abhaken(zeichne);

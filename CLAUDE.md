@@ -24,5 +24,8 @@ Der Aufbau und die Pflege von Inhalten stehen in README.md.
 - Vorher `git pull`, falls auf github.com etwas geändert wurde.
 
 ## Stand
-- Klasse 10: lineare und quadratische Funktionen, Prüfungsaufgaben Funktionen, Raum und Form, Daten und Zufall.
-- Klassen 6–9 und 11: noch leer.
+- Klassen: vierstufig 6, 7, 8, 9, V10 · zweistufig Z10, Z11. V10 und Z11 haben denselben Stoff (`ABSCHLUSS` in inhalte.js).
+- Prüfungsvorbereitung (Teil A/B, Teil A üben) nur in V10 und Z11 (`pruefung: true`).
+- V10/Z11: lineare und quadratische Funktionen, Prüfungsaufgaben Funktionen, Raum und Form, Daten und Zufall.
+- Klasse 7 und 9: Webquests. Klassen 6, 8, Z10: noch leer (Rechentest-Training gibt es für alle).
+- Format: Startseite nur Klassenwahl (kompakt, Handy), in der Klasse Wege als große Knöpfe (Stand 05.11.).

@@ -240,8 +240,12 @@ const STUFEN = {
   D: { name: "V9 / Z10", aufgaben: ["schaetzen", "klammer", "prozent", "einheitMix", "million", "bruchMal", "bruchAdd", "flaeche", "potenzGross", "rabatt"] },
   E: { name: "V10 / Z11", aufgaben: ["schaetzen", "grossDiv", "potenzDezimal", "geld", "einheitMix", "prozent", "klammerQuadrat", "bruchAdd", "wurzel", "produktKette"] }
 };
+// Klassen wie auf der Startseite. V10 und Z11 machen den gleichen Stoff, Z10 entspricht V9.
+const KLASSEN_RT = { "6": "A", "7": "B", "8": "C", "9": "D", "V10": "E", "Z10": "D", "Z11": "E" };
 function stufeFuer(klasse, zweig) {
-  return { "6": "A", "7": "B", "8": "C", "9": "D", "11": "E" }[klasse] || (klasse === "10" ? (zweig === "z" ? "D" : zweig === "v" ? "E" : null) : null);
+  if (klasse === "11") return "E";                                     // alte Links
+  if (klasse === "10") return zweig === "z" ? "D" : zweig === "v" ? "E" : null;
+  return KLASSEN_RT[klasse] || null;
 }
 
 // ---------- Nie eine echte Testaufgabe ----------
@@ -283,8 +287,8 @@ let test = [], start = 0, uhr = null, ausgewertet = false;
 
 function zeigeWahl(klasse) {
   $("#rt").innerHTML = `<p class="lead">In welchem Zweig bist du?</p><div class="wahl">
-    <a class="weg-knopf rechentest" href="?k=10&z=v"><span class="icon">4</span><span><b>V10</b><small>vierstufig</small></span><span class="pfeil">›</span></a>
-    <a class="weg-knopf rechentest" href="?k=10&z=z"><span class="icon">2</span><span><b>Z10</b><small>zweistufig</small></span><span class="pfeil">›</span></a></div>`;
+    <a class="weg-knopf rechentest" href="?k=V10"><span class="icon">4</span><span><b>V10</b><small>vierstufig</small></span><span class="pfeil">›</span></a>
+    <a class="weg-knopf rechentest" href="?k=Z10"><span class="icon">2</span><span><b>Z10</b><small>zweistufig</small></span><span class="pfeil">›</span></a></div>`;
 }
 
 function eingabe(a, i) {
@@ -392,14 +396,17 @@ document.addEventListener("keydown", e => {
 // ---------- Start ----------
 (function () {
   const q = new URLSearchParams(location.search);
-  const klasse = q.get("k") || "", zweig = q.get("z") || "";
+  let klasse = q.get("k") || "";
+  const zweig = q.get("z") || "";
+  if (klasse === "10" && zweig) klasse = zweig === "z" ? "Z10" : "V10";   // alte Links
+  if (klasse === "11") klasse = "Z11";
   if (klasse) { $("#zurueck").href = `klasse.html?k=${encodeURIComponent(klasse)}`; $("#zurueck").textContent = `← Klasse ${klasse}`; }
   const stufe = stufeFuer(klasse, zweig);
   if (klasse === "10" && !stufe) return zeigeWahl(klasse);
   if (!stufe) {
-    $("#rt").innerHTML = `<p class="lead">Wähle zuerst deine Klasse.</p><div class="klassen">${["6", "7", "8", "9", "10", "11"].map(x =>
+    $("#rt").innerHTML = `<p class="lead">Wähle zuerst deine Klasse.</p><div class="klassen">${Object.keys(KLASSEN_RT).map(x =>
       `<a class="klasse" href="?k=${x}"><span>Klasse</span><b>${x}</b></a>`).join("")}</div>`;
     return;
   }
-  neuerTest(stufe, klasse === "10" ? (zweig === "z" ? "Z10" : "V10") : (klasse === "11" ? "Z11" : "V" + klasse));
+  neuerTest(stufe, /^\d+$/.test(klasse) ? "Klasse " + klasse : klasse);
 })();

@@ -6,10 +6,13 @@ Lernseite für Mathematik an der Wirtschaftsschule (Jahrgangsstufen 6–11), geh
 
 | Datei | Zweck |
 |---|---|
-| `index.html` | Startseite mit allen Jahrgangsstufen |
-| `klasse.html?k=V10` | Eine Klasse (6–9, V10, Z10, Z11): Lernwege, alle Lerninhalte mit Abhaken, Lernpakete |
+| `index.html` | Startseite: nur die Klassenwahl – vierstufig (6, 7, 8, 9, V10) und zweistufig (Z10, Z11) |
+| `klasse.html?k=V10` | Wege: Thema lernen (`#lernen`), Schulaufgabe (`#schulaufgabe`), Rechentest – und nur in V10 und Z11 (`pruefung: true`) Prüfung (`#pruefung`). Alte Links `?k=10`/`?k=11` führen zu V10/Z11 |
+| `rechentest.html?k=8` | Rechentest-Training: 10 zufällige Kopfrechenaufgaben je Stufe (`?k=V10`, `?k=Z10`, `?k=Z11` usw.) |
+| `assets/rechentest.js` | Aufgabenarten und Stufen des Rechentests (6, 7, 8, 9 = Z10, V10 = Z11) |
 | `lernpaket.html?id=v10-sa1` | Individuelles Lernpaket für eine Schulaufgabe |
-| `pruefung.html` | Abschlussprüfung: alle Themen mit `ap: true` |
+| `pruefung.html` | Abschlussprüfung im Aufbau der echten AP: Teil A (Pflicht + Wahlblöcke) und Teil B (Aufgaben 1–5); gepflegt in `PRUEFUNG` in `inhalte.js` |
+| `pruefung-a.html` | Teil A üben (ohne Taschenrechner, 2 von 3 Wahlblöcken, 25-Minuten-Uhr); Aufgaben in `assets/teil-a.js` |
 | `lehrkraefte.html` | Baukasten: Lernpaket per Häkchen erstellen, Link + QR-Code |
 | `assets/inhalte.js` | **Die einzige Datei, die du für neue Inhalte änderst** |
 | `assets/style.css`, `assets/app.js` | Design und Logik (normalerweise nicht anfassen) |
@@ -26,7 +29,7 @@ Lernseite für Mathematik an der Wirtschaftsschule (Jahrgangsstufen 6–11), geh
 an die Klasse geben. Das ganze Paket steckt im Link – nichts muss geändert oder hochgeladen werden.
 
 Dauerhaft auf der Startseite sichtbare Pakete: in `assets/inhalte.js` unter `PAKETE` einen Eintrag kopieren, Schlüssel ändern (z. B. `"v10-sa2"`),
-Datum, Themen-ids und Checkliste anpassen. Den Schülern dann den Link schicken:
+Datum und Themen-ids anpassen. Zu jedem Thema zeigt das Lernpaket automatisch den „Ich kann …“-Satz (`kann`) aus `KLASSEN` – eine eigene Checkliste ist nur für Zusatzpunkte nötig. Den Schülern dann den Link schicken:
 
 `https://marconicklas.github.io/unterricht-mathe/lernpaket.html?id=v10-sa2`
 
@@ -43,3 +46,14 @@ python3 -m http.server 8000
 ```
 
 Dann im Browser `http://localhost:8000` öffnen.
+
+## Rechentest-Training
+
+- Aufgabenarten und Stufen stehen in `assets/rechentest.js` (`STUFEN`, `SCHAETZEN`).
+- Die Aufgaben sind ähnlich wie im echten Rechentest, aber **nie gleich**: Jede Aufgabe wird mit allen
+  echten Testaufgaben verglichen (`assets/rechentest-echt.js`) und neu gewürfelt, wenn sie dieselben Zahlen enthält.
+- Nach neuen Rechentests die Ausschlussliste neu erzeugen (Word-Dateien vorher entpacken):
+
+```
+python3 werkzeuge/rechentest_ausschluss.py "../Rechentest verschiedener Klassen"
+```
