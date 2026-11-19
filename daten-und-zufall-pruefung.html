@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daten und Zufall – Prüfungstrainer</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+:root{
+  --bg:#f5f6f8; --card:#ffffff; --ink:#1d2330; --muted:#5d6678; --line:#dfe3ea;
+  --accent:#2357c6; --accent-soft:#e8eefb; --ok:#1f8a4c; --ok-soft:#e5f5ec;
+  --bad:#c0392b; --bad-soft:#fbeae8; --tip:#b26a00; --tip-soft:#fff4e0;
+  --sol:#5b3cc4; --sol-soft:#efeafd; --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14171d; --card:#1d2129; --ink:#e7eaf0; --muted:#9aa3b2; --line:#2e3440;
+    --accent:#7ba2ff; --accent-soft:#1f2a44; --ok:#5fd08f; --ok-soft:#173226;
+    --bad:#ff8a7a; --bad-soft:#3a1f1c; --tip:#f2b453; --tip-soft:#3a2d14;
+    --sol:#b4a2ff; --sol-soft:#2a2347;
+  }
+}
+:root[data-theme="dark"]{
+    --bg:#14171d; --card:#1d2129; --ink:#e7eaf0; --muted:#9aa3b2; --line:#2e3440;
+    --accent:#7ba2ff; --accent-soft:#1f2a44; --ok:#5fd08f; --ok-soft:#173226;
+    --bad:#ff8a7a; --bad-soft:#3a1f1c; --tip:#f2b453; --tip-soft:#3a2d14;
+    --sol:#b4a2ff; --sol-soft:#2a2347;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header.top{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.top-in{max-width:960px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.top h1{font-size:17px;margin:0;flex:1;min-width:0}
+.top button{padding:5px 10px;font-size:14px}
+.top h1 small{display:block;font-weight:400;color:var(--muted);font-size:13px}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 12px}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+button:disabled{opacity:.5;cursor:not-allowed}
+main{max-width:960px;margin:0 auto;padding:20px 16px 60px}
+.intro{color:var(--muted);margin:0 0 18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.exam-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:0;overflow:hidden;text-align:left;display:flex;flex-direction:column}
+.exam-card:hover{border-color:var(--accent)}
+.exam-card .thumb{background:#fff;height:130px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--line)}
+.exam-card .thumb img{max-width:100%;max-height:124px}
+.exam-card .body{padding:12px 14px}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:var(--accent-soft);color:var(--accent);font-weight:600}
+.exam-card h3{margin:6px 0 4px;font-size:17px}
+.bar{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:8px}
+.bar>i{display:block;height:100%;background:var(--ok);width:0}
+.meta{font-size:13px;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:16px}
+.figure{background:#fff;border-radius:8px;padding:8px;text-align:center;margin-top:10px}
+.figure img{max-width:100%;height:auto}
+.figrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center}
+.task{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:14px;overflow:hidden}
+.task.done{border-color:var(--ok)}
+.task-head{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.task-head .nr{font-weight:700;font-size:18px}
+.task-head .pts{margin-left:auto;font-size:13px;color:var(--muted)}
+.status{font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px}
+.status.ok{background:var(--ok-soft);color:var(--ok)}
+.status.sol{background:var(--sol-soft);color:var(--sol)}
+.task-body{padding:14px 16px}
+.vortext{color:var(--muted);border-left:3px solid var(--line);padding-left:10px;margin:0 0 10px}
+.aufg{font-weight:600;margin:0 0 6px}
+.ergebnis{font-size:14px;color:var(--muted);margin:0 0 10px}
+.answer{background:var(--bg);border-radius:8px;padding:12px;margin:12px 0}
+.answer .lbl{font-size:13px;color:var(--muted);margin-bottom:6px}
+.fields{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.field{display:flex;align-items:center;gap:6px}
+.pm{padding:4px 9px;font-weight:700;font-size:16px;line-height:1.2}
+.field input,.field select{font:inherit;width:96px;padding:6px 8px;border:1.5px solid var(--line);border-radius:7px;background:var(--card);color:var(--ink)}
+.field select{width:auto}
+.field input.ok,.field select.ok{border-color:var(--ok);background:var(--ok-soft)}
+.field input.bad,.field select.bad{border-color:var(--bad);background:var(--bad-soft)}
+.unit{color:var(--muted);font-size:14px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.btn-tip{border-color:var(--tip);color:var(--tip)}
+.btn-sol{border-color:var(--sol);color:var(--sol)}
+.feedback{margin-top:10px;font-size:14px;padding:8px 10px;border-radius:7px;display:none}
+.feedback.ok{display:block;background:var(--ok-soft);color:var(--ok)}
+.feedback.bad{display:block;background:var(--bad-soft);color:var(--bad)}
+.feedback.info{display:block;background:var(--tip-soft);color:var(--tip)}
+.tips{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.tipbox{background:var(--tip-soft);border-left:4px solid var(--tip);border-radius:7px;padding:9px 12px}
+.tipbox b{color:var(--tip)}
+.solbox{margin-top:12px;background:var(--sol-soft);border-left:4px solid var(--sol);border-radius:7px;padding:10px 14px}
+.solbox h4{margin:0 0 6px;color:var(--sol)}
+.solbox .step{margin:4px 0;overflow-x:auto}
+.solbox .note{font-size:14px;color:var(--muted);margin-top:6px}
+.score{font-weight:700}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;z-index:20;overflow:auto}
+.modal.show{display:flex}
+.modal .box{background:var(--card);border-radius:var(--radius);max-width:640px;width:100%;padding:18px 20px}
+.modal h2{margin-top:0}
+.f-item{border-top:1px solid var(--line);padding:10px 0}
+.f-item:first-of-type{border-top:0}
+.f-item h4{margin:0 0 4px}
+.katex-display{margin:.35em 0}
+.back{margin-bottom:14px}
+footer{max-width:960px;margin:0 auto;padding:0 16px 30px;color:var(--muted);font-size:13px}
+@media (max-width:520px){ .field input{width:80px} .task-body{padding:12px} }
+.teil{font-size:19px;margin:26px 0 12px;padding-bottom:6px;border-bottom:2px solid var(--accent)}
+.teil .meta{font-weight:400;margin-left:6px}
+.jump{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+.jump a{font-size:14px;color:var(--accent);text-decoration:none;border:1px solid var(--accent);border-radius:99px;padding:3px 12px}
+.jump a:hover{background:var(--accent-soft)}
+div.vortext{color:var(--muted);border-left:3px solid var(--line);padding-left:10px;margin:0 0 10px}
+div.vortext::after,.panel::after{content:"";display:block;clear:both}
+.fig-r{float:right;margin:0 0 8px 12px;background:#fff;border-radius:8px;padding:4px}
+.fig-r img{width:130px;height:auto;display:block}
+table.dt{border-collapse:collapse;margin:10px 0;font-size:14px;color:var(--ink);background:var(--card)}
+table.dt th,table.dt td{border:1px solid var(--muted);padding:5px 10px;text-align:center}
+table.dt th{background:var(--accent-soft)}
+table.dt tr.pk th,table.dt tr.pk td{background:#f7c4ea;color:#1d2330}
+table.dt.row td{min-width:38px}
+.figure img{max-height:340px}
+@media (max-width:520px){ .top h1 small{display:none} .top h1{font-size:15px} .fig-r img{width:90px} table.dt{font-size:12px} table.dt th,table.dt td{padding:4px 5px} }
+</style>
+<style>/* Logo + Link zurück zur Lernseite, fest in der Kopfzeile */.home-logo{display:inline-flex;align-items:center;gap:8px;flex:0 0 auto;color:inherit;text-decoration:none;font:inherit;font-size:14px;font-weight:600;line-height:1.2;white-space:nowrap;margin-right:12px;padding-right:12px;border-right:1px solid color-mix(in srgb,currentColor 22%,transparent)}.home-logo img{height:32px;width:auto;display:block;background:#fff;border-radius:6px;padding:2px 4px}.home-logo:hover span{text-decoration:underline}@media(max-width:640px){.home-logo img{height:24px}.home-logo span{display:none}}</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <a class="home-logo" href="index.html" title="Zur Startseite der Lernseite"><img src="assets/schullogo.png" alt="Schullogo – zur Startseite"><span>⌂ Lernseite</span></a>
+  <h1>Daten und Zufall<small>Prüfungstrainer · Abschlussprüfung</small></h1>
+  <button id="btnFormeln">Formeln</button>
+  <button id="btnTheme" title="Hell/Dunkel umschalten">◐</button>
+</div></header>
+
+<main id="app"></main>
+
+<div class="modal" id="formelModal"><div class="box">
+  <h2>Formelsammlung</h2>
+  <div class="f-item"><h4>Absolute und relative Häufigkeit</h4>\(H(E)\) = Anzahl, wie oft \(E\) vorkommt. \[ h(E)=\frac{H(E)}{n} \] \(n\) = Anzahl aller Werte. Mal 100 → Prozent.</div>
+  <div class="f-item"><h4>Summe der relativen Häufigkeiten</h4>Alle relativen Häufigkeiten zusammen ergeben \(1\) (also \(100\,\%\)).</div>
+  <div class="f-item"><h4>Arithmetisches Mittel</h4>\[ \bar x=\frac{x_1+x_2+\dots+x_n}{n} \] Ist der Durchschnitt bekannt: Gesamtsumme \(=\bar x\cdot n\).</div>
+  <div class="f-item"><h4>Median \(x_{med}\)</h4>Werte der Größe nach ordnen. Ungerade Anzahl: der mittlere Wert. Gerade Anzahl: Mittelwert der beiden mittleren Werte.</div>
+  <div class="f-item"><h4>Spannweite</h4>\[ R=x_{max}-x_{min} \]</div>
+  <div class="f-item"><h4>Kreisdiagramm</h4>Winkel \(=\) relative Häufigkeit \(\cdot 360^\circ\).</div>
+  <div class="f-item"><h4>Pfadregeln im Baumdiagramm</h4><b>1. Pfadregel (Produktregel):</b> entlang eines Pfades multiplizieren.<br><b>2. Pfadregel (Summenregel):</b> gehören mehrere Pfade zum Ereignis, ihre Wahrscheinlichkeiten addieren.<br>An jeder Verzweigung ergeben die Äste zusammen \(1\).</div>
+  <div class="f-item"><h4>Ohne Zurücklegen</h4>Nach jedem Zug wird der Nenner um 1 kleiner (und beim gezogenen Typ auch der Zähler).</div>
+  <div class="actions"><button class="primary" onclick="closeModal()">Schließen</button></div>
+</div></div>
+
+<footer>Eingabe mit Komma oder Punkt möglich (z. B. 0,25). Brüche mit Schrägstrich eingeben (z. B. 2/10). Tausenderpunkte darfst du weglassen (113726 oder 113.726). Dein Fortschritt wird nur in diesem Browser gespeichert.</footer>
+
+<script>
+const R = String.raw;
+const B = 'assets/dz-ap/';
+/* =====================================================================
+   PRÜFUNGEN – zum Erweitern einfach ein weiteres Objekt anhängen.
+   aufgaben: {teil:'A'|'B', nr, punkte, vortext, text, bild, felder, tipps, loesung, loesungBild}
+   felder:   {key, label, wert, tol, einheit}            Zahl (auch 2/10 erlaubt)
+             {key, label, typ:'bruch', z, n}             gekürzter Bruch z/n
+             {key, label, typ:'wahl', optionen, wert}    Auswahl
+   ===================================================================== */
+const PRUEFUNGEN = [
+{
+  id:'ap2025-dz', tag:'AP 2025', titel:'Socken, Bildschirmzeit und Darts-WM', bild:B+'ap25_saeulen_leer.png',
+  teilA: R`Teil A ohne Taschenrechner · Wahlblock 2`,
+  teilB: R`Bei der Darts-WM sind die besten 32 Spieler der Weltrangliste qualifiziert. Bei der letzten WM kamen die Spieler aus 11 verschiedenen Nationen. Die meisten davon stammten aus dem Vereinigten Königreich mit folgender Länderverteilung:
+  <table class="dt"><tr><th>Land im Vereinigten Königreich</th><th>Anzahl der Spieler</th></tr><tr><td>England</td><td>13</td></tr><tr><td>Schottland</td><td>2</td></tr><tr><td>Wales</td><td>2</td></tr><tr><td>Nordirland</td><td>3</td></tr></table>`,
+  aufgaben:[
+  { teil:'A', nr:'2.1', punkte:2,
+    vortext: R`Tim und sein Freund ziehen sich vor einem Fußballspiel in der Umkleidekabine um. Von 15 Sockenpaaren haben zwei Paare Löcher (L) und die restlichen keine (KL). Fünf Mitspieler haben bereits Socken ohne Löcher erhalten, nun nimmt Tim für sich und seinen Freund nacheinander zwei Paare.`,
+    text: R`Tragen Sie die zwei geforderten Übergangswahrscheinlichkeiten ein und berechnen Sie die Wahrscheinlichkeit für das Ereignis E: „Tim zieht zwei Paar Socken mit Löchern“. Geben Sie das Ergebnis als gekürzten Bruch an.`,
+    bild: B+'ap25_baum_leer.png',
+    eingabe: R`Brüche mit / eingeben`,
+    felder:[{key:'p1',label:'1. Zug L:',wert:0.2},{key:'p2',label:'2. Zug L (nach L):',wert:1/9},{key:'pe',label:'P(E) =',typ:'bruch',z:1,n:45}],
+    tipps:[
+      R`Wie viele Sockenpaare liegen noch da, wenn Tim zieht? Fünf Paare ohne Löcher sind schon weg: \(15-5=10\) Paare – davon haben immer noch \(2\) Löcher.`,
+      R`1. Zug: \(P(L)=\dfrac{2}{10}\). Ohne Zurücklegen: Beim 2. Zug liegen nur noch \(9\) Paare da, davon \(1\) mit Löchern → \(\dfrac{1}{9}\).`,
+      R`1. Pfadregel: \(P(E)=\dfrac{2}{10}\cdot\dfrac{1}{9}=\dfrac{2}{90}\). Jetzt noch kürzen!`
+    ],
+    loesung:[ R`\text{1. Zug: } \frac{2}{10}\qquad \text{2. Zug: } \frac{1}{9}`, R`P(E)=\frac{2}{10}\cdot\frac{1}{9}=\frac{2}{90}=\frac{1}{45}` ],
+    loesungBild: B+'ap25_baum_loesung.png'},
+  { teil:'A', nr:'2.2', punkte:2,
+    vortext: R`An Tims Wirtschaftsschule wurde in den einzelnen Klassen eine Umfrage zur Bildschirmzeit von Kindern und Jugendlichen durchgeführt.`,
+    text: R`Bestimmen Sie rechnerisch die durchschnittliche Bildschirmzeit der 10. Klasse und vervollständigen Sie das Säulendiagramm bei dieser Klasse.`,
+    bild: B+'ap25_saeulen_leer.png',
+    felder:[{key:'t',label:'10. Klasse:',wert:250,einheit:'Minuten'}],
+    tipps:[
+      R`Der Durchschnitt aller <b>sechs</b> Klassen ist \(160\) Minuten. Daraus bekommst du die Gesamtsumme: \(160\cdot 6\).`,
+      R`Gesamtsumme \(=960\) Minuten. Die fünf bekannten Klassen ergeben zusammen \(100+110+120+180+200=710\) Minuten.`,
+      R`Der Rest gehört der 10. Klasse: \(960-710\). Zeichne die Säule dann bis zu diesem Wert.`
+    ],
+    loesung:[ R`160\cdot 6=960\text{ Minuten}`, R`100+110+120+180+200=710\text{ Minuten}`, R`960-710=250\text{ Minuten}` ],
+    loesungBild: B+'ap25_saeulen_loesung.png'},
+  { teil:'B', nr:'4.1', punkte:1,
+    text: R`Bestimmen Sie die absolute Häufigkeit für das Ereignis \(E_1\): „Ein Spieler kommt aus dem Vereinigten Königreich“.`,
+    felder:[{key:'h',label:R`\(H(E_1)=\)`,wert:20,einheit:'Spieler'}],
+    tipps:[ R`Absolute Häufigkeit = Anzahl. Zähle alle Spieler aus England, Schottland, Wales und Nordirland zusammen.`, R`\(13+2+2+3\)` ],
+    loesung:[ R`H(E_1)=13+2+2+3=20\text{ Spieler}` ]},
+  { teil:'B', nr:'4.2', punkte:2,
+    text: R`Bestimmen Sie die relative Häufigkeit in Prozent für das Ereignis \(E_2\): „Ein Spieler kommt nicht aus dem Vereinigten Königreich“.`,
+    felder:[{key:'h',label:R`\(h(E_2)=\)`,wert:37.5,tol:0.006,einheit:'%'}],
+    tipps:[
+      R`Insgesamt sind \(32\) Spieler dabei, \(20\) davon kommen aus dem Vereinigten Königreich. Wie viele kommen <b>nicht</b> von dort?`,
+      R`\(32-20=12\) Spieler. Relative Häufigkeit: \(h(E_2)=\dfrac{12}{32}\). Mal 100 ergibt Prozent.`
+    ],
+    loesung:[ R`h(E_2)=\frac{32-20}{32}=\frac{3}{8}=0,375=37,50\,\%` ]},
+  { teil:'B', nr:'4.3', punkte:2,
+    text: R`Erstellen Sie auf Grundlage obiger Tabelle ein Säulendiagramm, das die Anzahl der Spieler der einzelnen Länder des Vereinigten Königreichs darstellt.`,
+    eingabe: R`Zeichne auf Papier. Trage hier ein, bis zu welchem Wert die höchste und die niedrigste Säule reichen.`,
+    felder:[{key:'max',label:'höchste Säule:',wert:13},{key:'min',label:'niedrigste Säule:',wert:2}],
+    tipps:[
+      R`Ein Säulendiagramm hat eine <b>Rechtsachse</b> mit den vier Ländern und eine <b>Hochachse</b> mit der Anzahl der Spieler. Achsen beschriften und eine Überschrift nicht vergessen!`,
+      R`Die Hochachse muss mindestens bis \(13\) gehen (England). Eine gute Einteilung: 1 Kästchen = 1 Spieler oder in Zweierschritten \(0, 2, 4, \dots, 14\).`,
+      R`Jede Säule ist gleich breit und hat den gleichen Abstand. Höhe = Anzahl aus der Tabelle: England 13, Schottland 2, Wales 2, Nordirland 3.`
+    ],
+    loesung:[ R`\text{England 13 · Schottland 2 · Wales 2 · Nordirland 3}` ],
+    loesungBild: B+'ap25_uk_loesung.png'},
+  { teil:'B', nr:'4.4', punkte:4,
+    vortext: R`Im Finale warf der aktuelle Weltmeister Luke Littler zu Beginn der Partie folgende Punkte:
+      <table class="dt row"><tr><td>99</td><td>60</td><td>140</td><td>26</td><td>100</td><td>76</td><td>100</td><td>180</td><td>96</td><td>109</td><td>16</td></tr></table>`,
+    text: R`Bestimmen Sie das arithmetische Mittel, den Median und die Spannweite aus den erzielten Punkten.`,
+    felder:[{key:'m',label:R`\(\bar x=\)`,wert:91.09,tol:0.006,einheit:'Punkte'},{key:'med',label:R`\(x_{med}=\)`,wert:99,einheit:'Punkte'},{key:'r',label:R`\(R=\)`,wert:164,einheit:'Punkte'}],
+    hinweisFelder:'Mittelwert auf zwei Nachkommastellen',
+    tipps:[
+      R`Ordne die 11 Werte zuerst der Größe nach: \(16;\ 26;\ 60;\ \dots\) – das brauchst du für Median und Spannweite.`,
+      R`Geordnet: \(16;\ 26;\ 60;\ 76;\ 96;\ 99;\ 100;\ 100;\ 109;\ 140;\ 180\). Bei 11 Werten ist der <b>6.</b> Wert der Median. Spannweite = größter − kleinster Wert.`,
+      R`Arithmetisches Mittel: alle Werte addieren (Summe \(1.002\)) und durch \(11\) teilen.`
+    ],
+    loesung:[ R`\text{Geordnet: } 16;\,26;\,60;\,76;\,96;\,\mathbf{99};\,100;\,100;\,109;\,140;\,180`, R`x_{med}=99\text{ Punkte}`, R`R=180-16=164\text{ Punkte}`, R`\bar x=\frac{1002}{11}\approx 91,09\text{ Punkte}` ]},
+  { teil:'B', nr:'4.5', punkte:3,
+    vortext: R`Die Wahrscheinlichkeit, dass Luke Littler mit einem Dart das Triple-20-Feld trifft (T), beträgt 11 %. Er wirft nacheinander drei Darts.`,
+    text: R`Stellen Sie den Sachverhalt in einem vollständig beschrifteten Baumdiagramm dar (T: Treffer Triple 20; NT: kein Treffer).`,
+    eingabe: R`Zeichne auf Papier und trage ein:`,
+    felder:[{key:'t',label:'P(T) =',wert:0.11},{key:'nt',label:'P(NT) =',wert:0.89},{key:'e',label:'Anzahl Pfade:',wert:8}],
+    tipps:[
+      R`Drei Würfe nacheinander → das Baumdiagramm hat <b>drei Stufen</b>. An jeder Verzweigung gibt es zwei Äste: T und NT.`,
+      R`\(P(T)=11\,\%=0,11\). Die Gegenwahrscheinlichkeit ist \(P(NT)=1-0,11\). Die Wahrscheinlichkeiten bleiben bei jedem Wurf gleich.`,
+      R`Stufe 1: 2 Äste, Stufe 2: \(2\cdot 2\), Stufe 3: \(2\cdot2\cdot2\) Enden. An jeden Ast die Wahrscheinlichkeit schreiben!`
+    ],
+    loesung:[ R`P(T)=0,11\qquad P(NT)=0,89\qquad 2\cdot2\cdot2=8\text{ Pfade}` ],
+    loesungBild: B+'ap25_dart_baum.png'},
+  { teil:'B', nr:'4.6', punkte:1,
+    text: R`Berechnen Sie die Wahrscheinlichkeit für das Ereignis \(E_3\): „Luke Littler trifft mit allen drei Darts das Triple-20-Feld“.`,
+    felder:[{key:'p',label:R`\(P(E_3)=\)`,wert:0.13,tol:0.006,einheit:'%'}],
+    hinweisFelder:'in Prozent, zwei Nachkommastellen',
+    tipps:[ R`Es gehört nur <b>ein</b> Pfad dazu: T – T – T. 1. Pfadregel: multiplizieren.`, R`\(0,11\cdot0,11\cdot0,11=0,001331\). Mal 100 ergibt Prozent.` ],
+    loesung:[ R`P(E_3)=P(T,T,T)=0,11\cdot0,11\cdot0,11\approx0,0013=0,13\,\%` ]},
+  { teil:'B', nr:'4.7', punkte:2,
+    text: R`Berechnen Sie die Wahrscheinlichkeit für das Ereignis \(E_4\): „Luke Littler trifft genau zweimal das Triple-20-Feld“.`,
+    felder:[{key:'p',label:R`\(P(E_4)=\)`,wert:3.23,tol:0.006,einheit:'%'}],
+    hinweisFelder:'in Prozent, zwei Nachkommastellen',
+    tipps:[
+      R`„Genau zweimal“: zwei Treffer und ein Fehlwurf. Der Fehlwurf kann beim 1., 2. oder 3. Dart passieren → <b>drei</b> Pfade.`,
+      R`Pfade: (T, T, NT), (T, NT, T), (NT, T, T). Jeder Pfad: \(0,11\cdot0,11\cdot0,89\).`,
+      R`2. Pfadregel: die drei Pfade addieren: \(3\cdot 0,010769\).`
+    ],
+    loesung:[ R`P(E_4)=P(T,T,NT)+P(T,NT,T)+P(NT,T,T)`, R`=0,11\cdot0,11\cdot0,89+0,11\cdot0,89\cdot0,11+0,89\cdot0,11\cdot0,11`, R`\approx 0,0323=3,23\,\%` ]}
+  ]
+},
+{
+  id:'ap2024-dz', tag:'AP 2024', titel:'Freibad und Hochzeiten', bild:B+'ap24_kreis_loesung.png',
+  teilA: R`Teil A ohne Taschenrechner · Wahlblock 2`,
+  teilB: R`<span class="fig-r"><img src="${B}ap24_ringe.png" alt="Zwei Eheringe"></span>In der Hauptsaison 2023 von April bis September heirateten in Deutschland 259.134 Paare. Folgende Statistik zeigt die Verteilung der Eheschließungen in diesem Zeitraum:
+  <table class="dt"><tr><th colspan="2">Zweites Quartal 2023</th><th colspan="2">Drittes Quartal 2023</th></tr>
+  <tr class="pk"><th>Monat</th><th>Anzahl der Hochzeiten</th><th>Monat</th><th>Anzahl der Hochzeiten</th></tr>
+  <tr><td>April</td><td>27.277</td><td>Juli</td><td>50.951</td></tr><tr class="pk"><td>Mai</td><td>41.365</td><td>August</td><td>46.096</td></tr><tr><td>Juni</td><td>45.084</td><td>September</td><td>48.361</td></tr></table>`,
+  aufgaben:[
+  { teil:'A', nr:'2.1', punkte:1,
+    vortext: R`Die Tabelle zeigt die Auswertung der Aufenthaltsdauer der Freibadbesucher in einer Woche. Der Bademeister hat die Besuchszeit der Badegäste in der folgenden Tabelle zusammengefasst. Bei der Auswertung ist ein Fehler entstanden.
+      <table class="dt"><tr><th>Aufenthaltsdauer</th><th>weniger 1 h</th><th>1 – 2 h 59 min</th><th>3 – 3 h 59 min</th><th>ab 4 h</th></tr><tr><th>relative Häufigkeit</th><td>0,10</td><td>0,30</td><td><b>ERROR</b></td><td>0,35</td></tr></table>`,
+    text: R`Berechnen Sie den fehlenden Wert „ERROR“ in der Tabelle.`,
+    felder:[{key:'e',label:'ERROR =',wert:0.25}],
+    tipps:[ R`Alle relativen Häufigkeiten zusammen ergeben immer \(1\) (also \(100\,\%\)).`, R`\(1-0,10-0,30-0,35=\ ?\)` ],
+    loesung:[ R`\text{ERROR}=1-0,10-0,30-0,35=0,25` ]},
+  { teil:'A', nr:'2.2', punkte:1,
+    vortext: R`Die Geschäftsleitung interessiert, wie viele der 2.800 Badegäste in dieser Woche weniger als eine Stunde im Freibad blieben.`,
+    text: R`Berechnen Sie anhand der obigen Tabelle die Anzahl der Besucher.`,
+    felder:[{key:'n',label:'Anzahl:',wert:280,einheit:'Besucher'}],
+    tipps:[ R`Die relative Häufigkeit für „weniger 1 h“ ist \(0,10\) – das sind \(10\,\%\) aller Badegäste.`, R`Absolute Häufigkeit \(=\) relative Häufigkeit \(\cdot\) Gesamtzahl: \(0,10\cdot 2.800\).` ],
+    loesung:[ R`0,10\cdot 2.800=280\text{ Besucher}` ]},
+  { teil:'A', nr:'2.3', punkte:2,
+    vortext: R`<span class="fig-r"><img src="${B}ap24_riegel.png" alt="Riegel"></span>Zum Geburtstag darf man am Freibadkiosk zwei Süßigkeiten aus einer Box ziehen. In dieser befinden sich neun Schoko-, fünf Hafer- und sieben Kokosriegel. Das Geburtstagskind Jan hat eine Kokosallergie.`,
+    text: R`Berechnen Sie die Wahrscheinlichkeit, dass er zweimal hintereinander einen Kokosriegel zieht. Geben Sie das Ergebnis als vollständig gekürzten Bruch an.`,
+    eingabe: R`Bruch mit / eingeben, z. B. 3/7`,
+    felder:[{key:'p',label:'P =',typ:'bruch',z:1,n:10}],
+    tipps:[
+      R`Wie viele Riegel sind insgesamt in der Box? \(9+5+7=21\). Davon sind \(7\) Kokosriegel.`,
+      R`Ohne Zurücklegen (den ersten Riegel behält Jan): 1. Zug \(\dfrac{7}{21}\), 2. Zug \(\dfrac{6}{20}\).`,
+      R`1. Pfadregel: \(\dfrac{7}{21}\cdot\dfrac{6}{20}=\dfrac{42}{420}\). Vollständig kürzen!`
+    ],
+    loesung:[ R`P=\frac{7}{21}\cdot\frac{6}{20}=\frac{42}{420}=\frac{1}{10}` ]},
+  { teil:'B', nr:'4.1', punkte:1,
+    text: R`Berechnen Sie die absolute Häufigkeit für das Ereignis \(E_1\): „Ein Paar heiratet im zweiten Quartal“.`,
+    felder:[{key:'h',label:R`\(H(E_1)=\)`,wert:113726,einheit:'Paare'}],
+    tipps:[ R`Zum zweiten Quartal gehören April, Mai und Juni.`, R`\(27.277+41.365+45.084\)` ],
+    loesung:[ R`H(E_1)=27.277+41.365+45.084=113.726\text{ Paare}` ]},
+  { teil:'B', nr:'4.2', punkte:2,
+    text: R`Berechnen Sie die relative Häufigkeit in Prozent für das Ereignis \(E_2\): „Ein Paar heiratet im dritten Quartal“.`,
+    felder:[{key:'h',label:R`\(h(E_2)=\)`,wert:56.11,tol:0.006,einheit:'%'}],
+    hinweisFelder:'zwei Nachkommastellen',
+    tipps:[
+      R`Drittes Quartal: Juli, August, September. Zuerst die Anzahl dieser Hochzeiten addieren.`,
+      R`\(50.951+46.096+48.361=145.408\). Teile durch <b>alle</b> Hochzeiten der Hauptsaison (\(259.134\)).`,
+      R`\(h(E_2)=\dfrac{145.408}{259.134}\approx 0,5611\). Mal 100 ergibt Prozent.`
+    ],
+    loesung:[ R`h(E_2)=\frac{50.951+46.096+48.361}{259.134}=\frac{145.408}{259.134}\approx 56,11\,\%` ]},
+  { teil:'B', nr:'4.3', punkte:3,
+    vortext: R`Im dritten Quartal 2023 heirateten 145.408 Paare.`,
+    text: R`Erstellen Sie ein Kreisdiagramm, das den prozentualen Anteil der Hochzeiten pro Monat von Juli bis September angibt, gemessen an der Gesamtzahl der Hochzeiten im dritten Quartal.`,
+    bild: B+'ap24_kreis_leer.png',
+    eingabe: R`Prozente und Winkel (eine Nachkommastelle beim Winkel)`,
+    felder:[{key:'pj',label:'Juli:',wert:35.04,tol:0.006,einheit:'%'},{key:'wj',label:'Winkel Juli:',wert:126.1,tol:0.06,einheit:'°'},
+            {key:'pa',label:'August:',wert:31.70,tol:0.006,einheit:'%'},{key:'wa',label:'Winkel August:',wert:114.1,tol:0.06,einheit:'°'},
+            {key:'ps',label:'September:',wert:33.26,tol:0.006,einheit:'%'},{key:'ws',label:'Winkel September:',wert:119.7,tol:0.06,einheit:'°'}],
+    tipps:[
+      R`Achtung: Hier ist die Gesamtzahl nur das <b>dritte Quartal</b>, also \(145.408\) – nicht \(259.134\)!`,
+      R`Juli: \(\dfrac{50.951}{145.408}\approx 0,3504=35,04\,\%\). Genauso für August und September.`,
+      R`Winkel \(=\) Anteil \(\cdot 360^\circ\), z. B. Juli: \(0,3504\cdot360^\circ\approx126,1^\circ\). Zeichne mit dem Geodreieck ab der vorgegebenen Linie und beschrifte jedes Kreisstück.`
+    ],
+    loesung:[ R`h(\text{Juli})=\frac{50.951}{145.408}\approx35,04\,\%\ \to\ 126,1^\circ`, R`h(\text{August})=\frac{46.096}{145.408}\approx31,70\,\%\ \to\ 114,1^\circ`, R`h(\text{September})=\frac{48.361}{145.408}\approx33,26\,\%\ \to\ 119,7^\circ` ],
+    loesungBild: B+'ap24_kreis_loesung.png'},
+  { teil:'B', nr:'4.4', punkte:3,
+    text: R`Ermitteln Sie das arithmetische Mittel und den Median für die Anzahl der Hochzeiten von April bis September.`,
+    felder:[{key:'m',label:R`\(\bar x=\)`,wert:43189,einheit:'Hochzeiten'},{key:'med',label:R`\(x_{med}=\)`,wert:45590,einheit:'Hochzeiten'}],
+    tipps:[
+      R`Arithmetisches Mittel: alle sechs Monate addieren und durch \(6\) teilen. Die Summe steht schon im Text: \(259.134\).`,
+      R`Median: Ordne die sechs Werte der Größe nach: \(27.277;\ 41.365;\ 45.084;\ 46.096;\ 48.361;\ 50.951\).`,
+      R`Bei sechs Werten gibt es keinen einzelnen mittleren Wert → Mittelwert aus dem 3. und 4. Wert: \(\dfrac{45.084+46.096}{2}\).`
+    ],
+    loesung:[ R`\bar x=\frac{259.134}{6}=43.189\text{ Hochzeiten}`, R`27.277;\ 41.365;\ \mathbf{45.084};\ \mathbf{46.096};\ 48.361;\ 50.951`, R`x_{med}=\frac{45.084+46.096}{2}=45.590\text{ Hochzeiten}` ]},
+  { teil:'B', nr:'4.5', punkte:3,
+    vortext: R`Eine Hochzeitsstudie zeigte, dass es bei 83 % der befragten Paare einen „klassischen“ Heiratsantrag durch den Mann gab. 12 % der Paare haben sich gemeinsam für die Hochzeit entschieden und bei nur 5 % der Befragten machte die Frau den Antrag.<br>An welcher Hand der Verlobungsring getragen wird, wurde von den Männern wie folgt beantwortet: 90 % tragen den Ring links und 10 % tragen ihn rechts.<br>Die geplanten Ausgaben für die Hochzeit belaufen sich bei 30 % auf weniger als 15.000,00 €, bei 64 % sollen es zwischen 15.000,00 € und 25.000,00 € sein und 6 % planen mehr als 25.000,00 € für ihre Hochzeit auszugeben.`,
+    text: R`Ergänzen Sie die fehlenden Übergangswahrscheinlichkeiten im untenstehenden Baumdiagramm.`,
+    bild: B+'ap24_baum_leer.png',
+    eingabe: R`als Dezimalzahl`,
+    felder:[{key:'m',label:'Mann:',wert:0.83},{key:'g',label:'gemeinsam:',wert:0.12},{key:'l',label:'links:',wert:0.9},{key:'r',label:'rechts:',wert:0.1},{key:'u',label:'< 15.000 €:',wert:0.3},{key:'o',label:'> 25.000 €:',wert:0.06}],
+    tipps:[
+      R`Wandle die Prozentangaben in Dezimalzahlen um: \(83\,\%=0,83\).`,
+      R`1. Stufe: Mann \(0,83\), Frau \(0,05\) (steht schon da), gemeinsam \(0,12\). Probe: zusammen \(1\).`,
+      R`2. Stufe (links/rechts): \(0,90\) und \(0,10\). 3. Stufe: \(0,30\), \(0,64\) (steht da) und \(0,06\).`
+    ],
+    loesung:[ R`\text{Mann } 0,83\quad\text{gemeinsam } 0,12\quad\text{links } 0,90\quad\text{rechts } 0,10`, R`<\!15.000\,€:\ 0,30\qquad >\!25.000\,€:\ 0,06` ],
+    loesungBild: B+'ap24_baum_loesung.png'},
+  { teil:'B', nr:'4.6', punkte:3,
+    text: R`Berechnen Sie die prozentuale Wahrscheinlichkeit für das Ereignis \(E_3\): „Das Paar hatte einen „klassischen“ Heiratsantrag durch den Mann, trägt den Verlobungsring links und plant maximal 25.000,00 € für die Hochzeit auszugeben“.`,
+    felder:[{key:'p',label:R`\(P(E_3)=\)`,wert:70.22,tol:0.006,einheit:'%'}],
+    hinweisFelder:'zwei Nachkommastellen',
+    tipps:[
+      R`„Maximal 25.000 €“ heißt: weniger als 15.000 € <b>oder</b> 15.000 – 25.000 €. Es gehören also <b>zwei</b> Pfade dazu.`,
+      R`Pfad 1: Mann – links – unter 15.000 €: \(0,83\cdot0,90\cdot0,30\). Pfad 2: Mann – links – 15.000 bis 25.000 €: \(0,83\cdot0,90\cdot0,64\).`,
+      R`2. Pfadregel: beide Pfade addieren: \(0,2241+0,47808\). Mal 100 ergibt Prozent.`
+    ],
+    loesung:[ R`P(E_3)=0,83\cdot0,90\cdot0,30`, R`\qquad\ +\,0,83\cdot0,90\cdot0,64`, R`P(E_3)=0,2241+0,47808`, R`P(E_3)=0,70218\approx70,22\,\%` ]}
+  ]
+}
+];
+
+/* Dezimalkomma in Formeln korrekt setzen (0,5 statt 0, 5) */
+const dc=x=>x.replace(/(\d),(\d)/g,'$1{,}$2');
+const fixM=s=>s.replace(/\\\(([\s\S]*?)\\\)/g,(m,x)=>'\\('+dc(x)+'\\)').replace(/\\\[([\s\S]*?)\\\]/g,(m,x)=>'\\['+dc(x)+'\\]');
+PRUEFUNGEN.forEach(ex=>{ ex.aufgaben.forEach(a=>{
+  ['vortext','text','eingabe'].forEach(k=>{ if(a[k]) a[k]=fixM(a[k]); });
+  a.tipps=a.tipps.map(fixM); a.loesung=a.loesung.map(dc);
+  a.felder.forEach(f=>{ f.label=fixM(f.label); });
+});});
+document.querySelectorAll('.f-item').forEach(el=>{ el.innerHTML=fixM(el.innerHTML); });
+
+/* ====================== Speicher ====================== */
+const KEY='dz-pruefungstrainer-v1';
+let state={};
+try{ state=JSON.parse(localStorage.getItem(KEY))||{}; }catch(e){ state={}; }
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(state)); }catch(e){} }
+function sid(a){ return a.teil+a.nr; }
+function st(eid,a){ const n=sid(a); state[eid]=state[eid]||{}; state[eid][n]=state[eid][n]||{tips:0,sol:false,ok:false,pts:0,vals:{}}; return state[eid][n]; }
+
+/* ====================== Hilfsfunktionen ====================== */
+function clean(s){ return String(s??'').trim().replace(/[−–]/g,'-').replace(/\s/g,'').replace(/(%|°|€|Minuten|Punkte|Paare|Besucher|Spieler|Hochzeiten)$/i,''); }
+function parseNum(s){
+  s=clean(s); if(s==='') return NaN;
+  const fr=s.match(/^([-+]?\d+)\/(\d+)$/); if(fr) return +fr[2]===0?NaN:(+fr[1])/(+fr[2]);
+  if(/^\d{1,3}(\.\d{3})+$/.test(s)) s=s.replace(/\./g,'');           // 113.726 → 113726
+  else if(/^\d{1,3}(\.\d{3})+,\d+$/.test(s)) s=s.replace(/\./g,'');   // 1.234,5
+  s=s.replace(',', '.');
+  if(!/^[-+]?\d*\.?\d+$/.test(s)) return NaN;
+  return parseFloat(s);
+}
+function ggt(a,b){ a=Math.abs(a); b=Math.abs(b); while(b){ [a,b]=[b,a%b]; } return a; }
+function math(el){
+  if(window.renderMathInElement){
+    renderMathInElement(el,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],
+      preProcess:m=>m.replace(/(\d),(\d)/g,'$1{,}$2'),throwOnError:false});
+  }
+}
+function examScore(ex){
+  let p=0,max=0,done=0;
+  ex.aufgaben.forEach(a=>{max+=a.punkte; const s=(state[ex.id]||{})[sid(a)]; if(s){p+=s.pts||0; if(s.ok) done++;}});
+  return {p,max,done,n:ex.aufgaben.length};
+}
+const app=document.getElementById('app');
+
+/* ====================== Übersicht ====================== */
+function renderHome(){
+  history.replaceState(null,'',location.pathname+location.search);
+  let h=`<p class="intro">Wähle eine Abschlussprüfung. Rechne zuerst selbst auf Papier und trage dann deine Ergebnisse ein. Wenn du nicht weiterkommst, hol dir Schritt für Schritt einen <b>Tipp</b>. Die vollständige <b>Lösung</b> wird freigeschaltet, wenn du richtig gerechnet oder alle Tipps angesehen hast.</p>
+  <p class="intro"><b>Teil A</b> (Wahlblock 2) rechnest du in der Prüfung <b>ohne</b> Taschenrechner, <b>Teil B</b> (Aufgabe 4) mit Taschenrechner.</p><div class="grid">`;
+  PRUEFUNGEN.forEach((ex,i)=>{
+    const s=examScore(ex);
+    h+=`<button class="exam-card" onclick="openExam(${i})">
+      <div class="thumb"><img src="${ex.bild}" alt="Bild zu ${ex.titel}"></div>
+      <div class="body"><span class="tag">${ex.tag}</span><h3>${ex.titel}</h3>
+      <div class="meta">${s.n} Teilaufgaben · ${s.max} Punkte · gelöst: ${s.done}/${s.n} · <span class="score">${s.p}/${s.max} P.</span></div>
+      <div class="bar"><i style="width:${Math.round(100*s.p/s.max)}%"></i></div></div></button>`;
+  });
+  h+=`</div><div class="actions" style="margin-top:22px"><button onclick="resetAll()">Gesamten Fortschritt löschen</button></div>`;
+  app.innerHTML=h; window.scrollTo(0,0);
+}
+function resetAll(){ if(confirm('Wirklich den gesamten Fortschritt löschen?')){ state={}; save(); renderHome(); } }
+
+/* ====================== Prüfungsansicht ====================== */
+let cur=null;
+function openExam(i,teil){
+  cur=i; const ex=PRUEFUNGEN[i]; location.hash=ex.id;
+  const s=examScore(ex);
+  let h=`<button class="back" onclick="renderHome()">← Alle Prüfungen</button>
+  <div class="panel"><span class="tag">${ex.tag}</span> <span class="meta" id="examScore">Punkte: <b>${s.p}</b> / ${s.max}</span>
+  <h2 style="margin:6px 0 8px">Daten und Zufall – ${ex.titel}</h2>
+  <div class="jump"><a href="#" onclick="jump('A');return false">Teil A · Wahlblock 2</a><a href="#" onclick="jump('B');return false">Teil B · Aufgabe 4</a></div></div>`;
+  let last='';
+  ex.aufgaben.forEach((a,k)=>{
+    if(a.teil!==last){
+      last=a.teil;
+      h+= a.teil==='A'
+        ? `<h2 class="teil" id="teilA">Teil A · Wahlblock 2 – Daten und Zufall <span class="meta">ohne Taschenrechner</span></h2>`
+        : `<h2 class="teil" id="teilB">Teil B · Aufgabe 4 – Daten und Zufall <span class="meta">mit Taschenrechner</span></h2><div class="panel">${ex.teilB}</div>`;
+    }
+    h+=`<div class="task" id="t${k}"></div>`;
+  });
+  h+=`<div class="actions"><button onclick="resetExam()">Diese Prüfung zurücksetzen</button>${i+1<PRUEFUNGEN.length?`<button class="primary" onclick="openExam(${i+1})">Nächste Prüfung →</button>`:''}</div>`;
+  app.innerHTML=h;
+  ex.aufgaben.forEach((a,k)=>renderTask(k));
+  app.querySelectorAll('.panel').forEach(math);
+  if(teil) jump(teil); else window.scrollTo(0,0);
+}
+function jump(t){ const el=document.getElementById('teil'+t); if(el) el.scrollIntoView({behavior:'smooth'}); }
+function resetExam(){ const ex=PRUEFUNGEN[cur]; if(confirm('Fortschritt dieser Prüfung löschen?')){ delete state[ex.id]; save(); openExam(cur);} }
+function updateScore(){ const s=examScore(PRUEFUNGEN[cur]); const el=document.getElementById('examScore'); if(el) el.innerHTML=`Punkte: <b>${s.p}</b> / ${s.max}`; }
+
+function renderTask(k){
+  const ex=PRUEFUNGEN[cur], a=ex.aufgaben[k], s=st(ex.id,a);
+  const box=document.getElementById('t'+k);
+  box.className='task'+(s.ok?' done':'');
+  const unlocked=s.ok||s.tips>=a.tipps.length;
+  let status='';
+  if(s.ok&&s.pts>0) status=`<span class="status ok">richtig · ${s.pts} P.</span>`;
+  else if(s.ok) status=`<span class="status ok">richtig</span>`;
+  else if(s.sol) status=`<span class="status sol">Lösung angesehen</span>`;
+  let fields=a.felder.map(f=>{
+    const v=s.vals[f.key]??'';
+    if(f.typ==='wahl') return `<label class="field">${f.label} <select data-k="${f.key}"><option value="">–</option>${f.optionen.map(o=>`<option ${v===o?'selected':''}>${o}</option>`).join('')}</select></label>`;
+    return `<label class="field">${f.label} <input data-k="${f.key}" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="${v}" ${f.typ==='bruch'?'placeholder="z/n"':''}>${f.einheit?`<span class="unit">${f.einheit}</span>`:''}</label>`;
+  }).join('');
+  let tips='';
+  for(let t=0;t<s.tips;t++) tips+=`<div class="tipbox"><b>Tipp ${t+1}:</b> ${a.tipps[t]}</div>`;
+  const tipLeft=a.tipps.length-s.tips;
+  box.innerHTML=`<div class="task-head"><span class="nr">${a.nr}</span>${status}<span class="pts">${a.punkte} Punkt${a.punkte>1?'e':''}</span></div>
+  <div class="task-body">
+    ${a.vortext?`<div class="vortext">${a.vortext}</div>`:''}
+    <p class="aufg">${a.text}</p>
+    ${a.bild?`<div class="figure"><img src="${a.bild}" alt="Abbildung zu ${a.nr}"></div>`:''}
+    <div class="answer"><div class="lbl">Dein Ergebnis${a.eingabe?': '+a.eingabe:''}${a.hinweisFelder?' · '+a.hinweisFelder:''}</div>
+      <div class="fields">${fields}</div>
+      <div class="actions">
+        <button class="primary" onclick="check(${k})">Prüfen</button>
+        <button class="btn-tip" onclick="tip(${k})" ${tipLeft<=0?'disabled':''}>${tipLeft>0?`Tipp ${s.tips+1} von ${a.tipps.length}`:'Alle Tipps angezeigt'}</button>
+        <button class="btn-sol" onclick="showSol(${k})">${s.sol?'Lösung ausblenden':(unlocked?'Lösung zeigen':'Lösung (gesperrt)')}</button>
+      </div>
+      <div class="feedback" id="fb${k}"></div>
+    </div>
+    <div class="tips">${tips}</div>
+    ${s.sol?`<div class="solbox"><h4>Lösungsweg</h4>${a.loesung.map(l=>`<div class="step">\\[${l}\\]</div>`).join('')}${a.loesungBild?`<div class="figure"><img src="${a.loesungBild}" alt="Lösung zu ${a.nr}"></div>`:''}</div>`:''}
+  </div>`;
+  box.querySelectorAll('input').forEach(inp=>inp.addEventListener('keydown',e=>{if(e.key==='Enter') check(k);}));
+  math(box);
+}
+
+function check(k){
+  const ex=PRUEFUNGEN[cur], a=ex.aufgaben[k], s=st(ex.id,a);
+  const box=document.getElementById('t'+k);
+  let allOk=true, empty=false, kuerzen=false;
+  a.felder.forEach(f=>{
+    const el=box.querySelector(`[data-k="${f.key}"]`); const raw=el.value; s.vals[f.key]=raw;
+    let ok;
+    if(raw.trim()==='') empty=true;
+    if(f.typ==='wahl'){ ok=raw===f.wert; }
+    else if(f.typ==='bruch'){
+      const m=clean(raw).match(/^(\d+)\/(\d+)$/);
+      ok=false;
+      if(m){ const z=+m[1], n=+m[2]; if(n>0 && z*f.n===n*f.z){ if(z===f.z&&n===f.n) ok=true; else kuerzen=true; } }
+    }
+    else { const n=parseNum(raw); const tol=f.tol??Math.max(0.001,Math.abs(f.wert)*0.001); ok=!isNaN(n)&&Math.abs(n-f.wert)<=tol; }
+    el.classList.remove('ok','bad'); if(raw!=='') el.classList.add(ok?'ok':'bad');
+    if(!ok) allOk=false;
+  });
+  const fb=document.getElementById('fb'+k);
+  if(allOk){
+    const first=!s.ok; s.ok=true; if(first&&!s.sol) s.pts=a.punkte;
+    save(); renderTask(k); updateScore();
+    const fb2=document.getElementById('fb'+k);
+    fb2.className='feedback ok';
+    fb2.innerHTML = s.pts>0 ? `Richtig! ${s.tips>0?'(mit '+s.tips+' Tipp'+(s.tips>1?'s':'')+') ':''}Vergleiche jetzt deinen Rechenweg mit der Lösung.` : 'Richtig! (Punkte gibt es nur, wenn die Lösung vorher nicht angesehen wurde.)';
+  } else {
+    save();
+    fb.className='feedback '+(empty?'info':(kuerzen?'info':'bad'));
+    fb.innerHTML = empty ? 'Bitte alle Felder ausfüllen.' : kuerzen ? 'Der Wert stimmt – aber der Bruch ist noch nicht vollständig gekürzt!' : 'Noch nicht ganz. Rot markierte Werte stimmen nicht. Prüfe deine Rechnung'+(s.tips<a.tipps.length?' oder hol dir einen Tipp.':'.');
+  }
+}
+function tip(k){
+  const ex=PRUEFUNGEN[cur], a=ex.aufgaben[k], s=st(ex.id,a);
+  saveVals(k); if(s.tips<a.tipps.length){ s.tips++; save(); renderTask(k); }
+}
+function showSol(k){
+  const ex=PRUEFUNGEN[cur], a=ex.aufgaben[k], s=st(ex.id,a);
+  saveVals(k);
+  if(s.sol){ s.sol=false; save(); renderTask(k); return; }
+  if(!(s.ok||s.tips>=a.tipps.length)){
+    const fb=document.getElementById('fb'+k); fb.className='feedback info';
+    fb.innerHTML='Versuch es zuerst mit den Tipps! Die Lösung wird frei, sobald du alle Tipps angesehen oder die Aufgabe richtig gelöst hast.'; return;
+  }
+  s.sol=true; save(); renderTask(k);
+}
+function saveVals(k){
+  const ex=PRUEFUNGEN[cur], a=ex.aufgaben[k], s=st(ex.id,a), box=document.getElementById('t'+k);
+  a.felder.forEach(f=>{ const el=box.querySelector(`[data-k="${f.key}"]`); if(el) s.vals[f.key]=el.value; });
+}
+
+/* ====================== Allgemein ====================== */
+const modal=document.getElementById('formelModal');
+document.getElementById('btnFormeln').onclick=()=>{ modal.classList.add('show'); math(modal); };
+function closeModal(){ modal.classList.remove('show'); }
+modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
+document.getElementById('btnTheme').onclick=()=>{
+  const r=document.documentElement; const dark=r.dataset.theme? r.dataset.theme==='dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  r.dataset.theme=dark?'light':'dark'; try{localStorage.setItem(KEY+'-theme',r.dataset.theme);}catch(e){}
+};
+try{ const t=localStorage.getItem(KEY+'-theme'); if(t) document.documentElement.dataset.theme=t; }catch(e){}
+
+/* Aufruf: #ap2024-dz  ·  #ap2024-dz-A (Teil A)  ·  #ap2024-dz-B (Teil B) */
+function start(){
+  const m=location.hash.slice(1).match(/^(.*?)(?:-([AB]))?$/); const id=m?m[1]:'';
+  const i=PRUEFUNGEN.findIndex(e=>e.id===id);
+  if(i>=0) openExam(i,m[2]); else renderHome();
+}
+window.addEventListener('DOMContentLoaded',start);
+</script>
+</body>
+</html>

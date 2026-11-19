@@ -88,7 +88,9 @@ const ABSCHLUSS = [
       { id: "dz-ereig",  titel: "Ereignisse und Gegenereignis",                                      link: "daten-und-zufall.html#k4", art: "Kapitel 4", kann: "Ich kann Ereignisse und Gegenereignisse beschreiben und berechnen." },
       { id: "dz-baum",   titel: "Baumdiagramm und Pfadregeln",                                       link: "daten-und-zufall.html#k5", art: "Kapitel 5", kann: "Ich kann ein Baumdiagramm zeichnen und die Pfadregeln anwenden." },
       { id: "dz-urne",   titel: "Mit und ohne Zurücklegen",                                          link: "daten-und-zufall.html#k6", art: "Kapitel 6", kann: "Ich kann Aufgaben mit und ohne Zurücklegen lösen." },
-      { id: "dz-train",  titel: "Training und Übersicht",                                            link: "daten-und-zufall.html#training", art: "Training" , ap: true, kann: "Ich kann gemischte Aufgaben zu Daten und Zufall lösen." }
+      { id: "dz-train",  titel: "Training und Übersicht",                                            link: "daten-und-zufall.html#training", art: "Training" , ap: true, kann: "Ich kann gemischte Aufgaben zu Daten und Zufall lösen." },
+      { id: "dz-ap2025", titel: "AP 2025: Socken, Bildschirmzeit und Darts-WM (Teil A + B)",          link: "daten-und-zufall-pruefung.html#ap2025-dz", art: "Abschlussprüfung" , ap: true, kann: "Ich habe die AP 2025 Daten und Zufall gerechnet." },
+      { id: "dz-ap2024", titel: "AP 2024: Freibad und Hochzeiten (Teil A + B)",                        link: "daten-und-zufall-pruefung.html#ap2024-dz", art: "Abschlussprüfung" , ap: true, kann: "Ich habe die AP 2024 Daten und Zufall gerechnet." }
     ]
   }
 ];
@@ -208,7 +210,7 @@ const PRUEFUNG = {
       { nr: 1, titel: "Finanzmathematik",          inhalt: "Zinseszins, Tilgungsplan, Annuität, Rente",         themen: [] },
       { nr: 2, titel: "Funktionaler Zusammenhang", inhalt: "Parabeln und Geraden in Sachaufgaben",              themen: ["pruef-strat", "pruef-ap2025", "pruef-ap2024", "pruef-funk", "lin-sach"] },
       { nr: 3, titel: "Trigonometrie",             inhalt: "Längen und Winkel in Dreiecken, Steigung in %",     themen: [] },
-      { nr: 4, titel: "Daten und Zufall",          inhalt: "Häufigkeiten, Kennzahlen, Diagramme, Baumdiagramm", themen: ["dz-train"] },
+      { nr: 4, titel: "Daten und Zufall",          inhalt: "Häufigkeiten, Kennzahlen, Diagramme, Baumdiagramm", themen: ["dz-ap2025", "dz-ap2024", "dz-train"] },
       { nr: 5, titel: "Raum und Form",             inhalt: "Pyramide, Kegel, Zylinder, Kugel – Volumen und Oberfläche", themen: ["ruf-pruef"] }
     ]
   }
