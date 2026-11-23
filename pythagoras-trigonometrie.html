@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pythagoras und Trigonometrie – Lernseite</title>
+<meta name="theme-color" content="#123b73">
+<link rel="icon" href="assets/schullogo.png">
+<style>
+:root{
+  --bg:#f5f6f8; --card:#ffffff; --ink:#1d2330; --muted:#5d6678; --line:#dfe3ea;
+  --accent:#2357c6; --accent-soft:#e8eefb; --ok:#1f8a4c; --ok-soft:#e5f5ec;
+  --bad:#c0392b; --bad-soft:#fbeae8; --tip:#b26a00; --tip-soft:#fff4e0;
+  --sol:#5b3cc4; --sol-soft:#efeafd; --radius:12px;
+  --gk:#c0392b; --ak:#2357c6; --hy:#1f8a4c;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14171d; --card:#1d2129; --ink:#e7eaf0; --muted:#9aa3b2; --line:#2e3440;
+    --accent:#7ba2ff; --accent-soft:#1f2a44; --ok:#5fd08f; --ok-soft:#173226;
+    --bad:#ff8a7a; --bad-soft:#3a1f1c; --tip:#f2b453; --tip-soft:#3a2d14;
+    --sol:#b4a2ff; --sol-soft:#2a2347; --gk:#ff8a7a; --ak:#7ba2ff; --hy:#5fd08f;
+  }
+}
+:root[data-theme="dark"]{
+    --bg:#14171d; --card:#1d2129; --ink:#e7eaf0; --muted:#9aa3b2; --line:#2e3440;
+    --accent:#7ba2ff; --accent-soft:#1f2a44; --ok:#5fd08f; --ok-soft:#173226;
+    --bad:#ff8a7a; --bad-soft:#3a1f1c; --tip:#f2b453; --tip-soft:#3a2d14;
+    --sol:#b4a2ff; --sol-soft:#2a2347; --gk:#ff8a7a; --ak:#7ba2ff; --hy:#5fd08f;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+h2{font-size:1.3em;margin:0 0 .4em} h3{font-size:1.08em;margin:1em 0 .4em} h4{margin:.6em 0 .3em;font-size:1em}
+p{margin:.4em 0 .7em}
+ul,ol{padding-left:1.3em;margin:.3em 0 .7em}
+header.top{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.top-in{max-width:860px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:8px}
+.top h1{font-size:17px;margin:0;flex:1;min-width:0;line-height:1.25}
+.top h1 small{display:block;font-weight:400;color:var(--muted);font-size:13px}
+.home-logo{display:inline-flex;align-items:center;gap:8px;flex:0 0 auto;color:inherit;text-decoration:none;font-size:14px;font-weight:600;white-space:nowrap;margin-right:6px;padding-right:12px;border-right:1px solid var(--line)}
+.home-logo img{height:32px;width:auto;display:block;background:#fff;border-radius:6px;padding:2px 4px}
+@media(max-width:640px){.home-logo img{height:24px}.home-logo span{display:none}}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 12px}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.btn-tip{border-color:var(--tip);color:var(--tip)}
+.btn-sol{border-color:var(--sol);color:var(--sol)}
+.tabs{max-width:860px;margin:0 auto;padding:0 16px;display:flex;gap:2px;overflow-x:auto}
+.tabs a{border-bottom:3px solid transparent;padding:8px 12px;font-weight:600;color:var(--muted);text-decoration:none;white-space:nowrap}
+.tabs a.active{color:var(--accent);border-bottom-color:var(--accent)}
+main{max-width:860px;margin:0 auto;padding:18px 16px 60px}
+.intro{color:var(--muted);margin:0 0 16px}
+.view{display:none}.view.show{display:block}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:16px;scroll-margin-top:110px}
+.panel>h2:first-child{margin-top:0}
+.nr{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-size:15px;margin-right:6px;vertical-align:2px}
+.inhalt{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}
+.inhalt a{font-size:14px;padding:4px 10px;border-radius:99px;background:var(--accent-soft);color:var(--accent);text-decoration:none;font-weight:600}
+.merke{border-left:4px solid var(--accent);background:var(--accent-soft);border-radius:8px;padding:10px 12px;margin:10px 0}
+.merke b:first-child{color:var(--accent)}
+.bsp{border-left:4px solid var(--ok);background:var(--ok-soft);border-radius:8px;padding:10px 12px;margin:10px 0}
+.achtung{border-left:4px solid var(--tip);background:var(--tip-soft);border-radius:8px;padding:10px 12px;margin:10px 0}
+.f{font-family:"Cambria Math","STIX Two Math",Georgia,serif;font-size:1.08em;white-space:nowrap}
+.frac{display:inline-flex;flex-direction:column;text-align:center;vertical-align:middle;line-height:1.15;margin:0 2px}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 3px}
+.frac>span:last-child{padding:0 3px}
+.gross{font-size:1.25em}
+.figure{background:#fff;border-radius:8px;padding:8px;text-align:center;margin:10px 0;border:1px solid var(--line);color:#1d2330}
+.figure svg{max-width:100%;height:auto;display:block;margin:0 auto}
+.figure figcaption{font-size:13px;color:#5d6678;margin-top:2px}
+.regler{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;margin:8px 0}
+.regler input[type=range]{width:100%;accent-color:var(--accent)}
+.regler output{font-weight:700;min-width:3.5em;text-align:right}
+.werte{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.werte div{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:15px}
+.tablewrap{overflow-x:auto}
+table.t{border-collapse:collapse;margin:8px 0;font-size:15px}
+table.t td,table.t th{border:1px solid var(--line);padding:6px 10px;text-align:center}
+table.t th{background:var(--accent-soft)}
+td.pfeil{border:none!important;color:var(--accent);font-weight:700;text-align:left!important;white-space:nowrap}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.c-gk{color:var(--gk);font-weight:700}.c-ak{color:var(--ak);font-weight:700}.c-hy{color:var(--hy);font-weight:700}
+/* Wissens-Check */
+.frage{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px}
+.frage p{margin:0 0 8px;font-weight:600}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts button{min-width:64px}
+.opts button:disabled{opacity:1;cursor:default;color:var(--muted)}
+.opts button.richtig{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);font-weight:700}
+.opts button.falsch{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.erkl{margin-top:8px;font-size:15px;color:var(--muted)}
+.stand{font-weight:700}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:8px}
+.bar>i{display:block;height:100%;background:var(--ok);width:0;transition:width .3s}
+/* Aufgaben */
+.filter{display:flex;flex-wrap:wrap;gap:6px}
+.filter button{border-radius:99px;padding:5px 12px;font-size:14px}
+.filter button.an{background:var(--accent);color:#fff;border-color:var(--accent)}
+.aufg{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;scroll-margin-top:110px}
+.aufg.geloest{border-color:var(--ok)}
+.aufg .kopf{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.aufg h3{margin:0;flex:1;font-size:1.05em}
+.haken{color:var(--ok);font-weight:700;display:none}
+.aufg.geloest .haken{display:inline}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;font-weight:700}
+.tag.s1{background:var(--ok-soft);color:var(--ok)}
+.tag.s2{background:var(--accent-soft);color:var(--accent)}
+.tag.s3{background:var(--sol-soft);color:var(--sol)}
+.felder{display:flex;flex-wrap:wrap;gap:10px 16px;margin:10px 0}
+.feld{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.feld input{font:inherit;width:120px;padding:7px 9px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink)}
+.feld input.ok{border-color:var(--ok);background:var(--ok-soft)}
+.feld input.bad{border-color:var(--bad);background:var(--bad-soft)}
+.feld .wahl{display:flex;gap:6px;flex-wrap:wrap}
+.feld .wahl button.an{background:var(--accent-soft);border-color:var(--accent);font-weight:700}
+.feld .wahl button.ok{background:var(--ok-soft);border-color:var(--ok)}
+.feld .wahl button.bad{background:var(--bad-soft);border-color:var(--bad)}
+.knoepfe{display:flex;flex-wrap:wrap;gap:8px}
+.fb{margin-top:8px;font-weight:600}
+.fb.ok{color:var(--ok)}.fb.bad{color:var(--bad)}
+.tippbox{background:var(--tip-soft);border-left:4px solid var(--tip);border-radius:8px;padding:8px 12px;margin-top:8px}
+.loesung{background:var(--sol-soft);border-left:4px solid var(--sol);border-radius:8px;padding:8px 12px;margin-top:8px}
+.hinweis{font-size:14px;color:var(--muted)}
+.weiter{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:10px}
+footer{max-width:860px;margin:0 auto;padding:0 16px 40px;color:var(--muted);font-size:14px}
+footer button{font-size:13px;padding:4px 10px;margin-top:6px}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <a class="home-logo" href="klasse.html?k=9#lernen" title="Zurück zur Klasse 9"><img src="assets/schullogo.png" alt="Schullogo – zurück zur Klasse"><span>⌂ Klasse 9</span></a>
+  <h1>Pythagoras und Trigonometrie<small>Lernseite · Mathematik 9 · Wirtschaftsschule</small></h1>
+  <button id="btnTheme" title="Hell/Dunkel umschalten">◐</button>
+</div>
+<nav class="tabs" aria-label="Bereiche"><a href="#wissen" data-v="wissen">1 Wissen</a><a href="#check" data-v="check">2 Wissens-Check</a><a href="#aufgaben" data-v="aufgaben">3 Aufgaben</a></nav>
+</header>
+
+<main>
+<section class="view" id="wissen">
+  <p class="intro">Im rechtwinkligen Dreieck kannst du fehlende Seiten und Winkel berechnen. Mit dem Satz des Pythagoras findest du eine Seite, wenn du zwei Seiten kennst. Mit Sinus, Kosinus und Tangens geht es auch mit einem Winkel. Arbeite die Abschnitte der Reihe nach durch.</p>
+  <nav class="inhalt" id="inhalt" aria-label="Inhalt"></nav>
+  <div class="panel" id="dreieck" data-kurz="Rechtwinkliges Dreieck">
+    <h2><span class="nr">1</span>Das rechtwinklige Dreieck</h2>
+    <figure class="figure"><svg viewBox="0 0 360 200" width="360">
+      <polygon points="40,170 300,170 40,40" fill="#f3f6fc" stroke="none"/>
+      <line x1="40" y1="170" x2="300" y2="170" stroke="#2357c6" stroke-width="4"/>
+      <line x1="40" y1="170" x2="40" y2="40" stroke="#2357c6" stroke-width="4"/>
+      <line x1="40" y1="40" x2="300" y2="170" stroke="#1f8a4c" stroke-width="5"/>
+      <rect x="40" y="150" width="20" height="20" fill="none" stroke="#1d2330" stroke-width="2"/><circle cx="50" cy="160" r="2.5" fill="#1d2330"/>
+      <text x="170" y="192" font-size="16" text-anchor="middle" fill="#2357c6" font-weight="700">Kathete</text>
+      <text x="30" y="110" font-size="16" text-anchor="middle" fill="#2357c6" font-weight="700" transform="rotate(-90 30 110)">Kathete</text>
+      <text x="190" y="92" font-size="17" text-anchor="middle" fill="#1f8a4c" font-weight="700" transform="rotate(26.6 190 92)">Hypotenuse</text>
+    </svg><figcaption>Die Hypotenuse liegt dem rechten Winkel gegenüber.</figcaption></figure>
+    <ul>
+      <li>Die <b>Hypotenuse</b> liegt <b>gegenüber vom rechten Winkel</b>. Sie ist immer die <b>längste Seite</b>.</li>
+      <li>Die beiden anderen Seiten heißen <b>Katheten</b>. Sie bilden den rechten Winkel.</li>
+    </ul>
+    <div class="achtung">Die Hypotenuse heißt nicht immer c! Suche zuerst den rechten Winkel – die Seite gegenüber ist die Hypotenuse.</div>
+  </div>
+
+  <div class="panel" id="pythagoras" data-kurz="Satz des Pythagoras">
+    <h2><span class="nr">2</span>Der Satz des Pythagoras</h2>
+    <div class="merke gross"><b>Merke:</b> Kathete² + Kathete² = Hypotenuse² &nbsp;&nbsp;<span class="f">a² + b² = c²</span> (wenn c die Hypotenuse ist)</div>
+    <h3>Probier's aus: Die Quadrate über den Seiten</h3>
+    <p>Die Flächen der beiden kleinen Quadrate ergeben zusammen genau die Fläche des großen Quadrats.</p>
+    <figure class="figure"><svg id="pyBild" viewBox="0 0 360 300" width="360"></svg></figure>
+    <div class="regler">
+      <label for="rA">Kathete a</label><input type="range" id="rA" min="1" max="8" step="0.5" value="3"><output id="oA"></output>
+      <label for="rB">Kathete b</label><input type="range" id="rB" min="1" max="8" step="0.5" value="4"><output id="oB"></output>
+    </div>
+    <div class="bsp" id="pyText"></div>
+    <p><b>Umkehrung:</b> Gilt a² + b² = c², dann ist das Dreieck rechtwinklig. So kannst du prüfen, ob eine Ecke wirklich 90° hat.</p>
+  </div>
+
+  <div class="panel" id="umstellen" data-kurz="Seite berechnen">
+    <h2><span class="nr">3</span>Erst aufstellen, dann umformen</h2>
+    <p>Schreibe die Gleichung immer zuerst so auf, dass die <b>Hypotenuse allein</b> steht. Dann stellst du nach der gesuchten Seite um und ziehst am Ende die Wurzel.</p>
+    <div class="grid2">
+      <div class="bsp"><b>Hypotenuse gesucht</b><br>Katheten 6 cm und 8 cm<br><span class="f">c² = 6² + 8² = 36 + 64 = 100</span><br><span class="f">c = √100 = 10 cm</span></div>
+      <div class="bsp"><b>Kathete gesucht</b><br>Hypotenuse 13 cm, Kathete 5 cm<br><span class="f">a² + 5² = 13²</span> &nbsp;|&nbsp;−25<br><span class="f">a² = 169 − 25 = 144</span> → <span class="f">a = 12 cm</span></div>
+    </div>
+    <div class="merke"><b>Für das Kopfrechnen:</b> Diese Zahlentripel passen genau: 3 – 4 – 5 · 5 – 12 – 13 · 8 – 15 – 17 · 7 – 24 – 25 und alle Vielfachen davon, z. B. 6 – 8 – 10 oder 9 – 12 – 15.</div>
+    <div class="achtung"><b>Typischer Fehler:</b> Wer eine Kathete sucht, muss <b>subtrahieren</b>: Kathete² = Hypotenuse² − andere Kathete².</div>
+  </div>
+
+  <div class="panel" id="namen" data-kurz="Seiten am Winkel">
+    <h2><span class="nr">4</span>Die Seiten am Winkel α</h2>
+    <p>Für die Trigonometrie bekommen die Katheten neue Namen. Sie hängen davon ab, <b>von welchem Winkel du ausgehst</b>.</p>
+    <figure class="figure"><svg viewBox="0 0 360 200" width="360">
+      <polygon points="40,170 300,170 300,40" fill="#f3f6fc"/>
+      <line x1="40" y1="170" x2="300" y2="170" stroke="#2357c6" stroke-width="5"/>
+      <line x1="300" y1="170" x2="300" y2="40" stroke="#c0392b" stroke-width="5"/>
+      <line x1="40" y1="170" x2="300" y2="40" stroke="#1f8a4c" stroke-width="5"/>
+      <rect x="280" y="150" width="20" height="20" fill="none" stroke="#1d2330" stroke-width="2"/>
+      <path d="M 95 170 A 55 55 0 0 0 89.2 145.4" fill="none" stroke="#1d2330" stroke-width="2"/>
+      <text x="104" y="160" font-size="18" font-weight="700" fill="#1d2330">α</text>
+      <text x="170" y="192" font-size="15" text-anchor="middle" fill="#2357c6" font-weight="700">Ankathete (liegt am Winkel)</text>
+      <text x="312" y="110" font-size="15" fill="#c0392b" font-weight="700">Gegen-</text><text x="312" y="128" font-size="15" fill="#c0392b" font-weight="700">kathete</text>
+      <text x="150" y="92" font-size="16" text-anchor="middle" fill="#1f8a4c" font-weight="700" transform="rotate(-26.6 150 92)">Hypotenuse</text>
+    </svg><figcaption>Gegenkathete liegt dem Winkel gegenüber, Ankathete liegt am Winkel an.</figcaption></figure>
+    <ul>
+      <li><span class="c-gk">Gegenkathete (GK)</span>: liegt dem Winkel α <b>gegenüber</b></li>
+      <li><span class="c-ak">Ankathete (AK)</span>: liegt am Winkel α <b>an</b> (und ist nicht die Hypotenuse)</li>
+      <li><span class="c-hy">Hypotenuse (H)</span>: gegenüber vom rechten Winkel – bleibt immer gleich</li>
+    </ul>
+  </div>
+
+  <div class="panel" id="trigo" data-kurz="sin, cos, tan">
+    <h2><span class="nr">5</span>Sinus, Kosinus, Tangens</h2>
+    <div class="grid2">
+      <div class="merke gross"><span class="f">sin α = <span class="frac"><span class="c-gk">GK</span><span class="c-hy">H</span></span></span></div>
+      <div class="merke gross"><span class="f">cos α = <span class="frac"><span class="c-ak">AK</span><span class="c-hy">H</span></span></span></div>
+      <div class="merke gross"><span class="f">tan α = <span class="frac"><span class="c-gk">GK</span><span class="c-ak">AK</span></span></span></div>
+    </div>
+    <h3>Welche Funktion passt?</h3>
+    <p>Schau, welche <b>zwei Seiten</b> in der Aufgabe vorkommen – eine bekannte und eine gesuchte:</p>
+    <div class="tablewrap"><table class="t"><tr><th>Seiten in der Aufgabe</th><th>Funktion</th></tr>
+      <tr><td>Gegenkathete und Hypotenuse</td><td><b>sin</b></td></tr>
+      <tr><td>Ankathete und Hypotenuse</td><td><b>cos</b></td></tr>
+      <tr><td>Gegenkathete und Ankathete</td><td><b>tan</b></td></tr>
+      <tr><td>drei Seiten, kein Winkel</td><td><b>Pythagoras</b></td></tr></table></div>
+    <h3>Probier's aus: Die Verhältnisse hängen nur vom Winkel ab</h3>
+    <p>Mach das Dreieck größer oder kleiner – sin, cos und tan bleiben gleich. Sie ändern sich nur, wenn du den Winkel änderst.</p>
+    <figure class="figure"><svg id="trBild" viewBox="0 0 360 220" width="360"></svg></figure>
+    <div class="regler">
+      <label for="rW">Winkel α</label><input type="range" id="rW" min="5" max="85" value="35"><output id="oW"></output>
+      <label for="rH">Größe (H)</label><input type="range" id="rH" min="3" max="8" step="0.5" value="6"><output id="oH"></output>
+    </div>
+    <div class="werte" id="trWerte"></div>
+  </div>
+
+  <div class="panel" id="berechnen" data-kurz="Rechenbeispiele">
+    <h2><span class="nr">6</span>Seiten und Winkel berechnen</h2>
+    <div class="bsp"><b>Seite oben im Bruch</b>: α = 35°, H = 8 cm, gesucht GK<br><span class="f">sin 35° = <span class="frac"><span>GK</span><span>8 cm</span></span></span> &nbsp;| · 8 cm<br><span class="f">GK = 8 cm · sin 35° ≈ 4,59 cm</span></div>
+    <div class="bsp"><b>Seite unten im Bruch</b>: α = 40°, GK = 5 cm, gesucht H<br><span class="f">sin 40° = <span class="frac"><span>5 cm</span><span>H</span></span></span> &nbsp;| · H &nbsp;| : sin 40°<br><span class="f">H = 5 cm : sin 40° ≈ 7,78 cm</span></div>
+    <div class="bsp"><b>Winkel gesucht</b>: GK = 3 cm, AK = 4 cm<br><span class="f">tan α = <span class="frac"><span>3</span><span>4</span></span> = 0,75</span><br><span class="f">α = tan⁻¹(0,75) ≈ 36,87°</span></div>
+    <h3>Eingabe in den Taschenrechner</h3>
+    <ul>
+      <li>Der Rechner muss im Modus <b>DEG</b> (Grad) stehen – im Display steht ein kleines <b>D</b>. Test: sin 30 muss 0,5 ergeben.</li>
+      <li>Seite: z. B. <b>8 × sin 35 =</b></li>
+      <li>Winkel: <b>SHIFT</b> (oder 2nd) und dann <b>tan</b> → tan⁻¹(0,75) =</li>
+    </ul>
+  </div>
+
+  <div class="panel" id="steigung" data-kurz="Steigung">
+    <h2><span class="nr">7</span>Steigung und Gefälle</h2>
+    <p>Ein Schild „12 %“ bedeutet: Auf 100 m waagrechter Strecke geht es 12 m nach oben (oder unten). Das ist genau der Tangens des Steigungswinkels.</p>
+    <div class="merke"><span class="f">Steigung in % = <span class="frac"><span>Höhenunterschied</span><span>waagrechte Strecke</span></span> · 100 % = tan α · 100 %</span></div>
+    <div class="bsp">12 % Steigung: tan α = 0,12 → α = tan⁻¹(0,12) ≈ 6,84°</div>
+    <div class="achtung">100 % Steigung sind <b>nicht</b> senkrecht, sondern 45° – dann sind Höhe und Strecke gleich lang.</div>
+  </div>
+
+  <div class="panel" id="skizze" data-kurz="Gute Skizze">
+    <h2><span class="nr">8</span>So erstellst du eine gute Skizze</h2>
+    <ol>
+      <li>Unterstreiche im Text alle gegebenen Werte und das Gesuchte.</li>
+      <li>Zeichne ein rechtwinkliges Dreieck und markiere den <b>rechten Winkel</b>.</li>
+      <li>Trage die bekannten Werte ein und markiere die gesuchte Größe farbig.</li>
+      <li>Entscheide: Kommt ein Winkel vor? Ja → sin, cos oder tan. Nein → Pythagoras.</li>
+      <li>Gleichung aufstellen, umformen, ausrechnen, mit Einheit antworten.</li>
+    </ol>
+    <div class="merke"><b>Für Profis – der Einheitskreis:</b> In einem Kreis mit Radius 1 hat der Punkt auf dem Kreis beim Winkel α die Koordinaten (cos α | sin α). Darum liegen sin und cos immer zwischen −1 und 1.</div>
+  </div>
+  <div class="weiter"><span></span><a class="tabs-link" href="#check"><button class="primary">Weiter zum Wissens-Check →</button></a></div>
+</section>
+
+<section class="view" id="check">
+  <p class="intro">Teste dich: Tippe jeweils die richtige Antwort an. Du siehst sofort, ob es stimmt, und bekommst eine kurze Erklärung.</p>
+  <div class="panel"><div class="stand" id="checkStand"></div><div class="bar"><i id="checkBar"></i></div></div>
+  <div id="checkListe"></div>
+  <div class="weiter"><button id="checkNeu">Check neu starten</button><a href="#aufgaben"><button class="primary">Weiter zu den Aufgaben →</button></a></div>
+</section>
+
+<section class="view" id="aufgaben">
+  <p class="intro">Für diese Aufgaben darfst du den Taschenrechner benutzen (Modus DEG). Mach dir immer zuerst eine Skizze und entscheide: Pythagoras oder Trigonometrie?</p>
+  <div class="panel">
+    <div class="filter" id="filter"></div>
+    <div class="bar"><i id="aufgBar"></i></div><div class="hinweis" id="aufgStand" style="margin-top:4px"></div>
+    <p class="hinweis" style="margin-bottom:0">Eingaben mit Komma (4,8). Längen und Winkel auf zwei Nachkommastellen runden. Einheiten musst du nicht mit eintippen.</p>
+  </div>
+  <div id="aufgListe"></div>
+
+</section>
+</main>
+
+<footer>Dein Fortschritt wird nur in diesem Browser gespeichert – ohne Anmeldung.<br><button id="reset">Fortschritt löschen</button></footer>
+<script>
+const SEITE={key:'k9pyth_'};
+const CHECK=[
+ {f:'Welche Seite ist die Hypotenuse?',o:['die Seite gegenüber vom rechten Winkel','eine Seite am rechten Winkel','immer die waagrechte Seite','die kürzeste Seite'],r:0,e:'Die Hypotenuse liegt gegenüber vom rechten Winkel und ist die längste Seite.'},
+ {f:'Die Katheten sind 6 cm und 8 cm lang. Wie lang ist die Hypotenuse?',o:['10 cm','14 cm','48 cm','100 cm'],r:0,e:'6² + 8² = 36 + 64 = 100, √100 = 10.'},
+ {f:'Hypotenuse 10 cm, eine Kathete 6 cm. Wie lang ist die andere Kathete?',o:['4 cm','8 cm','11,66 cm','16 cm'],r:1,e:'10² − 6² = 100 − 36 = 64, √64 = 8. Für eine Kathete subtrahierst du.'},
+ {f:'Ist ein Dreieck mit den Seiten 5 cm, 7 cm und 9 cm rechtwinklig?',o:['ja','nein'],r:1,e:'5² + 7² = 25 + 49 = 74, aber 9² = 81. Das passt nicht.'},
+ {f:'sin α ist …',o:['Gegenkathete : Hypotenuse','Ankathete : Hypotenuse','Gegenkathete : Ankathete','Hypotenuse : Gegenkathete'],r:0,e:'sin = GK/H, cos = AK/H, tan = GK/AK.'},
+ {f:'Gegeben sind Ankathete und Hypotenuse. Gesucht ist der Winkel α. Was brauchst du?',o:['sin','cos','tan','Pythagoras'],r:1,e:'Ankathete und Hypotenuse gehören zum Kosinus.'},
+ {f:'Gegeben sind α und die Ankathete, gesucht ist die Gegenkathete. Was brauchst du?',o:['sin','cos','tan','Pythagoras'],r:2,e:'Gegenkathete und Ankathete gehören zum Tangens.'},
+ {f:'In welchem Modus muss der Taschenrechner stehen?',o:['DEG','RAD','GRA','egal'],r:0,e:'DEG steht für Grad (degree). Test: sin 30 = 0,5.'},
+ {f:'100 % Steigung entsprechen einem Winkel von …',o:['45°','60°','90°','100°'],r:0,e:'tan α = 1 → α = 45°. Höhe und Strecke sind dann gleich lang.'}
+];
+// Skizze: rechtwinkliges Dreieck mit Beschriftungen
+function dreieck(o){const g=o.g||'',a=o.a||'',h=o.h||'',w=o.w||'';
+ return `<svg viewBox="0 0 300 170" width="300"><polygon points="30,140 250,140 250,30" fill="#f3f6fc" stroke="#1d2330" stroke-width="2.5"/>
+ <rect x="236" y="126" width="14" height="14" fill="none" stroke="#1d2330" stroke-width="1.5"/>
+ ${w?`<path d="M 75 140 A 45 45 0 0 0 70.2 119.9" fill="none" stroke="#1d2330" stroke-width="2"/><text x="82" y="132" font-size="15" fill="#1d2330">${w}</text>`:''}
+ <text x="140" y="160" font-size="15" text-anchor="middle" fill="#2357c6" font-weight="700">${a}</text>
+ <text x="258" y="90" font-size="15" fill="#c0392b" font-weight="700">${g}</text>
+ <text x="128" y="74" font-size="15" text-anchor="middle" fill="#1f8a4c" font-weight="700">${h}</text></svg>`;}
+const AUFGABEN=[
+ {id:'e1',s:1,t:'Hypotenuse berechnen',text:'Die Katheten eines rechtwinkligen Dreiecks sind 9 cm und 12 cm lang. Berechne die Hypotenuse.',fig:dreieck({a:'12 cm',g:'9 cm',h:'c = ?'}),felder:[{l:'c =',r:15,e:'cm'}],
+  tipps:['c² = 9² + 12²','81 + 144 = 225. Jetzt die Wurzel ziehen.'],loes:'c² = 81 + 144 = 225 → c = √225 = <b>15 cm</b> (Tripel 3-4-5 mal 3)'},
+ {id:'e2',s:1,t:'Kathete berechnen',text:'Die Hypotenuse ist 26 cm lang, eine Kathete 10 cm. Berechne die andere Kathete.',fig:dreieck({a:'b = ?',g:'10 cm',h:'26 cm'}),felder:[{l:'b =',r:24,e:'cm'}],
+  tipps:['Für eine Kathete rechnest du Hypotenuse² minus Kathete².','26² − 10² = 676 − 100'],loes:'b² = 676 − 100 = 576 → b = <b>24 cm</b>'},
+ {id:'e3',s:1,t:'Leiter an der Wand',text:'Eine 5 m lange Leiter lehnt an einer Hauswand. Ihr Fuß steht 1,4 m von der Wand entfernt. In welcher Höhe berührt sie die Wand?',felder:[{l:'Höhe:',r:4.8,e:'m'}],
+  tipps:['Die Leiter ist die Hypotenuse, sie liegt gegenüber vom rechten Winkel zwischen Wand und Boden.','h² = 5² − 1,4² = 25 − 1,96'],loes:'h² = 25 − 1,96 = 23,04 → h = <b>4,8 m</b>'},
+ {id:'e4',s:1,t:'Gegenkathete mit sin',text:'Gegeben: α = 30°, Hypotenuse 12 cm. Berechne die Gegenkathete.',fig:dreieck({g:'GK = ?',h:'12 cm',w:'30°'}),felder:[{l:'GK =',r:6,e:'cm'}],
+  tipps:['GK und H gehören zum Sinus: sin 30° = GK : 12 cm.','GK = 12 cm · sin 30°'],loes:'GK = 12 cm · sin 30° = 12 cm · 0,5 = <b>6 cm</b>'},
+ {id:'e5',s:1,t:'Winkel berechnen',text:'Gegenkathete und Ankathete sind beide 7 cm lang. Wie groß ist α?',fig:dreieck({g:'7 cm',a:'7 cm',w:'α = ?'}),felder:[{l:'α =',r:45,e:'°'}],
+  tipps:['GK und AK gehören zum Tangens.','tan α = 7 : 7 = 1. Jetzt tan⁻¹ verwenden.'],loes:'tan α = 1 → α = tan⁻¹(1) = <b>45°</b>'},
+ {id:'t1',s:2,t:'Tablet-Bildschirm',text:'Ein Tablet-Bildschirm ist 24 cm breit und 18 cm hoch. Wie lang ist die Diagonale? Bildschirme werden in Zoll angegeben (1 Zoll = 2,54 cm). Wie viel Zoll sind das?',felder:[{l:'Diagonale:',r:30,e:'cm'},{l:'in Zoll:',r:11.81,e:'Zoll',tol:0.02}],
+  tipps:['Die Diagonale ist die Hypotenuse: d² = 24² + 18².','d = 30 cm. Für Zoll teilst du durch 2,54.'],loes:'d² = 576 + 324 = 900 → d = <b>30 cm</b> · 30 : 2,54 ≈ <b>11,81 Zoll</b>'},
+ {id:'t2',s:2,t:'Rollstuhlrampe',text:'Eine Rampe ist (schräg gemessen) 4 m lang und überwindet eine Höhe von 0,5 m. Wie groß ist der Steigungswinkel?',felder:[{l:'α =',r:7.18,e:'°',tol:0.02}],
+  tipps:['Die Rampe ist die Hypotenuse, die Höhe ist die Gegenkathete zum Winkel am Boden.','sin α = 0,5 : 4 = 0,125'],loes:'sin α = 0,125 → α = sin⁻¹(0,125) ≈ <b>7,18°</b>'},
+ {id:'t3',s:2,t:'Höhe eines Baums',text:'Du stehst 20 m von einem Baum entfernt. Die Baumspitze siehst du unter einem Winkel von 32° (gemessen vom Boden aus). Wie hoch ist der Baum?',felder:[{l:'Höhe:',r:12.5,e:'m',tol:0.02}],
+  tipps:['Die 20 m liegen am Winkel an (Ankathete), die Höhe liegt gegenüber (Gegenkathete).','tan 32° = h : 20 m → h = 20 m · tan 32°'],loes:'h = 20 m · tan 32° ≈ <b>12,50 m</b>'},
+ {id:'t4',s:2,t:'Drachen steigen lassen',text:'Die Schnur eines Drachens ist 50 m lang und straff gespannt. Sie bildet mit dem Boden einen Winkel von 55°. In welcher Höhe fliegt der Drachen (Hand am Boden gedacht)?',felder:[{l:'Höhe:',r:40.96,e:'m',tol:0.02}],
+  tipps:['Die Schnur ist die Hypotenuse, die Höhe die Gegenkathete.','h = 50 m · sin 55°'],loes:'h = 50 m · sin 55° ≈ <b>40,96 m</b>'},
+ {id:'t5',s:2,t:'Steile Straße',text:'Ein Verkehrsschild zeigt 8 % Steigung. Wie groß ist der Steigungswinkel? Welchen Höhenunterschied hat die Straße auf 2,5 km waagrechter Strecke?',felder:[{l:'α =',r:4.57,e:'°',tol:0.02},{l:'Höhe:',r:200,e:'m'}],
+  tipps:['8 % bedeutet tan α = 0,08.','8 % von 2500 m sind der Höhenunterschied.'],loes:'α = tan⁻¹(0,08) ≈ <b>4,57°</b> · Höhe: 2500 m · 0,08 = <b>200 m</b>'},
+ {id:'t6',s:2,t:'Diagonale im Rechteck',text:'Ein Rechteck ist 15 cm lang und 8 cm breit. Berechne die Diagonale und den Winkel zwischen der Diagonale und der langen Seite.',felder:[{l:'Diagonale:',r:17,e:'cm'},{l:'Winkel:',r:28.07,e:'°',tol:0.02}],
+  tipps:['Die Diagonale teilt das Rechteck in zwei rechtwinklige Dreiecke.','Für den Winkel: tan α = 8 : 15 (Gegenkathete : Ankathete).'],loes:'d² = 225 + 64 = 289 → d = <b>17 cm</b> · tan α = 8/15 → α ≈ <b>28,07°</b>'},
+ {id:'p1',s:3,t:'Gleichschenkliges Dreieck',text:'Ein gleichschenkliges Dreieck hat eine Basis von 10 cm und zwei Schenkel von je 13 cm. Berechne die Höhe auf die Basis und den Flächeninhalt.',felder:[{l:'Höhe:',r:12,e:'cm'},{l:'Fläche:',r:60,e:'cm²'}],
+  tipps:['Die Höhe teilt die Basis in zwei Hälften von je 5 cm. Es entsteht ein rechtwinkliges Dreieck.','h² = 13² − 5². Fläche = Basis · Höhe : 2.'],loes:'h² = 169 − 25 = 144 → h = <b>12 cm</b> · A = 10 · 12 : 2 = <b>60 cm²</b>'},
+ {id:'p2',s:3,t:'Satteldach',text:'Ein Haus ist 9 m breit. Das Satteldach ist auf beiden Seiten gleich und hat eine Dachneigung von 38°. Wie lang ist ein Dachsparren (von der Traufe bis zum First) und wie hoch ist der First über dem Dachboden?',felder:[{l:'Sparren:',r:5.71,e:'m',tol:0.02},{l:'Firsthöhe:',r:3.52,e:'m',tol:0.02}],
+  tipps:['Teile das Dach in der Mitte: Es entsteht ein rechtwinkliges Dreieck mit der Ankathete 4,5 m.','Sparren = Hypotenuse: cos 38° = 4,5 m : s. Höhe: tan 38° = h : 4,5 m.'],loes:'s = 4,5 m : cos 38° ≈ <b>5,71 m</b> · h = 4,5 m · tan 38° ≈ <b>3,52 m</b>'},
+ {id:'p3',s:3,t:'Leuchtturm',text:'Ein Leuchtturm ist 45 m hoch. Von einem Boot aus sieht man die Spitze unter einem Höhenwinkel von 4°. Wie weit ist das Boot vom Leuchtturm entfernt?',felder:[{l:'Entfernung:',r:643.53,e:'m',tol:0.05}],
+  tipps:['Die Höhe ist die Gegenkathete, die Entfernung die Ankathete.','tan 4° = 45 m : e → e = 45 m : tan 4°'],loes:'e = 45 m : tan 4° ≈ <b>643,53 m</b>'},
+ {id:'p4',s:3,t:'Rechter Winkel?',text:'Ein Gärtner steckt ein Beet mit den Seiten 20 m, 21 m und 29 m ab. Ist das Beet rechtwinklig?',felder:[{l:'',k:'wahl',o:['ja, rechtwinklig','nein'],r:0}],
+  tipps:['Prüfe mit der Umkehrung des Pythagoras: Die längste Seite wäre die Hypotenuse.','Vergleiche 20² + 21² mit 29².'],loes:'20² + 21² = 400 + 441 = 841 und 29² = 841 → <b>ja</b>, das Dreieck ist rechtwinklig.'}
+];
+function init(){
+  // Pythagoras-Quadrate
+  const rA=$('#rA'),rB=$('#rB');
+  const py=()=>{const a=+rA.value,b=+rB.value,c=Math.hypot(a,b);
+    $('#oA').textContent=fmt(a)+' cm';$('#oB').textContent=fmt(b)+' cm';
+    // Koordinaten (y nach oben): C(0,0), A(b,0), B(0,a)
+    const P=[[0,0],[b,0],[0,a]],sqA=[[0,0],[0,a],[-a,a],[-a,0]],sqB=[[0,0],[b,0],[b,-b],[0,-b]],sqC=[[b,0],[0,a],[a,a+b],[a+b,b]];
+    const xs=[-a,b+a,a+b],ys=[-b,a+b];const minX=-a,maxX=a+b,minY=-b,maxY=a+b;
+    const k=Math.min(340/(maxX-minX),280/(maxY-minY));const ox=10+(340-k*(maxX-minX))/2,oy=10+(280-k*(maxY-minY))/2;
+    const T=([x,y])=>[(ox+(x-minX)*k).toFixed(1),(oy+(maxY-y)*k).toFixed(1)];
+    const poly=(pts,f,s)=>`<polygon points="${pts.map(p=>T(p).join(',')).join(' ')}" fill="${f}" stroke="${s}" stroke-width="2"/>`;
+    const mid=pts=>T([pts.reduce((s,p)=>s+p[0],0)/pts.length,pts.reduce((s,p)=>s+p[1],0)/pts.length]);
+    const lab=(pts,t,c)=>{const[m,n]=mid(pts);return `<text x="${m}" y="${+n+5}" font-size="14" text-anchor="middle" font-weight="700" fill="${c}">${t}</text>`};
+    $('#pyBild').innerHTML=poly(sqA,'#e8eefb','#2357c6')+poly(sqB,'#e8eefb','#2357c6')+poly(sqC,'#e5f5ec','#1f8a4c')+poly(P,'#fff4e0','#1d2330')
+      +lab(sqA,'a² = '+fmt(a*a),'#2357c6')+lab(sqB,'b² = '+fmt(b*b),'#2357c6')+lab(sqC,'c² = '+fmt(c*c),'#1f8a4c');
+    $('#pyText').innerHTML=`a² + b² = ${fmt(a*a)} + ${fmt(b*b)} = <b>${fmt(c*c)}</b> = c² &nbsp;→&nbsp; c = √${fmt(c*c)} ${Number.isInteger(c)?'=':'≈'} <b>${fmt(c)} cm</b>`;};
+  rA.oninput=rB.oninput=py;py();
+  // Trigonometrie
+  const rW=$('#rW'),rH=$('#rH');
+  const tr=()=>{const w=+rW.value,H=+rH.value,r=w*Math.PI/180,AK=H*Math.cos(r),GK=H*Math.sin(r);
+    $('#oW').textContent=w+'°';$('#oH').textContent=fmt(H)+' cm';
+    const k=Math.min(300/8,190/8),x0=30,y0=200,x1=x0+AK*k,y1=y0-GK*k;
+    $('#trBild').innerHTML=`<polygon points="${x0},${y0} ${x1},${y0} ${x1},${y1}" fill="#f3f6fc"/>
+      <line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y0}" stroke="#2357c6" stroke-width="4"/>
+      <line x1="${x1}" y1="${y0}" x2="${x1}" y2="${y1}" stroke="#c0392b" stroke-width="4"/>
+      <line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y1}" stroke="#1f8a4c" stroke-width="4"/>
+      <rect x="${x1-12}" y="${y0-12}" width="12" height="12" fill="none" stroke="#1d2330" stroke-width="1.5"/>
+      <text x="${x0+30}" y="${y0-8}" font-size="15" font-weight="700" fill="#1d2330">α</text>
+      <text x="${(x0+x1)/2}" y="${y0+16}" font-size="13" text-anchor="middle" fill="#2357c6" font-weight="700">AK = ${fmt(AK)}</text>
+      <text x="${x1+6}" y="${(y0+y1)/2}" font-size="13" fill="#c0392b" font-weight="700">GK = ${fmt(GK)}</text>`;
+    $('#trWerte').innerHTML=`<div>sin ${w}° = <span class="c-gk">${fmt(GK)}</span> : <span class="c-hy">${fmt(H)}</span> ≈ <b>${fmt(Math.sin(r),2)}</b></div>
+      <div>cos ${w}° = <span class="c-ak">${fmt(AK)}</span> : <span class="c-hy">${fmt(H)}</span> ≈ <b>${fmt(Math.cos(r),2)}</b></div>
+      <div>tan ${w}° = <span class="c-gk">${fmt(GK)}</span> : <span class="c-ak">${fmt(AK)}</span> ≈ <b>${fmt(Math.tan(r),2)}</b></div>`;};
+  rW.oninput=rH.oninput=tr;tr();
+}
+</script>
+<script>
+// ===== Gemeinsamer Teil: Ansichten, Wissens-Check, Aufgaben =====
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const store={get(k,d){try{const v=localStorage.getItem(SEITE.key+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(SEITE.key+k,JSON.stringify(v))}catch(e){}}};
+const fmt=(x,d=2)=>Number(x).toLocaleString('de-DE',{maximumFractionDigits:d});
+
+// Hell/Dunkel
+(function(){const t=store.get('theme',null);if(t)document.documentElement.setAttribute('data-theme',t)})();
+$('#btnTheme').onclick=()=>{const cur=document.documentElement.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');const nt=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nt);store.set('theme',nt)};
+
+// Ansichten über den Hash (#wissen, #check, #aufgaben oder eine Abschnitts-ID)
+const VIEWS=['wissen','check','aufgaben'];
+function route(){
+  const h=decodeURIComponent(location.hash.slice(1))||'wissen';
+  let v=h,ziel=null;
+  if(!VIEWS.includes(h)){const el=document.getElementById(h);if(el&&el.closest('.view')){v=el.closest('.view').id;ziel=el}else v='wissen'}
+  $$('.view').forEach(s=>s.classList.toggle('show',s.id===v));
+  $$('.tabs a').forEach(a=>a.classList.toggle('active',a.dataset.v===v));
+  if(ziel)setTimeout(()=>ziel.scrollIntoView({block:'start'}),30);else scrollTo(0,0);
+}
+addEventListener('hashchange',route);
+
+// Inhaltsverzeichnis für „Wissen“
+(function(){const box=$('#inhalt');if(!box)return;
+  box.innerHTML=$$('#wissen .panel[id]').map((p,i)=>`<a href="#${p.id}">${i+1}. ${p.dataset.kurz||p.querySelector('h2').textContent.replace(/^\d+\s*/,'')}</a>`).join('');})();
+
+// Zahlen lesen: Komma oder Punkt, Einheiten am Ende werden ignoriert
+function zahl(s){
+  s=String(s).trim().replace(/\s+/g,'').replace(/[−–]/g,'-').replace(/[€%°]|[a-zA-ZäöüÄÖÜ²³]+$/g,'');
+  if(/^-?\d+(?:[.,]\d+)?\/-?\d+(?:[.,]\d+)?$/.test(s)){const[a,b]=s.split('/').map(t=>Number(t.replace(',','.')));return b?a/b:NaN}
+  if(/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s))s=s.replace(/\./g,'');
+  s=s.replace(',','.');
+  return /^-?(\d+\.?\d*|\.\d+)$/.test(s)?Number(s):NaN;
+}
+const ggT=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a};
+const leseBruch=s=>{const m=String(s).replace(/\s/g,'').match(/^(-?\d+)\/(\d+)$/);return m?[+m[1],+m[2]]:null};
+
+// ---------- Wissens-Check ----------
+function baueCheck(){
+  const box=$('#checkListe');if(!box)return;
+  const ant=store.get('check',{});
+  box.innerHTML=CHECK.map((q,i)=>`<div class="frage" data-i="${i}"><p>${i+1}. ${q.f}</p><div class="opts">${q.o.map((o,j)=>`<button data-j="${j}">${o}</button>`).join('')}</div><div class="erkl" hidden></div></div>`).join('');
+  const zeige=(div,j)=>{const q=CHECK[div.dataset.i];
+    $$('button',div).forEach(b=>{const k=+b.dataset.j;b.disabled=true;if(k===q.r)b.classList.add('richtig');else if(k===j)b.classList.add('falsch')});
+    const e=$('.erkl',div);e.hidden=false;e.innerHTML=(j===q.r?'✓ Richtig. ':'✗ Leider falsch. ')+(q.e||'');};
+  $$('.frage',box).forEach(div=>{const i=div.dataset.i;
+    if(ant[i]!==undefined)zeige(div,ant[i]);
+    $$('button',div).forEach(b=>b.onclick=()=>{ant[i]=+b.dataset.j;store.set('check',ant);zeige(div,+b.dataset.j);stand()});});
+  const stand=()=>{const n=Object.keys(ant).length,r=Object.entries(ant).filter(([i,j])=>CHECK[i].r===j).length;
+    $('#checkStand').innerHTML=n<CHECK.length?`${n} von ${CHECK.length} Fragen beantwortet`:
+      `${r} von ${CHECK.length} richtig. `+(r>=CHECK.length-1?'Stark – weiter zu den <a href="#aufgaben">Aufgaben</a>!':'Lies die Erklärungen und schau dir den Teil <a href="#wissen">Wissen</a> noch einmal an.');
+    $('#checkBar').style.width=(100*r/CHECK.length)+'%';};
+  stand();
+  $('#checkNeu').onclick=()=>{for(const k in ant)delete ant[k];store.set('check',ant);baueCheck()};
+}
+
+// ---------- Aufgaben ----------
+const STUFE={1:'Einstieg',2:'Training',3:'Profi'};
+function baueAufgaben(){
+  const box=$('#aufgListe');if(!box)return;
+  const fertig=new Set(store.get('fertig',[]));
+  box.innerHTML=AUFGABEN.map((a,n)=>`<article class="aufg${fertig.has(a.id)?' geloest':''}" id="a-${a.id}" data-s="${a.s}">
+    <div class="kopf"><span class="tag s${a.s}">${STUFE[a.s]}</span><h3>${n+1}. ${a.t}</h3><span class="haken">✓ gelöst</span></div>
+    <div class="txt">${a.text}</div>${a.fig?`<figure class="figure">${a.fig}<figcaption>Skizze, nicht maßstabsgetreu</figcaption></figure>`:''}
+    <div class="felder">${a.felder.map((f,i)=>f.k==='wahl'
+      ?`<div class="feld" data-i="${i}"><span>${f.l||''}</span><div class="wahl">${f.o.map((o,j)=>`<button type="button" data-j="${j}">${o}</button>`).join('')}</div></div>`
+      :`<label class="feld" data-i="${i}"><span>${f.l||''}</span><input ${f.k==='bruch'?'inputmode="text" placeholder="z. B. 3/4"':'inputmode="decimal"'} autocomplete="off"><span>${f.e||''}</span></label>`).join('')}</div>
+    <div class="knoepfe"><button class="primary pr">Prüfen</button>${a.tipps&&a.tipps.length?`<button class="btn-tip tp">Tipp 1</button>`:''}<button class="btn-sol ls">Lösung</button></div>
+    <div class="fb"></div><div class="tipps"></div><div class="loesung" hidden>${a.loes}</div></article>`).join('');
+  $$('.aufg',box).forEach(art=>{
+    const a=AUFGABEN.find(x=>'a-'+x.id===art.id);
+    $$('.wahl',art).forEach(w=>$$('button',w).forEach(b=>b.onclick=()=>{$$('button',w).forEach(x=>x.classList.remove('an','ok','bad'));b.classList.add('an')}));
+    $$('input',art).forEach(inp=>inp.addEventListener('keydown',e=>{if(e.key==='Enter')$('.pr',art).click()}));
+    $('.pr',art).onclick=()=>{
+      let ok=0,kuerzen=false,leer=false;
+      a.felder.forEach((f,i)=>{const feld=$(`.feld[data-i="${i}"]`,art);let r=false;
+        if(f.k==='wahl'){const b=$('.wahl button.an',feld);if(!b){leer=true;return}r=+b.dataset.j===f.r;b.classList.remove('ok','bad');b.classList.add(r?'ok':'bad')}
+        else{const inp=$('input',feld),v=inp.value.trim();inp.classList.remove('ok','bad');if(!v){leer=true;return}
+          if(f.k==='bruch'){const b=leseBruch(v),[rz,rn]=f.r;
+            if(b&&b[1]&&b[0]*rn===b[1]*rz){if(ggT(b[0],b[1])===1)r=true;else kuerzen=true}
+            else if(!b&&Math.abs(zahl(v)-rz/rn)<1e-9)kuerzen=true;}
+          else{const x=zahl(v);r=Math.abs(x-f.r)<=(f.tol??0.011)}
+          inp.classList.add(r?'ok':'bad')}
+        if(r)ok++;});
+      const fb=$('.fb',art),n=a.felder.length;
+      if(ok===n){fb.className='fb ok';fb.textContent='✓ Richtig! Super gemacht.';fertig.add(a.id);store.set('fertig',[...fertig]);art.classList.add('geloest');fortschritt()}
+      else{fb.className='fb bad';fb.textContent=kuerzen?'Fast! Schreibe das Ergebnis als vollständig gekürzten Bruch, z. B. 3/4.':leer?'Fülle zuerst alle Felder aus.':(n>1?`${ok} von ${n} richtig. `:'Noch nicht richtig. ')+(a.tipps&&a.tipps.length?'Hol dir einen Tipp.':'Rechne noch einmal nach.')}
+    };
+    const tp=$('.tp',art);let t=0;
+    if(tp)tp.onclick=()=>{$('.tipps',art).insertAdjacentHTML('beforeend',`<div class="tippbox"><b>Tipp ${t+1}:</b> ${a.tipps[t]}</div>`);t++;
+      if(t<a.tipps.length)tp.textContent='Tipp '+(t+1);else{tp.disabled=true;tp.textContent='keine Tipps mehr'}};
+    $('.ls',art).onclick=()=>{const l=$('.loesung',art);l.hidden=!l.hidden;$('.ls',art).textContent=l.hidden?'Lösung':'Lösung ausblenden'};
+  });
+  // Filter
+  let filter=store.get('filter','alle');
+  const fl=$('#filter');
+  fl.innerHTML=['alle',1,2,3].map(s=>`<button data-s="${s}">${s==='alle'?'Alle':STUFE[s]}</button>`).join('');
+  const setze=()=>{$$('button',fl).forEach(b=>b.classList.toggle('an',b.dataset.s==String(filter)));$$('.aufg',box).forEach(x=>x.hidden=filter!=='alle'&&x.dataset.s!=String(filter))};
+  $$('button',fl).forEach(b=>b.onclick=()=>{filter=b.dataset.s==='alle'?'alle':+b.dataset.s;store.set('filter',filter);setze()});
+  setze();
+  function fortschritt(){const n=AUFGABEN.filter(a=>fertig.has(a.id)).length;
+    $('#aufgStand').textContent=`${n} von ${AUFGABEN.length} Aufgaben gelöst`+(n===AUFGABEN.length?' – alles geschafft! 🎉':'');
+    $('#aufgBar').style.width=(100*n/AUFGABEN.length)+'%';}
+  fortschritt();
+}
+
+$('#reset').onclick=()=>{if(confirm('Fortschritt auf diesem Gerät löschen?')){['check','fertig','filter'].forEach(k=>{try{localStorage.removeItem(SEITE.key+k)}catch(e){}});location.reload()}};
+
+baueCheck();baueAufgaben();
+if(typeof init==='function')init();
+route();
+</script>
+</body>
+</html>

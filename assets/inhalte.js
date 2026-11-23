@@ -105,11 +105,11 @@ const KLASSEN = {
       {
         id: "v7-grund",
         titel: "Grundlagen: Bruchrechnung, Prozentrechnung, Dreisatz",
-        beschreibung: "Webquest zum Wiederholen der Grundlagen aus Klasse 6",
-        typ: "Webquest",
-        link: "https://claude.ai/artifact/7UWZ8UDbrcj3Yp9qAE6S2w",
+        beschreibung: "Grundlagen aus Klasse 6 wiederholen",
+        typ: "Lernseite",
+        link: "bruch-prozent-dreisatz.html",
         themen: [
-          { id: "v7-grund-wq", titel: "Webquest: Bruchrechnung, Prozentrechnung und Dreisatz", link: "https://claude.ai/artifact/7UWZ8UDbrcj3Yp9qAE6S2w", art: "Webquest", kann: "Ich kann Brüche, Prozente und Dreisatz sicher rechnen." }
+          { id: "v7-grund-wq", titel: "Brüche, Prozente und Dreisatz: Wissen, Check, Aufgaben", link: "bruch-prozent-dreisatz.html", art: "Lernseite", kann: "Ich kann Brüche, Prozente und Dreisatz sicher rechnen." }
         ]
       }
     ]
@@ -123,22 +123,22 @@ const KLASSEN = {
       {
         id: "v9-pyth",
         titel: "Pythagoras und Trigonometrie",
-        beschreibung: "Webquest zum Satz des Pythagoras und zu Sinus, Kosinus, Tangens",
-        typ: "Webquest",
-        link: "https://claude.ai/artifact/BQeyVsM5FXQ4URpBMmAFui",
+        beschreibung: "Satz des Pythagoras und Sinus, Kosinus, Tangens",
+        typ: "Lernseite",
+        link: "pythagoras-trigonometrie.html",
         themen: [
-          { id: "v9-pyth-wq",  titel: "Webquest: Pythagoras und Trigonometrie", link: "https://claude.ai/artifact/BQeyVsM5FXQ4URpBMmAFui",          art: "Webquest", kann: "Ich kann den Satz des Pythagoras und sin, cos, tan im rechtwinkligen Dreieck anwenden." },
-          { id: "v9-pyth-auf", titel: "Aufgaben zu Pythagoras und Trigonometrie", link: "https://claude.ai/artifact/BQeyVsM5FXQ4URpBMmAFui#aufgaben", art: "Aufgaben", kann: "Ich kann Aufgaben zu Pythagoras und Trigonometrie lösen." }
+          { id: "v9-pyth-wq",  titel: "Pythagoras und Trigonometrie: Wissen und Check", link: "pythagoras-trigonometrie.html",          art: "Lernseite", kann: "Ich kann den Satz des Pythagoras und sin, cos, tan im rechtwinkligen Dreieck anwenden." },
+          { id: "v9-pyth-auf", titel: "Aufgaben zu Pythagoras und Trigonometrie", link: "pythagoras-trigonometrie.html#aufgaben", art: "Aufgaben", kann: "Ich kann Aufgaben zu Pythagoras und Trigonometrie lösen." }
         ]
       },
       {
         id: "v9-strahl",
         titel: "Strahlensatz",
-        beschreibung: "Webquest zu den Strahlensätzen",
-        typ: "Webquest",
-        link: "https://claude.ai/artifact/XKCKkFAqRRchbHZRNRdq15",
+        beschreibung: "Längen berechnen mit den Strahlensätzen",
+        typ: "Lernseite",
+        link: "strahlensatz.html",
         themen: [
-          { id: "v9-strahl-wq", titel: "Webquest: Strahlensatz", link: "https://claude.ai/artifact/XKCKkFAqRRchbHZRNRdq15", art: "Webquest", kann: "Ich kann Längen mit den Strahlensätzen berechnen." }
+          { id: "v9-strahl-wq", titel: "Strahlensätze: Wissen, Check, Aufgaben", link: "strahlensatz.html", art: "Lernseite", kann: "Ich kann Längen mit den Strahlensätzen berechnen." }
         ]
       }
     ]

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Strahlensätze – Lernseite</title>
+<meta name="theme-color" content="#123b73">
+<link rel="icon" href="assets/schullogo.png">
+<style>
+:root{
+  --bg:#f5f6f8; --card:#ffffff; --ink:#1d2330; --muted:#5d6678; --line:#dfe3ea;
+  --accent:#2357c6; --accent-soft:#e8eefb; --ok:#1f8a4c; --ok-soft:#e5f5ec;
+  --bad:#c0392b; --bad-soft:#fbeae8; --tip:#b26a00; --tip-soft:#fff4e0;
+  --sol:#5b3cc4; --sol-soft:#efeafd; --radius:12px;
+  --gk:#c0392b; --ak:#2357c6; --hy:#1f8a4c;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14171d; --card:#1d2129; --ink:#e7eaf0; --muted:#9aa3b2; --line:#2e3440;
+    --accent:#7ba2ff; --accent-soft:#1f2a44; --ok:#5fd08f; --ok-soft:#173226;
+    --bad:#ff8a7a; --bad-soft:#3a1f1c; --tip:#f2b453; --tip-soft:#3a2d14;
+    --sol:#b4a2ff; --sol-soft:#2a2347; --gk:#ff8a7a; --ak:#7ba2ff; --hy:#5fd08f;
+  }
+}
+:root[data-theme="dark"]{
+    --bg:#14171d; --card:#1d2129; --ink:#e7eaf0; --muted:#9aa3b2; --line:#2e3440;
+    --accent:#7ba2ff; --accent-soft:#1f2a44; --ok:#5fd08f; --ok-soft:#173226;
+    --bad:#ff8a7a; --bad-soft:#3a1f1c; --tip:#f2b453; --tip-soft:#3a2d14;
+    --sol:#b4a2ff; --sol-soft:#2a2347; --gk:#ff8a7a; --ak:#7ba2ff; --hy:#5fd08f;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+h2{font-size:1.3em;margin:0 0 .4em} h3{font-size:1.08em;margin:1em 0 .4em} h4{margin:.6em 0 .3em;font-size:1em}
+p{margin:.4em 0 .7em}
+ul,ol{padding-left:1.3em;margin:.3em 0 .7em}
+header.top{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.top-in{max-width:860px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:8px}
+.top h1{font-size:17px;margin:0;flex:1;min-width:0;line-height:1.25}
+.top h1 small{display:block;font-weight:400;color:var(--muted);font-size:13px}
+.home-logo{display:inline-flex;align-items:center;gap:8px;flex:0 0 auto;color:inherit;text-decoration:none;font-size:14px;font-weight:600;white-space:nowrap;margin-right:6px;padding-right:12px;border-right:1px solid var(--line)}
+.home-logo img{height:32px;width:auto;display:block;background:#fff;border-radius:6px;padding:2px 4px}
+@media(max-width:640px){.home-logo img{height:24px}.home-logo span{display:none}}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 12px}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.btn-tip{border-color:var(--tip);color:var(--tip)}
+.btn-sol{border-color:var(--sol);color:var(--sol)}
+.tabs{max-width:860px;margin:0 auto;padding:0 16px;display:flex;gap:2px;overflow-x:auto}
+.tabs a{border-bottom:3px solid transparent;padding:8px 12px;font-weight:600;color:var(--muted);text-decoration:none;white-space:nowrap}
+.tabs a.active{color:var(--accent);border-bottom-color:var(--accent)}
+main{max-width:860px;margin:0 auto;padding:18px 16px 60px}
+.intro{color:var(--muted);margin:0 0 16px}
+.view{display:none}.view.show{display:block}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:16px;scroll-margin-top:110px}
+.panel>h2:first-child{margin-top:0}
+.nr{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-size:15px;margin-right:6px;vertical-align:2px}
+.inhalt{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}
+.inhalt a{font-size:14px;padding:4px 10px;border-radius:99px;background:var(--accent-soft);color:var(--accent);text-decoration:none;font-weight:600}
+.merke{border-left:4px solid var(--accent);background:var(--accent-soft);border-radius:8px;padding:10px 12px;margin:10px 0}
+.merke b:first-child{color:var(--accent)}
+.bsp{border-left:4px solid var(--ok);background:var(--ok-soft);border-radius:8px;padding:10px 12px;margin:10px 0}
+.achtung{border-left:4px solid var(--tip);background:var(--tip-soft);border-radius:8px;padding:10px 12px;margin:10px 0}
+.f{font-family:"Cambria Math","STIX Two Math",Georgia,serif;font-size:1.08em;white-space:nowrap}
+.frac{display:inline-flex;flex-direction:column;text-align:center;vertical-align:middle;line-height:1.15;margin:0 2px}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 3px}
+.frac>span:last-child{padding:0 3px}
+.gross{font-size:1.25em}
+.figure{background:#fff;border-radius:8px;padding:8px;text-align:center;margin:10px 0;border:1px solid var(--line);color:#1d2330}
+.figure svg{max-width:100%;height:auto;display:block;margin:0 auto}
+.figure figcaption{font-size:13px;color:#5d6678;margin-top:2px}
+.regler{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;margin:8px 0}
+.regler input[type=range]{width:100%;accent-color:var(--accent)}
+.regler output{font-weight:700;min-width:3.5em;text-align:right}
+.werte{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.werte div{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:15px}
+.tablewrap{overflow-x:auto}
+table.t{border-collapse:collapse;margin:8px 0;font-size:15px}
+table.t td,table.t th{border:1px solid var(--line);padding:6px 10px;text-align:center}
+table.t th{background:var(--accent-soft)}
+td.pfeil{border:none!important;color:var(--accent);font-weight:700;text-align:left!important;white-space:nowrap}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.c-gk{color:var(--gk);font-weight:700}.c-ak{color:var(--ak);font-weight:700}.c-hy{color:var(--hy);font-weight:700}
+/* Wissens-Check */
+.frage{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px}
+.frage p{margin:0 0 8px;font-weight:600}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts button{min-width:64px}
+.opts button:disabled{opacity:1;cursor:default;color:var(--muted)}
+.opts button.richtig{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);font-weight:700}
+.opts button.falsch{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.erkl{margin-top:8px;font-size:15px;color:var(--muted)}
+.stand{font-weight:700}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:8px}
+.bar>i{display:block;height:100%;background:var(--ok);width:0;transition:width .3s}
+/* Aufgaben */
+.filter{display:flex;flex-wrap:wrap;gap:6px}
+.filter button{border-radius:99px;padding:5px 12px;font-size:14px}
+.filter button.an{background:var(--accent);color:#fff;border-color:var(--accent)}
+.aufg{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;scroll-margin-top:110px}
+.aufg.geloest{border-color:var(--ok)}
+.aufg .kopf{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.aufg h3{margin:0;flex:1;font-size:1.05em}
+.haken{color:var(--ok);font-weight:700;display:none}
+.aufg.geloest .haken{display:inline}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;font-weight:700}
+.tag.s1{background:var(--ok-soft);color:var(--ok)}
+.tag.s2{background:var(--accent-soft);color:var(--accent)}
+.tag.s3{background:var(--sol-soft);color:var(--sol)}
+.felder{display:flex;flex-wrap:wrap;gap:10px 16px;margin:10px 0}
+.feld{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.feld input{font:inherit;width:120px;padding:7px 9px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink)}
+.feld input.ok{border-color:var(--ok);background:var(--ok-soft)}
+.feld input.bad{border-color:var(--bad);background:var(--bad-soft)}
+.feld .wahl{display:flex;gap:6px;flex-wrap:wrap}
+.feld .wahl button.an{background:var(--accent-soft);border-color:var(--accent);font-weight:700}
+.feld .wahl button.ok{background:var(--ok-soft);border-color:var(--ok)}
+.feld .wahl button.bad{background:var(--bad-soft);border-color:var(--bad)}
+.knoepfe{display:flex;flex-wrap:wrap;gap:8px}
+.fb{margin-top:8px;font-weight:600}
+.fb.ok{color:var(--ok)}.fb.bad{color:var(--bad)}
+.tippbox{background:var(--tip-soft);border-left:4px solid var(--tip);border-radius:8px;padding:8px 12px;margin-top:8px}
+.loesung{background:var(--sol-soft);border-left:4px solid var(--sol);border-radius:8px;padding:8px 12px;margin-top:8px}
+.hinweis{font-size:14px;color:var(--muted)}
+.weiter{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:10px}
+footer{max-width:860px;margin:0 auto;padding:0 16px 40px;color:var(--muted);font-size:14px}
+footer button{font-size:13px;padding:4px 10px;margin-top:6px}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <a class="home-logo" href="klasse.html?k=9#lernen" title="Zurück zur Klasse 9"><img src="assets/schullogo.png" alt="Schullogo – zurück zur Klasse"><span>⌂ Klasse 9</span></a>
+  <h1>Strahlensätze<small>Lernseite · Mathematik 9 · Wirtschaftsschule</small></h1>
+  <button id="btnTheme" title="Hell/Dunkel umschalten">◐</button>
+</div>
+<nav class="tabs" aria-label="Bereiche"><a href="#wissen" data-v="wissen">1 Wissen</a><a href="#check" data-v="check">2 Wissens-Check</a><a href="#aufgaben" data-v="aufgaben">3 Aufgaben</a></nav>
+</header>
+
+<main>
+<section class="view" id="wissen">
+  <p class="intro">Mit den Strahlensätzen berechnest du Längen, die du nicht direkt messen kannst – zum Beispiel die Höhe eines Turms oder die Breite eines Flusses. Lies die Abschnitte, probiere das Schaubild aus und rechne dann die Aufgaben.</p>
+  <nav class="inhalt" id="inhalt" aria-label="Inhalt"></nav>
+  <div class="panel" id="einstieg" data-kurz="Einstieg">
+    <h2><span class="nr">1</span>Einstieg: Schatten messen</h2>
+    <p>Ein Stab ist 1 m hoch und wirft einen Schatten von 1,5 m. Gleichzeitig wirft ein Baum daneben einen Schatten von 12 m. Wie hoch ist der Baum?</p>
+    <figure class="figure"><svg viewBox="0 0 340 170" width="340">
+      <line x1="20" y1="150" x2="330" y2="150" stroke="#5d6678" stroke-width="2"/>
+      <line x1="20" y1="150" x2="320" y2="20" stroke="#b26a00" stroke-width="2" stroke-dasharray="6 4"/>
+      <line x1="80" y1="150" x2="80" y2="124" stroke="#2357c6" stroke-width="5"/>
+      <line x1="320" y1="150" x2="320" y2="20" stroke="#1f8a4c" stroke-width="7"/>
+      <circle cx="320" cy="28" r="16" fill="#1f8a4c" opacity=".35"/>
+      <text x="50" y="167" font-size="13" text-anchor="middle" fill="#1d2330">1,5 m</text>
+      <text x="170" y="167" font-size="13" text-anchor="middle" fill="#1d2330">Schatten des Baums: 12 m</text>
+      <text x="86" y="138" font-size="13" fill="#2357c6" font-weight="700">1 m</text>
+      <text x="312" y="90" font-size="14" text-anchor="end" fill="#1f8a4c" font-weight="700">x</text>
+      <text x="24" y="140" font-size="12" fill="#b26a00">Sonnenstrahl</text>
+    </svg></figure>
+    <p>Stab und Baum stehen beide senkrecht – sie sind <b>parallel</b>. Der Baumschatten ist 8-mal so lang wie der Stabschatten (12 : 1,5 = 8). Darum ist auch der Baum 8-mal so hoch: <b>x = 8 m</b>.</p>
+    <div class="merke"><b>Die Idee:</b> Werden zwei Strahlen von Parallelen geschnitten, bleiben die <b>Verhältnisse</b> der Strecken gleich.</div>
+  </div>
+
+  <div class="panel" id="grundfigur" data-kurz="Grundfigur">
+    <h2><span class="nr">2</span>Die Grundfigur</h2>
+    <p>Zwei Strahlen gehen vom gemeinsamen Punkt <b>Z</b> (Zentrum) aus. Sie werden von zwei <b>parallelen</b> Geraden geschnitten. Es gibt zwei Formen:</p>
+    <div class="grid2">
+      <figure class="figure" id="figV"><figcaption>V-Figur: beide Parallelen auf derselben Seite von Z</figcaption></figure>
+      <figure class="figure" id="figX"><figcaption>X-Figur: die Parallelen liegen auf verschiedenen Seiten von Z</figcaption></figure>
+    </div>
+    <div class="achtung"><b>Wichtig: nur mit Parallelen!</b> Die Strahlensätze gelten nur, wenn AB und A'B' parallel sind. In Sachaufgaben erkennst du Parallelen oft an senkrechten Dingen: Masten, Bäume, Personen, Wände.</div>
+  </div>
+
+  <div class="panel" id="satz1" data-kurz="1. Strahlensatz">
+    <h2><span class="nr">3</span>Der 1. Strahlensatz</h2>
+    <p>Er verbindet nur Strecken <b>auf den Strahlen</b>. Alle Strecken werden <b>von Z aus</b> gemessen:</p>
+    <div class="merke gross"><span class="f"><span class="frac"><span>ZA</span><span>ZA'</span></span> = <span class="frac"><span>ZB</span><span>ZB'</span></span></span></div>
+    <p>Bei der V-Figur gilt auch mit den Teilstücken: <span class="f"><span class="frac"><span>ZA</span><span>AA'</span></span> = <span class="frac"><span>ZB</span><span>BB'</span></span></span></p>
+  </div>
+
+  <div class="panel" id="satz2" data-kurz="2. Strahlensatz">
+    <h2><span class="nr">4</span>Der 2. Strahlensatz</h2>
+    <p>Er verbindet die <b>Parallelen</b> mit den Strecken auf <b>einem</b> Strahl – wieder von Z aus gemessen:</p>
+    <div class="merke gross"><span class="f"><span class="frac"><span>AB</span><span>A'B'</span></span> = <span class="frac"><span>ZA</span><span>ZA'</span></span></span> &nbsp; oder &nbsp; <span class="f"><span class="frac"><span>AB</span><span>A'B'</span></span> = <span class="frac"><span>ZB</span><span>ZB'</span></span></span></div>
+    <div class="achtung"><b>Typischer Fehler:</b> Beim 2. Strahlensatz darfst du <b>nicht</b> die Teilstücke AA' oder BB' nehmen. Es muss immer die ganze Strecke ab Z sein.</div>
+    <h3>Probier's aus: Die Verhältnisse bleiben gleich</h3>
+    <p>Schiebe die zweite Parallele. Die Längen ändern sich – die Verhältnisse nicht.</p>
+    <figure class="figure"><svg id="ssBild" viewBox="0 0 320 232" width="340"></svg></figure>
+    <div class="regler"><label for="rS">ZA'</label><input type="range" id="rS" min="1" max="10" step="0.5" value="8"><output id="oS"></output></div>
+    <div class="werte" id="ssWerte"></div>
+  </div>
+
+  <div class="panel" id="fahrplan" data-kurz="Fahrplan">
+    <h2><span class="nr">5</span>Fahrplan zum Lösen</h2>
+    <ol>
+      <li>Skizze anschauen (oder zeichnen): Wo ist Z? Welche Strecken sind parallel?</li>
+      <li>Die gesuchte Strecke mit <b>x</b> markieren.</li>
+      <li>Satz wählen: Kommt eine Parallele (AB oder A'B') vor? → <b>2. Strahlensatz</b>. Sonst → <b>1. Strahlensatz</b>.</li>
+      <li>Verhältnisgleichung aufschreiben – am besten mit <b>x oben links</b>.</li>
+      <li>Mit dem Nenner unter x malnehmen und ausrechnen.</li>
+    </ol>
+    <div class="merke"><b>Goldene Regel: x steht oben links.</b> Dann reicht ein einziger Schritt: mit dem Nenner unter dem x multiplizieren.</div>
+    <div class="bsp"><b>Beispiel:</b> ZA' = x, ZA = 3 cm, ZB' = 9 cm, ZB = 6 cm (1. Strahlensatz)<br>
+      <span class="f"><span class="frac"><span>x</span><span>3 cm</span></span> = <span class="frac"><span>9 cm</span><span>6 cm</span></span></span> &nbsp;| · 3 cm<br>
+      <span class="f">x = <span class="frac"><span>9 · 3</span><span>6</span></span> cm = 4,5 cm</span></div>
+    <p class="hinweis">Steht x doch einmal unten, drehst du beide Brüche um – das ist erlaubt.</p>
+  </div>
+  <div class="weiter"><span></span><a class="tabs-link" href="#check"><button class="primary">Weiter zum Wissens-Check →</button></a></div>
+</section>
+
+<section class="view" id="check">
+  <p class="intro">Teste dich: Tippe jeweils die richtige Antwort an. Du siehst sofort, ob es stimmt, und bekommst eine kurze Erklärung.</p>
+  <div class="panel"><div class="stand" id="checkStand"></div><div class="bar"><i id="checkBar"></i></div></div>
+  <div id="checkListe"></div>
+  <div class="weiter"><button id="checkNeu">Check neu starten</button><a href="#aufgaben"><button class="primary">Weiter zu den Aufgaben →</button></a></div>
+</section>
+
+<section class="view" id="aufgaben">
+  <p class="intro">Die Einstiegsaufgaben gehen im Kopf. Ab „Training“ darfst du den Taschenrechner benutzen. Markiere in jeder Skizze zuerst die gesuchte Strecke x.</p>
+  <div class="panel">
+    <div class="filter" id="filter"></div>
+    <div class="bar"><i id="aufgBar"></i></div><div class="hinweis" id="aufgStand" style="margin-top:4px"></div>
+    <p class="hinweis" style="margin-bottom:0">Eingaben mit Komma (3,6). Ergebnisse auf zwei Nachkommastellen runden. Einheiten musst du nicht mit eintippen.</p>
+  </div>
+  <div id="aufgListe"></div>
+
+</section>
+</main>
+
+<footer>Dein Fortschritt wird nur in diesem Browser gespeichert – ohne Anmeldung.<br><button id="reset">Fortschritt löschen</button></footer>
+<script>
+const SEITE={key:'k9strahl_'};
+const CHECK=[
+ {f:'Wann darfst du die Strahlensätze anwenden?',o:['nur wenn die zwei Geraden parallel sind','immer, wenn sich zwei Strahlen schneiden','nur bei rechtwinkligen Dreiecken','nur bei der X-Figur'],r:0,e:'Ohne Parallelen sind die Verhältnisse nicht gleich.'},
+ {f:'Von welchem Punkt aus werden die Strecken auf den Strahlen gemessen?',o:['vom Zentrum Z','von A','von der Mitte der Parallelen','egal'],r:0,e:'ZA, ZA\', ZB, ZB\' – immer von Z aus.'},
+ {f:'Welche Gleichung ist der 1. Strahlensatz?',o:['ZA : ZA\' = ZB : ZB\'','AB : A\'B\' = AA\' : ZA\'','ZA : AB = ZB : BB\'','AB · A\'B\' = ZA · ZB'],r:0,e:'Der 1. Strahlensatz enthält nur Strecken auf den Strahlen.'},
+ {f:'Die Parallele A\'B\' ist gesucht. Welchen Satz brauchst du?',o:['1. Strahlensatz','2. Strahlensatz','Satz des Pythagoras'],r:1,e:'Sobald eine Parallele vorkommt, brauchst du den 2. Strahlensatz.'},
+ {f:'ZA = 2 cm, ZA\' = 6 cm, AB = 3 cm. Wie lang ist A\'B\'?',o:['1 cm','7 cm','9 cm','12 cm'],r:2,e:'ZA\' ist 3-mal so lang wie ZA, also ist A\'B\' 3-mal so lang wie AB: 9 cm.'},
+ {f:'x/4 = 6/3. Wie groß ist x?',o:['2','4,5','8','18'],r:2,e:'x = 6 : 3 · 4 = 8.'},
+ {f:'Beim 2. Strahlensatz darfst du das Teilstück AA\' verwenden.',o:['stimmt','stimmt nicht'],r:1,e:'Beim 2. Strahlensatz immer die ganze Strecke ab Z (ZA oder ZA\').'}
+];
+// Skizzen der Grundfigur mit Beschriftungen
+function strahl(o){const X=!!o.x,L=o.lab||{},m=0.5;
+  const Z=X?[160,92]:[25,150],t1=X?105:105,t2=X?-85:245;
+  const P=t=>[Z[0]+t,Z[1]],Q=t=>[Z[0]+t,Z[1]-m*t],A=P(t1),A2=P(t2),B=Q(t1),B2=Q(t2);
+  const r1=X?[P(t2-25),P(t1+25)]:[Z,P(t2+30)],r2=X?[Q(t2-25),Q(t1+25)]:[Z,Q(t2+30)];
+  const ln=(p,q,c,w,d)=>`<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="${c}" stroke-width="${w}"${d?' stroke-dasharray="5 4"':''}/>`;
+  const tx=(x,y,t,c,a)=>t?`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-size="14" text-anchor="${a||'middle'}" fill="${c||'#1d2330'}" font-weight="700">${t}</text>`:'';
+  const nx=0.447,ny=0.894;
+  const unten=(t0,t,txt,d)=>{const x=Z[0]+(t0+t)/2,s=(t>0||t0>0)?1:-1;return tx(x,Z[1]+(s>0?18+(d||0):-8-(d||0)),txt,'#2357c6')};
+  const schraeg=(t0,t,txt,d)=>{const x=Z[0]+(t0+t)/2,y=Z[1]-m*(t0+t)/2,s=(t>0||t0>0)?1:-1,k=14+(d||0);return tx(x-s*nx*k,y-s*ny*k+5,txt,'#2357c6')};
+  let s=ln(r1[0],r1[1],'#1d2330',2)+ln(r2[0],r2[1],'#1d2330',2)+ln(A,B,'#c0392b',3.5)+ln(A2,B2,'#c0392b',3.5);
+  const pt=(p,n,dx,dy)=>`<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="#1d2330"/><text x="${p[0]+dx}" y="${p[1]+dy}" font-size="13" fill="#5d6678">${n}</text>`;
+  s+=pt(Z,'Z',X?-4:-14,X?-8:4)+pt(A,'A',4,14)+pt(B,'B',-14,-4)+pt(A2,"A'",X?-16:4,X?-6:14)+pt(B2,"B'",X?-18:-16,X?16:-4);
+  s+=unten(0,t1,L.za)+schraeg(0,t1,L.zb);
+  if(X){s+=unten(0,t2,L.za2)+schraeg(0,t2,L.zb2)}
+  else{s+=unten(t1,t2,L.aa)+schraeg(t1,t2,L.bb);
+    if(L.za2){s+=`<line x1="${Z[0]}" y1="${Z[1]+28}" x2="${A2[0]}" y2="${Z[1]+28}" stroke="#2357c6" stroke-width="1.2"/><line x1="${Z[0]}" y1="${Z[1]+22}" x2="${Z[0]}" y2="${Z[1]+34}" stroke="#2357c6"/><line x1="${A2[0]}" y1="${Z[1]+22}" x2="${A2[0]}" y2="${Z[1]+34}" stroke="#2357c6"/>`+tx(Z[0]+t2/2,Z[1]+46,L.za2,'#2357c6')}
+    if(L.zb2){const k=32;s+=`<line x1="${Z[0]-nx*k}" y1="${Z[1]-ny*k}" x2="${B2[0]-nx*k}" y2="${B2[1]-ny*k}" stroke="#2357c6" stroke-width="1.2"/>`+tx(Z[0]+t2/2-nx*(k+12),Z[1]-m*t2/2-ny*(k+12)+5,L.zb2,'#2357c6')}}
+  s+=tx(A[0]+(X?7:-7),(A[1]+B[1])/2+5,L.ab,'#c0392b',X?'start':'end')+tx(A2[0]+(X?-7:7),(A2[1]+B2[1])/2+5,L.ab2,'#c0392b',X?'end':'start');
+  return `<svg viewBox="${X?'0 0 320 170':'0 -15 300 220'}" width="${X?320:300}">${s}</svg>`;}
+const AUFGABEN=[
+ {id:'e1',s:1,t:'Auf den Strahlen',text:'Berechne x.',fig:strahl({lab:{za:'3 cm',za2:'6 cm',zb:'4 cm',zb2:'x'}}),felder:[{l:'x =',r:8,e:'cm'}],
+  tipps:['Nur Strecken auf den Strahlen → 1. Strahlensatz: x : 4 = 6 : 3.','ZA\' ist doppelt so lang wie ZA.'],loes:'<span class="f">x/4 = 6/3</span> → x = 2 · 4 cm = <b>8 cm</b>'},
+ {id:'e2',s:1,t:'Parallele gesucht',text:'Berechne die Länge der Parallelen A\'B\' = x.',fig:strahl({lab:{za:'5 cm',za2:'15 cm',ab:'2 cm',ab2:'x'}}),felder:[{l:'x =',r:6,e:'cm'}],
+  tipps:['Eine Parallele kommt vor → 2. Strahlensatz: x : 2 = 15 : 5.','15 : 5 = 3. Die Parallele wird also 3-mal so lang.'],loes:'<span class="f">x/2 = 15/5</span> → x = 3 · 2 cm = <b>6 cm</b>'},
+ {id:'e3',s:1,t:'Mit Teilstücken',text:'Berechne das Teilstück BB\' = x.',fig:strahl({lab:{za:'4 cm',aa:'2 cm',zb:'6 cm',bb:'x'}}),felder:[{l:'x =',r:3,e:'cm'}],
+  tipps:['In der V-Figur gilt auch: BB\' : ZB = AA\' : ZA.','x : 6 = 2 : 4'],loes:'<span class="f">x/6 = 2/4</span> → x = 0,5 · 6 cm = <b>3 cm</b>'},
+ {id:'e4',s:1,t:'Kurze Parallele',text:'Berechne die Parallele AB = x.',fig:strahl({lab:{zb:'8 cm',zb2:'12 cm',ab:'x',ab2:'9 cm'}}),felder:[{l:'x =',r:6,e:'cm'}],
+  tipps:['2. Strahlensatz mit dem oberen Strahl: x : 9 = 8 : 12.','8/12 = 2/3. Wie viel sind 2/3 von 9?'],loes:'<span class="f">x/9 = 8/12</span> → x = 9 · 8 : 12 = <b>6 cm</b>'},
+ {id:'t1',s:2,t:'X-Figur',text:'In der X-Figur sind AB und A\'B\' parallel. Berechne x.',fig:strahl({x:true,lab:{za:'3 cm',za2:'4,5 cm',ab:'2,4 cm',ab2:'x'}}),felder:[{l:'x =',r:3.6,e:'cm'}],
+  tipps:['Die Strahlensätze gelten auch in der X-Figur. Gesucht ist eine Parallele → 2. Strahlensatz.','x : 2,4 = 4,5 : 3'],loes:'<span class="f">x/2,4 = 4,5/3</span> → x = 1,5 · 2,4 cm = <b>3,6 cm</b>'},
+ {id:'t2',s:2,t:'Kirchturm im Schatten',text:'Eine 1,80 m große Person wirft einen 2,40 m langen Schatten. Der Schatten eines Kirchturms ist zur gleichen Zeit 32 m lang. Wie hoch ist der Turm?',felder:[{l:'Höhe:',r:24,e:'m'}],
+  tipps:['Person und Turm sind parallel. Z ist die Schattenspitze.','h : 1,80 = 32 : 2,40'],loes:'<span class="f">h/1,80 = 32/2,40</span> → h = 1,80 m · 32 : 2,40 = <b>24 m</b>'},
+ {id:'t3',s:2,t:'Breite eines Flusses',text:'Um die Breite eines Flusses zu bestimmen, steckt man Punkte ab (siehe Skizze). AB und A\'B\' sind parallel zu den Ufern: ZA = 15 m, AB = 10 m (am diesseitigen Ufer), A\'B\' = 24 m (am anderen Ufer). Wie breit ist der Fluss (Strecke AA\')?',fig:strahl({lab:{za:'15 m',aa:'x',ab:'10 m',ab2:'24 m'}}),felder:[{l:'Breite:',r:21,e:'m'}],
+  tipps:['Berechne zuerst ZA\' mit dem 2. Strahlensatz: ZA\' : 15 = 24 : 10.','ZA\' = 36 m. Die Flussbreite ist ZA\' − ZA.'],loes:'ZA\' = 15 m · 24 : 10 = 36 m → Breite = 36 m − 15 m = <b>21 m</b>'},
+ {id:'t4',s:2,t:'Stütze unter der Rampe',text:'Eine Rampe ist 12 m lang (schräg gemessen) und endet in 3 m Höhe. 4 m nach dem Anfang der Rampe (schräg gemessen) soll eine senkrechte Stütze eingebaut werden. Wie lang muss die Stütze sein?',felder:[{l:'Stütze:',r:1,e:'m'}],
+  tipps:['Z ist der Anfang der Rampe. Die Stütze und die 3 m Endhöhe sind parallel.','2. Strahlensatz: x : 3 = 4 : 12'],loes:'<span class="f">x/3 = 4/12</span> → x = 3 m : 3 = <b>1 m</b>'},
+ {id:'p1',s:3,t:'Mit Teilstück zur Parallelen',text:'Berechne A\'B\' = x.',fig:strahl({lab:{za:'2,5 cm',aa:'3,5 cm',ab:'1,8 cm',ab2:'x'}}),felder:[{l:'x =',r:4.32,e:'cm'}],
+  tipps:['Für den 2. Strahlensatz brauchst du ZA\', nicht AA\'!','ZA\' = 2,5 + 3,5 = 6 cm. Dann x : 1,8 = 6 : 2,5.'],loes:'ZA\' = 6 cm · <span class="f">x/1,8 = 6/2,5</span> → x = 1,8 · 6 : 2,5 = <b>4,32 cm</b>'},
+ {id:'p2',s:3,t:'Sind die Geraden parallel?',text:'In einer V-Figur misst man: ZA = 4 cm, ZA\' = 10 cm, ZB = 6 cm, ZB\' = 14 cm. Sind AB und A\'B\' parallel?',felder:[{l:'',k:'wahl',o:['ja, parallel','nein, nicht parallel'],r:1}],
+  tipps:['Wenn sie parallel sind, müssen die Verhältnisse ZA : ZA\' und ZB : ZB\' gleich sein.','4 : 10 = 0,4. Und 6 : 14 = ?'],loes:'4 : 10 = 0,4 aber 6 : 14 ≈ 0,43 → <b>nicht parallel</b>. Die Strahlensätze dürfen hier nicht verwendet werden.'},
+ {id:'p3',s:3,t:'Daumensprung',text:'Du streckst den Arm aus. Dein Daumen ist 60 cm von deinem Auge entfernt und 2 cm breit. Er verdeckt genau ein Haus, das 30 m breit ist. Wie weit ist das Haus von dir entfernt?',felder:[{l:'Entfernung:',r:900,e:'m'}],
+  tipps:['Z ist dein Auge. Daumen und Hausfront sind parallel. Rechne alles in Meter: 0,6 m und 0,02 m.','x : 0,6 = 30 : 0,02'],loes:'<span class="f">x/0,6 = 30/0,02</span> → x = 0,6 m · 1500 = <b>900 m</b>'}
+];
+function init(){
+  $('#figV').insertAdjacentHTML('afterbegin',strahl({lab:{}}));
+  $('#figX').insertAdjacentHTML('afterbegin',strahl({x:true,lab:{}}));
+  const rS=$('#rS');
+  const ss=()=>{const za2=+rS.value,za=4,zb=5,ab=3,k=za2/za,s=25,Z=[20,205];
+    $('#oS').textContent=fmt(za2)+' cm';
+    const P=t=>[Z[0]+t*s,Z[1]],Q=t=>[Z[0]+t*s,Z[1]-0.75*t*s],A=P(za),B=Q(za),A2=P(za2),B2=Q(za2),end=Math.max(za,za2)+1;
+    const ln=(p,q,c,w)=>`<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="${c}" stroke-width="${w}"/>`;
+    $('#ssBild').innerHTML=ln(Z,P(end),'#1d2330',2)+ln(Z,Q(end),'#1d2330',2)+ln(A,B,'#c0392b',3.5)+ln(A2,B2,'#b26a00',3.5)
+      +`<text x="${Z[0]-4}" y="${Z[1]+18}" font-size="13" fill="#5d6678">Z</text><text x="${A[0]-4}" y="${A[1]+18}" font-size="13" fill="#5d6678">A</text><text x="${A2[0]-4}" y="${A2[1]+18}" font-size="13" fill="#5d6678">A'</text>
+      <text x="${A[0]+5}" y="${(A[1]+B[1])/2}" font-size="13" fill="#c0392b" font-weight="700">AB = 3</text>
+      <text x="${A2[0]+5}" y="${(A2[1]+B2[1])/2+14}" font-size="13" fill="#b26a00" font-weight="700">A'B' = ${fmt(ab*k)}</text>`;
+    $('#ssWerte').innerHTML=`<div>ZA : ZA' = 4 : ${fmt(za2)} = <b>${fmt(za/za2,3)}</b></div><div>ZB : ZB' = 5 : ${fmt(zb*k)} = <b>${fmt(zb/(zb*k),3)}</b></div><div>AB : A'B' = 3 : ${fmt(ab*k)} = <b>${fmt(ab/(ab*k),3)}</b></div>`;};
+  rS.oninput=ss;ss();
+}
+</script>
+<script>
+// ===== Gemeinsamer Teil: Ansichten, Wissens-Check, Aufgaben =====
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const store={get(k,d){try{const v=localStorage.getItem(SEITE.key+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(SEITE.key+k,JSON.stringify(v))}catch(e){}}};
+const fmt=(x,d=2)=>Number(x).toLocaleString('de-DE',{maximumFractionDigits:d});
+
+// Hell/Dunkel
+(function(){const t=store.get('theme',null);if(t)document.documentElement.setAttribute('data-theme',t)})();
+$('#btnTheme').onclick=()=>{const cur=document.documentElement.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');const nt=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nt);store.set('theme',nt)};
+
+// Ansichten über den Hash (#wissen, #check, #aufgaben oder eine Abschnitts-ID)
+const VIEWS=['wissen','check','aufgaben'];
+function route(){
+  const h=decodeURIComponent(location.hash.slice(1))||'wissen';
+  let v=h,ziel=null;
+  if(!VIEWS.includes(h)){const el=document.getElementById(h);if(el&&el.closest('.view')){v=el.closest('.view').id;ziel=el}else v='wissen'}
+  $$('.view').forEach(s=>s.classList.toggle('show',s.id===v));
+  $$('.tabs a').forEach(a=>a.classList.toggle('active',a.dataset.v===v));
+  if(ziel)setTimeout(()=>ziel.scrollIntoView({block:'start'}),30);else scrollTo(0,0);
+}
+addEventListener('hashchange',route);
+
+// Inhaltsverzeichnis für „Wissen“
+(function(){const box=$('#inhalt');if(!box)return;
+  box.innerHTML=$$('#wissen .panel[id]').map((p,i)=>`<a href="#${p.id}">${i+1}. ${p.dataset.kurz||p.querySelector('h2').textContent.replace(/^\d+\s*/,'')}</a>`).join('');})();
+
+// Zahlen lesen: Komma oder Punkt, Einheiten am Ende werden ignoriert
+function zahl(s){
+  s=String(s).trim().replace(/\s+/g,'').replace(/[−–]/g,'-').replace(/[€%°]|[a-zA-ZäöüÄÖÜ²³]+$/g,'');
+  if(/^-?\d+(?:[.,]\d+)?\/-?\d+(?:[.,]\d+)?$/.test(s)){const[a,b]=s.split('/').map(t=>Number(t.replace(',','.')));return b?a/b:NaN}
+  if(/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s))s=s.replace(/\./g,'');
+  s=s.replace(',','.');
+  return /^-?(\d+\.?\d*|\.\d+)$/.test(s)?Number(s):NaN;
+}
+const ggT=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a};
+const leseBruch=s=>{const m=String(s).replace(/\s/g,'').match(/^(-?\d+)\/(\d+)$/);return m?[+m[1],+m[2]]:null};
+
+// ---------- Wissens-Check ----------
+function baueCheck(){
+  const box=$('#checkListe');if(!box)return;
+  const ant=store.get('check',{});
+  box.innerHTML=CHECK.map((q,i)=>`<div class="frage" data-i="${i}"><p>${i+1}. ${q.f}</p><div class="opts">${q.o.map((o,j)=>`<button data-j="${j}">${o}</button>`).join('')}</div><div class="erkl" hidden></div></div>`).join('');
+  const zeige=(div,j)=>{const q=CHECK[div.dataset.i];
+    $$('button',div).forEach(b=>{const k=+b.dataset.j;b.disabled=true;if(k===q.r)b.classList.add('richtig');else if(k===j)b.classList.add('falsch')});
+    const e=$('.erkl',div);e.hidden=false;e.innerHTML=(j===q.r?'✓ Richtig. ':'✗ Leider falsch. ')+(q.e||'');};
+  $$('.frage',box).forEach(div=>{const i=div.dataset.i;
+    if(ant[i]!==undefined)zeige(div,ant[i]);
+    $$('button',div).forEach(b=>b.onclick=()=>{ant[i]=+b.dataset.j;store.set('check',ant);zeige(div,+b.dataset.j);stand()});});
+  const stand=()=>{const n=Object.keys(ant).length,r=Object.entries(ant).filter(([i,j])=>CHECK[i].r===j).length;
+    $('#checkStand').innerHTML=n<CHECK.length?`${n} von ${CHECK.length} Fragen beantwortet`:
+      `${r} von ${CHECK.length} richtig. `+(r>=CHECK.length-1?'Stark – weiter zu den <a href="#aufgaben">Aufgaben</a>!':'Lies die Erklärungen und schau dir den Teil <a href="#wissen">Wissen</a> noch einmal an.');
+    $('#checkBar').style.width=(100*r/CHECK.length)+'%';};
+  stand();
+  $('#checkNeu').onclick=()=>{for(const k in ant)delete ant[k];store.set('check',ant);baueCheck()};
+}
+
+// ---------- Aufgaben ----------
+const STUFE={1:'Einstieg',2:'Training',3:'Profi'};
+function baueAufgaben(){
+  const box=$('#aufgListe');if(!box)return;
+  const fertig=new Set(store.get('fertig',[]));
+  box.innerHTML=AUFGABEN.map((a,n)=>`<article class="aufg${fertig.has(a.id)?' geloest':''}" id="a-${a.id}" data-s="${a.s}">
+    <div class="kopf"><span class="tag s${a.s}">${STUFE[a.s]}</span><h3>${n+1}. ${a.t}</h3><span class="haken">✓ gelöst</span></div>
+    <div class="txt">${a.text}</div>${a.fig?`<figure class="figure">${a.fig}<figcaption>Skizze, nicht maßstabsgetreu</figcaption></figure>`:''}
+    <div class="felder">${a.felder.map((f,i)=>f.k==='wahl'
+      ?`<div class="feld" data-i="${i}"><span>${f.l||''}</span><div class="wahl">${f.o.map((o,j)=>`<button type="button" data-j="${j}">${o}</button>`).join('')}</div></div>`
+      :`<label class="feld" data-i="${i}"><span>${f.l||''}</span><input ${f.k==='bruch'?'inputmode="text" placeholder="z. B. 3/4"':'inputmode="decimal"'} autocomplete="off"><span>${f.e||''}</span></label>`).join('')}</div>
+    <div class="knoepfe"><button class="primary pr">Prüfen</button>${a.tipps&&a.tipps.length?`<button class="btn-tip tp">Tipp 1</button>`:''}<button class="btn-sol ls">Lösung</button></div>
+    <div class="fb"></div><div class="tipps"></div><div class="loesung" hidden>${a.loes}</div></article>`).join('');
+  $$('.aufg',box).forEach(art=>{
+    const a=AUFGABEN.find(x=>'a-'+x.id===art.id);
+    $$('.wahl',art).forEach(w=>$$('button',w).forEach(b=>b.onclick=()=>{$$('button',w).forEach(x=>x.classList.remove('an','ok','bad'));b.classList.add('an')}));
+    $$('input',art).forEach(inp=>inp.addEventListener('keydown',e=>{if(e.key==='Enter')$('.pr',art).click()}));
+    $('.pr',art).onclick=()=>{
+      let ok=0,kuerzen=false,leer=false;
+      a.felder.forEach((f,i)=>{const feld=$(`.feld[data-i="${i}"]`,art);let r=false;
+        if(f.k==='wahl'){const b=$('.wahl button.an',feld);if(!b){leer=true;return}r=+b.dataset.j===f.r;b.classList.remove('ok','bad');b.classList.add(r?'ok':'bad')}
+        else{const inp=$('input',feld),v=inp.value.trim();inp.classList.remove('ok','bad');if(!v){leer=true;return}
+          if(f.k==='bruch'){const b=leseBruch(v),[rz,rn]=f.r;
+            if(b&&b[1]&&b[0]*rn===b[1]*rz){if(ggT(b[0],b[1])===1)r=true;else kuerzen=true}
+            else if(!b&&Math.abs(zahl(v)-rz/rn)<1e-9)kuerzen=true;}
+          else{const x=zahl(v);r=Math.abs(x-f.r)<=(f.tol??0.011)}
+          inp.classList.add(r?'ok':'bad')}
+        if(r)ok++;});
+      const fb=$('.fb',art),n=a.felder.length;
+      if(ok===n){fb.className='fb ok';fb.textContent='✓ Richtig! Super gemacht.';fertig.add(a.id);store.set('fertig',[...fertig]);art.classList.add('geloest');fortschritt()}
+      else{fb.className='fb bad';fb.textContent=kuerzen?'Fast! Schreibe das Ergebnis als vollständig gekürzten Bruch, z. B. 3/4.':leer?'Fülle zuerst alle Felder aus.':(n>1?`${ok} von ${n} richtig. `:'Noch nicht richtig. ')+(a.tipps&&a.tipps.length?'Hol dir einen Tipp.':'Rechne noch einmal nach.')}
+    };
+    const tp=$('.tp',art);let t=0;
+    if(tp)tp.onclick=()=>{$('.tipps',art).insertAdjacentHTML('beforeend',`<div class="tippbox"><b>Tipp ${t+1}:</b> ${a.tipps[t]}</div>`);t++;
+      if(t<a.tipps.length)tp.textContent='Tipp '+(t+1);else{tp.disabled=true;tp.textContent='keine Tipps mehr'}};
+    $('.ls',art).onclick=()=>{const l=$('.loesung',art);l.hidden=!l.hidden;$('.ls',art).textContent=l.hidden?'Lösung':'Lösung ausblenden'};
+  });
+  // Filter
+  let filter=store.get('filter','alle');
+  const fl=$('#filter');
+  fl.innerHTML=['alle',1,2,3].map(s=>`<button data-s="${s}">${s==='alle'?'Alle':STUFE[s]}</button>`).join('');
+  const setze=()=>{$$('button',fl).forEach(b=>b.classList.toggle('an',b.dataset.s==String(filter)));$$('.aufg',box).forEach(x=>x.hidden=filter!=='alle'&&x.dataset.s!=String(filter))};
+  $$('button',fl).forEach(b=>b.onclick=()=>{filter=b.dataset.s==='alle'?'alle':+b.dataset.s;store.set('filter',filter);setze()});
+  setze();
+  function fortschritt(){const n=AUFGABEN.filter(a=>fertig.has(a.id)).length;
+    $('#aufgStand').textContent=`${n} von ${AUFGABEN.length} Aufgaben gelöst`+(n===AUFGABEN.length?' – alles geschafft! 🎉':'');
+    $('#aufgBar').style.width=(100*n/AUFGABEN.length)+'%';}
+  fortschritt();
+}
+
+$('#reset').onclick=()=>{if(confirm('Fortschritt auf diesem Gerät löschen?')){['check','fertig','filter'].forEach(k=>{try{localStorage.removeItem(SEITE.key+k)}catch(e){}});location.reload()}};
+
+baueCheck();baueAufgaben();
+if(typeof init==='function')init();
+route();
+</script>
+</body>
+</html>
