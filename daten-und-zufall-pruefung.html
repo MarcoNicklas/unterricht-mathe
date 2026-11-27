@@ -352,6 +352,111 @@ const PRUEFUNGEN = [
     ],
     loesung:[ R`P(E_3)=0,83\cdot0,90\cdot0,30`, R`\qquad\ +\,0,83\cdot0,90\cdot0,64`, R`P(E_3)=0,2241+0,47808`, R`P(E_3)=0,70218\approx70,22\,\%` ]}
   ]
+},
+{
+  id:'ap2022-dz', tag:'AP 2022', titel:'Glücksrad, Farbstifte und Schwimmkurs', bild:B+'ap22_kreis_loesung.png', wb:1,
+  teilA: R`Teil A ohne Taschenrechner · Wahlblock 1`,
+  teilB: R`Laut einem Zeitungsartikel können immer weniger Kinder gut schwimmen. Deshalb plant man an einer Wirtschaftsschule Schwimmkurse anzubieten. Um sich einen Überblick über die Schwimmfähigkeiten zu verschaffen, wurden 200 Schülerinnen und Schüler der Jahrgangsstufen 6 bis 9 befragt. Die Ergebnisse sind in der folgenden Tabelle aufgelistet.
+  <table class="dt"><tr><th>Schwimmfähigkeit</th><th>6a</th><th>6b</th><th>7a</th><th>7b</th><th>8a</th><th>8b</th><th>9a</th><th>9b</th><th>SUMME</th></tr>
+  <tr><td>Nichtschwimmer</td><td>5</td><td>4</td><td>2</td><td>4</td><td>–</td><td>1</td><td>2</td><td>–</td><td><b>18</b></td></tr>
+  <tr class="pk"><td>Anfänger</td><td>6</td><td>7</td><td>7</td><td>2</td><td>4</td><td>7</td><td>3</td><td>6</td><td><b>42</b></td></tr>
+  <tr><td>Fortgeschrittene</td><td>15</td><td>14</td><td>15</td><td>19</td><td>20</td><td>19</td><td>20</td><td>18</td><td><b>140</b></td></tr></table>`,
+  aufgaben:[
+  { teil:'A', nr:'1.1', punkte:1,
+    vortext: R`Ein Glücksrad hat 15 gleich große Felder mit verschiedenen Musterungen. Die Wahrscheinlichkeit, dass das Glücksrad bei einmaligem Drehen auf einer bestimmten Musterung stehen bleibt, liegt bei 40 %.`,
+    text: R`Bestimmen Sie rechnerisch die Anzahl der Felder mit dieser Musterung.`,
+    bild: B+'ap22_gluecksrad.png',
+    felder:[{key:'n',label:'Anzahl:',wert:6,einheit:'Felder'}],
+    tipps:[
+      R`Die Wahrscheinlichkeit ist der Anteil der passenden Felder an allen \(15\) Feldern.`,
+      R`\(40\,\%=0,4\). Rechne \(15\cdot 0,4\) – oder im Kopf: \(10\,\%\) von 15 sind \(1,5\), also sind \(40\,\%\) …`
+    ],
+    loesung:[ R`\text{Anzahl der Felder}=15\cdot0,4=6` ]},
+  { teil:'A', nr:'1.2', punkte:2,
+    vortext: R`In einem Behälter liegen zwölf Farbstifte. Bei vier Stiften ist die Mine eingetrocknet. Franz zieht nacheinander zwei Farbstifte und legt diese nicht mehr zurück.`,
+    text: R`Tragen Sie im Baumdiagramm die fehlenden Übergangswahrscheinlichkeiten ein.`,
+    bild: B+'ap22_stifte_leer.png',
+    eingabe: R`Brüche mit / eingeben (z. B. 8/12)`,
+    felder:[{key:'f1',label:'1. Zug funktionsfähig:',wert:8/12},{key:'d1',label:'1. Zug defekt:',wert:4/12},{key:'f2',label:'2. Zug funktionsfähig (nach defekt):',wert:8/11},{key:'d2',label:'2. Zug defekt (nach defekt):',wert:3/11}],
+    tipps:[
+      R`Von den 12 Stiften sind 4 defekt und \(12-4=8\) funktionsfähig. Damit hast du die 1. Stufe.`,
+      R`Ohne Zurücklegen: Nach dem 1. Zug liegen nur noch \(11\) Stifte im Behälter.`,
+      R`Wurde zuerst ein <b>defekter</b> Stift gezogen, sind noch \(3\) defekte und \(8\) funktionsfähige da.`
+    ],
+    loesung:[ R`\text{1. Zug: funktionsfähig } \frac{8}{12}\qquad \text{defekt } \frac{4}{12}`, R`\text{2. Zug (nach defekt): funktionsfähig } \frac{8}{11}\qquad \text{defekt } \frac{3}{11}` ],
+    loesungBild: B+'ap22_stifte_loesung.png'},
+  { teil:'A', nr:'1.3', punkte:1,
+    vortext: R`Zehn Schülerinnen und Schüler einer Projektgruppe benutzen je nach Entfernung ihres Wohnortes zur Schule verschiedene Verkehrsmittel auf ihrem Schulweg (siehe Tabelle).
+      <table class="dt"><tr><th></th><th>&lt; 1 km</th><th>1 km – 3 km</th><th>&gt; 3 km</th></tr><tr><th>U-Bahn / Bus</th><td>–</td><td>2</td><td>3</td></tr><tr class="pk"><th>Fahrrad</th><td>1</td><td>1</td><td>–</td></tr><tr><th>zu Fuß</th><td>2</td><td>1</td><td>–</td></tr></table>`,
+    text: R`Bestimmen Sie die relative Häufigkeit des Ereignisses E: „Eine Schülerin oder ein Schüler kommt ohne Fahrrad zur Schule und der Schulweg ist höchstens 3 km lang.“`,
+    felder:[{key:'h',label:R`\(h(E)=\)`,wert:0.5}],
+    hinweisFelder:'als Dezimalzahl oder Bruch',
+    tipps:[
+      R`„Ohne Fahrrad“: nur die Zeilen U-Bahn/Bus und zu Fuß. „Höchstens 3 km“: nur die Spalten „&lt; 1 km“ und „1 km – 3 km“.`,
+      R`Passend sind: Bus \(0+2\) und zu Fuß \(2+1\). Teile die Summe durch alle \(10\) Schülerinnen und Schüler.`
+    ],
+    loesung:[ R`h(E)=\frac{2+2+1}{10}=\frac{5}{10}=0,5=50\,\%` ]},
+  { teil:'B', nr:'4.1', punkte:2,
+    text: R`Berechnen Sie die prozentuale relative Häufigkeit des Ereignisses \(E_1\): „Eine Schülerin oder ein Schüler hat keine fortgeschrittene Schwimmfähigkeit.“`,
+    felder:[{key:'h',label:R`\(h(E_1)=\)`,wert:30,tol:0.006,einheit:'%'}],
+    tipps:[
+      R`„Keine fortgeschrittene Schwimmfähigkeit“: Nichtschwimmer <b>und</b> Anfänger zusammen.`,
+      R`\(18+42=60\) von \(200\) Befragten. \(h(E_1)=\dfrac{60}{200}\), mal 100 ergibt Prozent.`
+    ],
+    loesung:[ R`h(E_1)=\frac{18+42}{200}=\frac{60}{200}=0,30=30\,\%` ]},
+  { teil:'B', nr:'4.2', punkte:4,
+    vortext: R`Um dem Schulleiter die Schwimmfähigkeiten der Kinder an der Wirtschaftsschule zu veranschaulichen, werden die Zahlen grafisch aufbereitet.`,
+    text: R`Erstellen Sie ein Kreisdiagramm der jeweiligen Schwimmfähigkeit der befragten 200 Schülerinnen und Schüler.`,
+    bild: B+'ap22_kreis_leer.png',
+    eingabe: R`Berechne die Winkel (eine Nachkommastelle) und zeichne dann auf Papier:`,
+    felder:[{key:'wn',label:'Nichtschwimmer:',wert:32.4,tol:0.06,einheit:'°'},{key:'wa',label:'Anfänger:',wert:75.6,tol:0.06,einheit:'°'},{key:'wf',label:'Fortgeschrittene:',wert:252,tol:0.06,einheit:'°'}],
+    tipps:[
+      R`Winkel \(=\) relative Häufigkeit \(\cdot 360^\circ\). Die Gesamtzahl ist \(200\).`,
+      R`Nichtschwimmer: \(\dfrac{18}{200}\cdot360^\circ\). Genauso für Anfänger (42) und Fortgeschrittene (140).`,
+      R`Probe: Alle drei Winkel zusammen ergeben \(360^\circ\). Zeichne mit dem Geodreieck und beschrifte jedes Kreisstück.`
+    ],
+    loesung:[ R`\text{Nichtschwimmer: } \frac{18}{200}\cdot360^\circ=32,4^\circ`, R`\text{Anfänger: } \frac{42}{200}\cdot360^\circ=75,6^\circ`, R`\text{Fortgeschrittene: } \frac{140}{200}\cdot360^\circ=252^\circ` ],
+    loesungBild: B+'ap22_kreis_loesung.png'},
+  { teil:'B', nr:'4.3', punkte:3,
+    vortext: R`Die acht besten Schwimmerinnen und Schwimmer nehmen an einem Schwimmwettbewerb über 50 m Freistil teil. Die Zeiten in Sekunden sind in untenstehender Tabelle aufgelistet.
+      <table class="dt"><tr><th>Name</th><td>Karin</td><td>Tom</td><td>Lena</td><td>Luca</td><td>Elif</td><td>Ralf</td><td>Ylenia</td><td>Anton</td></tr><tr><th>Zeit in s</th><td>52,6</td><td>57,8</td><td>51,4</td><td>53,7</td><td>55,1</td><td>57,6</td><td>55,3</td><td>58,9</td></tr></table>`,
+    text: R`Ermitteln Sie das arithmetische Mittel und den Median der Schwimmzeiten aller acht Teilnehmerinnen und Teilnehmer.`,
+    felder:[{key:'m',label:R`\(\bar x=\)`,wert:55.3,tol:0.006,einheit:'s'},{key:'med',label:R`\(x_{med}=\)`,wert:55.2,tol:0.006,einheit:'s'}],
+    tipps:[
+      R`Ordne die acht Zeiten zuerst der Größe nach: \(51,4;\ 52,6;\ \dots\)`,
+      R`Arithmetisches Mittel: alle Zeiten addieren (Summe \(442,4\)) und durch \(8\) teilen.`,
+      R`Bei acht Werten ist der Median der Mittelwert aus dem 4. und 5. Wert der geordneten Liste.`
+    ],
+    loesung:[ R`\text{Geordnet: } 51,4;\,52,6;\,53,7;\,\mathbf{55,1};\,\mathbf{55,3};\,57,6;\,57,8;\,58,9`, R`\bar x=\frac{442,4}{8}=55,3\text{ Sekunden}`, R`x_{med}=\frac{55,1+55,3}{2}=55,2\text{ Sekunden}` ]},
+  { teil:'B', nr:'4.4', punkte:3,
+    vortext: R`Für den Schwimmkurs der 18 Nichtschwimmer werden drei gleich große Gruppen gebildet und den Lehrkräften Frau Sommer (S), Herrn Herbst (H) und Herrn Winter (W) jeden Tag neu zugelost. Der Schwimmkurs findet an zwei Tagen statt. Aufgrund einer Erkrankung von Herrn Herbst müssen am zweiten Tag die 18 Nichtschwimmer auf zwei gleich große Gruppen den Lehrkräften Frau Sommer und Herrn Winter zugeteilt werden.`,
+    text: R`Fertigen Sie zu dem Zufallsexperiment „Schülerverteilung auf die jeweiligen Lehrkräfte beim Schwimmkurs“ ein passendes Baumdiagramm an und tragen Sie die entsprechenden Übergangswahrscheinlichkeiten ein.`,
+    eingabe: R`Zeichne auf Papier und trage ein:`,
+    felder:[{key:'t1',label:'Tag 1, je Lehrkraft:',wert:1/3},{key:'t2',label:'Tag 2, je Lehrkraft:',wert:0.5},{key:'n',label:'Anzahl Pfade:',wert:6}],
+    tipps:[
+      R`Zwei Tage → zwei Stufen. Am 1. Tag gibt es drei Äste (S, H, W), am 2. Tag nur noch zwei (S, W).`,
+      R`Drei gleich große Gruppen: jede Lehrkraft hat die Wahrscheinlichkeit \(\dfrac{1}{3}\). Am 2. Tag bei zwei Gruppen: \(\dfrac{1}{2}\).`,
+      R`Von jedem der drei Äste gehen zwei Äste weiter: \(3\cdot2\) Pfade.`
+    ],
+    loesung:[ R`\text{Tag 1: } P(S)=P(H)=P(W)=\frac{1}{3}`, R`\text{Tag 2: } P(S)=P(W)=\frac{1}{2}`, R`3\cdot2=6\text{ Pfade}` ],
+    loesungBild: B+'ap22_baum_schwimm.png'},
+  { teil:'B', nr:'4.5', punkte:1,
+    text: R`Berechnen Sie die Wahrscheinlichkeit für das Ereignis \(E_2\): „Eine Schülerin oder ein Schüler hat an allen Projekttagen Schwimmunterricht bei Frau Sommer“.`,
+    felder:[{key:'p',label:R`\(P(E_2)=\)`,wert:16.67,tol:0.006,einheit:'%'}],
+    hinweisFelder:'in Prozent, zwei Nachkommastellen',
+    tipps:[ R`Es gehört nur <b>ein</b> Pfad dazu: S – S. 1. Pfadregel: multiplizieren.`, R`\(\dfrac{1}{3}\cdot\dfrac{1}{2}=\dfrac{1}{6}\). Mal 100 ergibt Prozent.` ],
+    loesung:[ R`P(E_2)=P(S;S)=\frac{1}{3}\cdot\frac{1}{2}=\frac{1}{6}\approx0,1667=16,67\,\%` ]},
+  { teil:'B', nr:'4.6', punkte:2,
+    text: R`Berechnen Sie die Wahrscheinlichkeit für das Ereignis \(E_3\): „Eine Schülerin oder ein Schüler wird in den Projekttagen höchstens einmal von Herrn Winter unterrichtet“.`,
+    felder:[{key:'p',label:R`\(P(E_3)=\)`,wert:83.33,tol:0.006,einheit:'%'}],
+    hinweisFelder:'in Prozent, zwei Nachkommastellen',
+    tipps:[
+      R`„Höchstens einmal Winter“ heißt: keinmal oder einmal. Das sind viele Pfade – einfacher geht es mit dem Gegenereignis.`,
+      R`Gegenereignis: „zweimal Winter“, also nur der Pfad W – W mit \(\dfrac{1}{3}\cdot\dfrac{1}{2}=\dfrac{1}{6}\).`,
+      R`\(P(E_3)=1-\dfrac{1}{6}\). Mal 100 ergibt Prozent.`
+    ],
+    loesung:[ R`P(E_3)=1-P(W;W)=1-\frac{1}{3}\cdot\frac{1}{2}=\frac{5}{6}\approx0,8333=83,33\,\%` ]}
+  ]
 }
 ];
 
@@ -402,7 +507,7 @@ const app=document.getElementById('app');
 function renderHome(){
   history.replaceState(null,'',location.pathname+location.search);
   let h=`<p class="intro">Wähle eine Abschlussprüfung. Rechne zuerst selbst auf Papier und trage dann deine Ergebnisse ein. Wenn du nicht weiterkommst, hol dir Schritt für Schritt einen <b>Tipp</b>. Die vollständige <b>Lösung</b> wird freigeschaltet, wenn du richtig gerechnet oder alle Tipps angesehen hast.</p>
-  <p class="intro"><b>Teil A</b> (Wahlblock 2) rechnest du in der Prüfung <b>ohne</b> Taschenrechner, <b>Teil B</b> (Aufgabe 4) mit Taschenrechner.</p><div class="grid">`;
+  <p class="intro"><b>Teil A</b> (Wahlblock) rechnest du in der Prüfung <b>ohne</b> Taschenrechner, <b>Teil B</b> (Aufgabe 4) mit Taschenrechner.</p><div class="grid">`;
   PRUEFUNGEN.forEach((ex,i)=>{
     const s=examScore(ex);
     h+=`<button class="exam-card" onclick="openExam(${i})">
@@ -424,13 +529,13 @@ function openExam(i,teil){
   let h=`<button class="back" onclick="renderHome()">← Alle Prüfungen</button>
   <div class="panel"><span class="tag">${ex.tag}</span> <span class="meta" id="examScore">Punkte: <b>${s.p}</b> / ${s.max}</span>
   <h2 style="margin:6px 0 8px">Daten und Zufall – ${ex.titel}</h2>
-  <div class="jump"><a href="#" onclick="jump('A');return false">Teil A · Wahlblock 2</a><a href="#" onclick="jump('B');return false">Teil B · Aufgabe 4</a></div></div>`;
+  <div class="jump"><a href="#" onclick="jump('A');return false">Teil A · Wahlblock ${ex.wb||2}</a><a href="#" onclick="jump('B');return false">Teil B · Aufgabe 4</a></div></div>`;
   let last='';
   ex.aufgaben.forEach((a,k)=>{
     if(a.teil!==last){
       last=a.teil;
       h+= a.teil==='A'
-        ? `<h2 class="teil" id="teilA">Teil A · Wahlblock 2 – Daten und Zufall <span class="meta">ohne Taschenrechner</span></h2>`
+        ? `<h2 class="teil" id="teilA">Teil A · Wahlblock ${ex.wb||2} – Daten und Zufall <span class="meta">ohne Taschenrechner</span></h2>`
         : `<h2 class="teil" id="teilB">Teil B · Aufgabe 4 – Daten und Zufall <span class="meta">mit Taschenrechner</span></h2><div class="panel">${ex.teilB}</div>`;
     }
     h+=`<div class="task" id="t${k}"></div>`;

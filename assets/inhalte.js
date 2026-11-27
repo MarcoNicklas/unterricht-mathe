@@ -58,7 +58,8 @@ const ABSCHLUSS = [
       { id: "pruef-strat",   titel: "Was ist zu tun? Anwendungsaufgaben richtig anpacken", link: "funktionaler-zusammenhang.html#strategie",  art: "Strategie" , ap: true, kann: "Ich weiß, wie ich eine Anwendungsaufgabe anpacke." },
       { id: "pruef-funk",    titel: "Prüfungsaufgaben zu Parabeln und Geraden", link: "quadratische_funktionen.html#s5",           art: "Prüfung" , ap: true, kann: "Ich kann Prüfungsaufgaben zu Parabeln und Geraden lösen." },
       { id: "pruef-ap2025",  titel: "AP 2025: Torbogen mit Skywalk",            link: "funktionaler-zusammenhang.html#ap2025-torbogen", art: "Abschlussprüfung" , ap: true, kann: "Ich habe die AP 2025 (Torbogen mit Skywalk) gerechnet." },
-      { id: "pruef-ap2024",  titel: "AP 2024: Minigolf mit Fangnetz",           link: "funktionaler-zusammenhang.html#ap2024-minigolf", art: "Abschlussprüfung" , ap: true, kann: "Ich habe die AP 2024 (Minigolf mit Fangnetz) gerechnet." }
+      { id: "pruef-ap2024",  titel: "AP 2024: Minigolf mit Fangnetz",           link: "funktionaler-zusammenhang.html#ap2024-minigolf", art: "Abschlussprüfung" , ap: true, kann: "Ich habe die AP 2024 (Minigolf mit Fangnetz) gerechnet." },
+      { id: "pruef-ap2022",  titel: "AP 2022: Glastunnel mit Rolltreppe",           link: "funktionaler-zusammenhang.html#ap2022-glastunnel", art: "Abschlussprüfung" , ap: true, kann: "Ich habe die AP 2022 (Glastunnel mit Rolltreppe) gerechnet." }
     ]
   },
   {
@@ -90,7 +91,8 @@ const ABSCHLUSS = [
       { id: "dz-urne",   titel: "Mit und ohne Zurücklegen",                                          link: "daten-und-zufall.html#k6", art: "Kapitel 6", kann: "Ich kann Aufgaben mit und ohne Zurücklegen lösen." },
       { id: "dz-train",  titel: "Training und Übersicht",                                            link: "daten-und-zufall.html#training", art: "Training" , ap: true, kann: "Ich kann gemischte Aufgaben zu Daten und Zufall lösen." },
       { id: "dz-ap2025", titel: "AP 2025: Socken, Bildschirmzeit und Darts-WM (Teil A + B)",          link: "daten-und-zufall-pruefung.html#ap2025-dz", art: "Abschlussprüfung" , ap: true, kann: "Ich habe die AP 2025 Daten und Zufall gerechnet." },
-      { id: "dz-ap2024", titel: "AP 2024: Freibad und Hochzeiten (Teil A + B)",                        link: "daten-und-zufall-pruefung.html#ap2024-dz", art: "Abschlussprüfung" , ap: true, kann: "Ich habe die AP 2024 Daten und Zufall gerechnet." }
+      { id: "dz-ap2024", titel: "AP 2024: Freibad und Hochzeiten (Teil A + B)",                        link: "daten-und-zufall-pruefung.html#ap2024-dz", art: "Abschlussprüfung" , ap: true, kann: "Ich habe die AP 2024 Daten und Zufall gerechnet." },
+      { id: "dz-ap2022", titel: "AP 2022: Glücksrad, Farbstifte und Schwimmkurs (Teil A + B)",                        link: "daten-und-zufall-pruefung.html#ap2022-dz", art: "Abschlussprüfung" , ap: true, kann: "Ich habe die AP 2022 Daten und Zufall gerechnet." }
     ]
   }
 ];
@@ -208,9 +210,9 @@ const PRUEFUNG = {
     hinweis: "60 Punkte = 4 Aufgaben zu je 15 Punkten. Welche Aufgaben du bearbeitest, sagt dir deine Lehrkraft.",
     aufgaben: [
       { nr: 1, titel: "Finanzmathematik",          inhalt: "Zinseszins, Tilgungsplan, Annuität, Rente",         themen: [] },
-      { nr: 2, titel: "Funktionaler Zusammenhang", inhalt: "Parabeln und Geraden in Sachaufgaben",              themen: ["pruef-strat", "pruef-ap2025", "pruef-ap2024", "pruef-funk", "lin-sach"] },
+      { nr: 2, titel: "Funktionaler Zusammenhang", inhalt: "Parabeln und Geraden in Sachaufgaben",              themen: ["pruef-strat", "pruef-ap2025", "pruef-ap2024", "pruef-ap2022", "pruef-funk", "lin-sach"] },
       { nr: 3, titel: "Trigonometrie",             inhalt: "Längen und Winkel in Dreiecken, Steigung in %",     themen: [] },
-      { nr: 4, titel: "Daten und Zufall",          inhalt: "Häufigkeiten, Kennzahlen, Diagramme, Baumdiagramm", themen: ["dz-ap2025", "dz-ap2024", "dz-train"] },
+      { nr: 4, titel: "Daten und Zufall",          inhalt: "Häufigkeiten, Kennzahlen, Diagramme, Baumdiagramm", themen: ["dz-ap2025", "dz-ap2024", "dz-ap2022", "dz-train"] },
       { nr: 5, titel: "Raum und Form",             inhalt: "Pyramide, Kegel, Zylinder, Kugel – Volumen und Oberfläche", themen: ["ruf-pruef"] }
     ]
   }

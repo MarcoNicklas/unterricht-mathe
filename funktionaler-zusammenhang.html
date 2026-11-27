@@ -362,6 +362,88 @@ const PRUEFUNGEN = [
       R`\Rightarrow \text{Der Ball fliegt ins Netz.}`
     ]}
   ]
+},
+{
+  id:'ap2022-glastunnel', tag:'AP 2022', titel:'Glastunnel mit Rolltreppe', bild:'assets/fz-ap/ap22_glastunnel.png',
+  intro: R`Für die Präsentation einer modernen Magnetschwebebahn wird ein Glastunnel inklusive Besucherplattform aufgebaut. Die Form des Glastunnels ist parabelförmig und wird durch den Scheitel \(S(5\mid 5,25)\) und den Punkt \(A(2\mid 3)\) beschrieben.<br><i>Alle Angaben in Meter. Die Skizze ist nicht maßstabsgetreu.</i>`,
+  aufgaben:[
+  { nr:'2.1', punkte:3,
+    text: R`Ermitteln Sie die Funktionsgleichung \(p\) des parabelförmigen Tunnels in allgemeiner Form.`,
+    ergebnis: R`(Ergebnis: \(p:\ y=-0,25x^2+2,5x-1\))`,
+    eingabe: R`\(p:\ y=a\,x^2+b\,x+c\)`,
+    felder:[{key:'a',label:'a =',wert:-0.25},{key:'b',label:'b =',wert:2.5},{key:'c',label:'c =',wert:-1}],
+    tipps:[
+      R`Du kennst den Scheitel – starte mit der Scheitelform \(y=a\cdot(x-x_S)^2+y_S\), also \(y=a\cdot(x-5)^2+5,25\).`,
+      R`Setze \(A(2\mid3)\) ein: \(3=a\cdot(2-5)^2+5,25\ \Rightarrow\ -2,25=9a\). So bekommst du \(a\).`,
+      R`Mit \(a=-0,25\): \(y=-0,25\cdot(x-5)^2+5,25\). Löse die Klammer mit der binomischen Formel auf: \((x-5)^2=x^2-10x+25\).`
+    ],
+    loesung:[
+      R`A \text{ in Scheitelform: } 3=a\cdot(2-5)^2+5,25`,
+      R`-2,25=9a\ \Rightarrow\ a=-0,25`,
+      R`y=-0,25\cdot(x-5)^2+5,25=-0,25\cdot(x^2-10x+25)+5,25`,
+      R`p:\ y=-0,25x^2+2,5x-1`
+    ]},
+  { nr:'2.2', punkte:4,
+    vortext: R`Der Hersteller des Glastunnels gibt dessen Spannweite \(\overline{DE}\) mit 9,16 m an.`,
+    text: R`Überprüfen Sie rechnerisch diesen Wert.`,
+    felder:[{key:'x1',label:R`\(x_1=\)`,wert:0.42,tol:0.006},{key:'x2',label:R`\(x_2=\)`,wert:9.58,tol:0.006},{key:'w',label:R`\(\overline{DE}=\)`,wert:9.16,tol:0.006,einheit:'m'},{key:'ok',label:'Angabe korrekt?',typ:'wahl',optionen:['ja','nein'],wert:'ja'}],
+    hinweisFelder:'x₁ = kleinere, x₂ = größere Nullstelle, zwei Nachkommastellen',
+    tipps:[
+      R`Die Spannweite ist der Abstand der beiden Fußpunkte \(D\) und \(E\). Dort ist \(y=0\) – du suchst die <b>Nullstellen</b>: \(0=-0,25x^2+2,5x-1\).`,
+      R`Lösungsformel mit \(a=-0,25;\ b=2,5;\ c=-1\): \(x_{1/2}=\dfrac{-2,5\pm\sqrt{2,5^2-4\cdot(-0,25)\cdot(-1)}}{2\cdot(-0,25)}\). Unter der Wurzel: \(6,25-1=5,25\).`,
+      R`\(x_1\approx0,42\) und \(x_2\approx9,58\). Spannweite \(=x_2-x_1\). Vergleiche mit 9,16 m.`
+    ],
+    loesung:[
+      R`0=-0,25x^2+2,5x-1`,
+      R`x_{1/2}=\frac{-2,5\pm\sqrt{2,5^2-4\cdot(-0,25)\cdot(-1)}}{2\cdot(-0,25)}`,
+      R`x_1\approx0,42\ \wedge\ x_2\approx9,58`,
+      R`\overline{DE}=9,58\text{ m}-0,42\text{ m}=9,16\text{ m}`,
+      R`\Rightarrow \text{Die Angabe des Herstellers ist korrekt.}`
+    ]},
+  { nr:'2.3', punkte:3,
+    vortext: R`Eine geradlinig verlaufende Rolltreppe \(g\) durch die Punkte \(B(-4\mid 1)\) und \(C(8\mid 7)\) führt zu einer Besucherplattform.`,
+    text: R`Berechnen Sie die Funktionsgleichung der Rolltreppe \(g\).`,
+    ergebnis: R`(Ergebnis: \(g:\ y=0,5x+3\))`,
+    eingabe: R`\(g:\ y=m\,x+t\)`,
+    felder:[{key:'m',label:'m =',wert:0.5},{key:'t',label:'t =',wert:3}],
+    tipps:[
+      R`Steigung: \(m=\dfrac{y_2-y_1}{x_2-x_1}\) mit \(B(-4\mid1)\) und \(C(8\mid7)\).`,
+      R`\(m=\dfrac{7-1}{8-(-4)}=\dfrac{6}{12}\). Achtung bei \(-(-4)\)!`,
+      R`Setze \(m=0,5\) und \(C(8\mid7)\) in \(y=mx+t\) ein: \(7=0,5\cdot8+t\).`
+    ],
+    loesung:[
+      R`m=\frac{7-1}{8-(-4)}=\frac{6}{12}=0,5`,
+      R`C \text{ in } g:\ 7=0,5\cdot8+t\ \Rightarrow\ t=3`,
+      R`g:\ y=0,5x+3`
+    ]},
+  { nr:'2.4', punkte:3,
+    text: R`Zeigen Sie rechnerisch, dass die Rolltreppe auf dem Glastunnel aufliegt.`,
+    felder:[{key:'d',label:R`\(D=\)`,wert:0},{key:'x',label:'Berührpunkt bei x =',wert:4},{key:'ok',label:'Liegt die Rolltreppe auf?',typ:'wahl',optionen:['ja','nein'],wert:'ja'}],
+    tipps:[
+      R`„Aufliegen“ heißt: Gerade und Parabel haben genau <b>einen</b> gemeinsamen Punkt. Setze gleich: \(-0,25x^2+2,5x-1=0,5x+3\).`,
+      R`Alles auf eine Seite: \(-0,25x^2+2x-4=0\). Berechne die Diskriminante \(D=b^2-4ac\) mit \(a=-0,25;\ b=2;\ c=-4\).`,
+      R`\(D=4-4=0\) → genau eine Lösung: \(x=\dfrac{-2}{2\cdot(-0,25)}\).`
+    ],
+    loesung:[
+      R`-0,25x^2+2,5x-1=0,5x+3`,
+      R`-0,25x^2+2x-4=0`,
+      R`D=2^2-4\cdot(-0,25)\cdot(-4)=4-4=0`,
+      R`D=0\ \Rightarrow\ \text{genau ein gemeinsamer Punkt (Berührpunkt bei } x=4)`,
+      R`\Rightarrow \text{Die Rolltreppe liegt auf dem Glastunnel auf.}`
+    ]},
+  { nr:'2.5', punkte:2,
+    vortext: R`Die Besucherplattform wird auf beiden Seiten durch senkrechte Säulen gestützt.`,
+    text: R`Bestimmen Sie rechnerisch die Länge der Säule \(s_1\).`,
+    felder:[{key:'s',label:R`\(s_1=\)`,wert:4,einheit:'m'}],
+    tipps:[
+      R`Die Säule \(s_1\) steht bei \(x=8\) (unter \(C\)). Sie reicht vom Glastunnel bis zur Plattform in 7 m Höhe.`,
+      R`Höhe des Tunnels bei \(x=8\): \(y=-0,25\cdot8^2+2,5\cdot8-1\). Danach \(7\text{ m}-y\).`
+    ],
+    loesung:[
+      R`y=-0,25\cdot8^2+2,5\cdot8-1=3`,
+      R`s_1=7\text{ m}-3\text{ m}=4\text{ m}`
+    ]}
+  ]
 }
 ];
 

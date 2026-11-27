@@ -27,5 +27,6 @@ Der Aufbau und die Pflege von Inhalten stehen in README.md.
 - Klassen: vierstufig 6, 7, 8, 9, V10 · zweistufig Z10, Z11. V10 und Z11 haben denselben Stoff (`ABSCHLUSS` in inhalte.js).
 - Prüfungsvorbereitung (Teil A/B, Teil A üben) nur in V10 und Z11 (`pruefung: true`).
 - V10/Z11: lineare und quadratische Funktionen, Prüfungsaufgaben Funktionen, Raum und Form, Daten und Zufall.
+- Prüfungstrainer (funktionaler-zusammenhang.html, daten-und-zufall-pruefung.html): AP 2025, 2024, 2022. Bilder in assets/dz-ap und assets/fz-ap.
 - Klasse 7 und 9: eigene Lernseiten (bruch-prozent-dreisatz.html, pythagoras-trigonometrie.html, strahlensatz.html), keine Links mehr nach außen. Klassen 6, 8, Z10: noch leer (Rechentest-Training gibt es für alle).
 - Format: Startseite nur Klassenwahl (kompakt, Handy), in der Klasse Wege als große Knöpfe (Stand 05.11.).
